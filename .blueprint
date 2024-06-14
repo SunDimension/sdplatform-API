@@ -1,0 +1,328 @@
+created:
+    - app/Http/Controllers/ItemCategoryController.php
+    - app/Http/Controllers/CreateItemController.php
+    - app/Http/Controllers/DimensionController.php
+    - app/Http/Controllers/RolesController.php
+    - app/Http/Controllers/AdjustmentTypeController.php
+    - app/Http/Controllers/WeightController.php
+    - app/Http/Controllers/ItemTypeController.php
+    - app/Http/Controllers/StatusController.php
+    - app/Http/Controllers/BranchController.php
+    - app/Http/Controllers/CustomerTypeController.php
+    - app/Http/Controllers/WarehouseController.php
+    - app/Http/Controllers/UnitController.php
+    - app/Http/Controllers/PaymentTermController.php
+    - app/Http/Controllers/DiscountController.php
+    - app/Http/Controllers/TaxController.php
+    - app/Http/Controllers/CarrierController.php
+    - app/Http/Controllers/PaymentModeController.php
+    - app/Http/Controllers/PaymentTypeController.php
+    - app/Http/Controllers/DesignationController.php
+    - app/Http/Controllers/ManufacturerController.php
+    - app/Http/Controllers/BrandController.php
+    - app/Http/Controllers/AttributeController.php
+    - app/Http/Controllers/CountryController.php
+    - app/Http/Controllers/StateController.php
+    - app/Http/Controllers/BankController.php
+    - app/Http/Controllers/VendorTypeController.php
+    - app/Http/Controllers/VendorController.php
+    - app/Http/Controllers/TransferOrderController.php
+    - app/Http/Controllers/DeliveryController.php
+    - app/Http/Controllers/SaleController.php
+    - app/Http/Controllers/InventoryAdjustmentController.php
+    - app/Http/Controllers/InvoiceController.php
+    - app/Http/Controllers/CreditSaleController.php
+    - app/Http/Controllers/CustomerController.php
+    - app/Http/Controllers/SalesReceiptController.php
+    - app/Http/Controllers/CreditLimitController.php
+    - app/Http/Controllers/PaymentReceivedController.php
+    - app/Http/Controllers/PaymentVoucherController.php
+    - app/Http/Controllers/VendorCreditController.php
+    - app/Http/Controllers/PurchaseReceivedDetailController.php
+    - app/Http/Controllers/NewPurchaseOrderController.php
+    - app/Http/Controllers/UsersController.php
+    - app/Http/Controllers/NewPurchaseReceivedController.php
+    - app/Http/Controllers/PaymentVoucherDetailController.php
+    - app/Http/Controllers/NewPaymentController.php
+    - app/Http/Controllers/PurchaseOrderDetailController.php
+    - database/factories/ItemCategoryFactory.php
+    - database/factories/PaymentTermFactory.php
+    - database/factories/ItemTypeFactory.php
+    - database/factories/UnitFactory.php
+    - database/factories/DimensionFactory.php
+    - database/factories/WeightFactory.php
+    - database/factories/ExpenseAccountFactory.php
+    - database/factories/AdjustmentTypeFactory.php
+    - database/factories/StatusFactory.php
+    - database/factories/CustomerTypeFactory.php
+    - database/factories/BranchFactory.php
+    - database/factories/TitleFactory.php
+    - database/factories/WarehouseFactory.php
+    - database/factories/TaxFactory.php
+    - database/factories/DiscountFactory.php
+    - database/factories/PaymentModeFactory.php
+    - database/factories/CarrierFactory.php
+    - database/factories/PaymentTypeFactory.php
+    - database/factories/DesignationFactory.php
+    - database/factories/BankFactory.php
+    - database/factories/ManufacturerFactory.php
+    - database/factories/VendorTypeFactory.php
+    - database/factories/ReasonFactory.php
+    - database/factories/BrandFactory.php
+    - database/factories/AttributeFactory.php
+    - database/factories/CountryFactory.php
+    - database/factories/StateFactory.php
+    - database/factories/CreateItemFactory.php
+    - database/factories/VendorFactory.php
+    - database/factories/TransferOrderFactory.php
+    - database/factories/DeliveryFactory.php
+    - database/factories/InventoryAdjustmentFactory.php
+    - database/factories/InvoiceFactory.php
+    - database/factories/SaleFactory.php
+    - database/factories/CreditLimitFactory.php
+    - database/factories/CreditSaleFactory.php
+    - database/factories/CustomerFactory.php
+    - database/factories/PaymentReceivedFactory.php
+    - database/factories/SalesReceiptFactory.php
+    - database/factories/PaymentVoucherFactory.php
+    - database/factories/VendorCreditFactory.php
+    - database/factories/PurchaseReceivedDetailFactory.php
+    - database/factories/RoleFactory.php
+    - database/factories/UserFactory.php
+    - database/factories/NewPurchaseOrderFactory.php
+    - database/factories/NewPurchaseReceivedFactory.php
+    - database/factories/NewPaymentFactory.php
+    - database/factories/PaymentVoucherDetailFactory.php
+    - database/factories/PurchaseOrderDetailFactory.php
+    - database/migrations/2024_06_14_100951_create_item_categories_table.php
+    - database/migrations/2024_06_14_100952_create_payment_terms_table.php
+    - database/migrations/2024_06_14_100953_create_item_types_table.php
+    - database/migrations/2024_06_14_100954_create_units_table.php
+    - database/migrations/2024_06_14_100955_create_dimensions_table.php
+    - database/migrations/2024_06_14_100956_create_weights_table.php
+    - database/migrations/2024_06_14_100957_create_expense_accounts_table.php
+    - database/migrations/2024_06_14_100958_create_adjustment_types_table.php
+    - database/migrations/2024_06_14_100959_create_statuses_table.php
+    - database/migrations/2024_06_14_101000_create_customer_types_table.php
+    - database/migrations/2024_06_14_101001_create_branches_table.php
+    - database/migrations/2024_06_14_101002_create_titles_table.php
+    - database/migrations/2024_06_14_101003_create_warehouses_table.php
+    - database/migrations/2024_06_14_101004_create_taxes_table.php
+    - database/migrations/2024_06_14_101005_create_discounts_table.php
+    - database/migrations/2024_06_14_101006_create_payment_modes_table.php
+    - database/migrations/2024_06_14_101007_create_carriers_table.php
+    - database/migrations/2024_06_14_101008_create_payment_types_table.php
+    - database/migrations/2024_06_14_101009_create_designations_table.php
+    - database/migrations/2024_06_14_101010_create_banks_table.php
+    - database/migrations/2024_06_14_101011_create_manufacturers_table.php
+    - database/migrations/2024_06_14_101012_create_vendor_types_table.php
+    - database/migrations/2024_06_14_101013_create_reasons_table.php
+    - database/migrations/2024_06_14_101014_create_brands_table.php
+    - database/migrations/2024_06_14_101015_create_attributes_table.php
+    - database/migrations/2024_06_14_101016_create_countries_table.php
+    - database/migrations/2024_06_14_101017_create_states_table.php
+    - database/migrations/2024_06_14_101018_create_create_items_table.php
+    - database/migrations/2024_06_14_101019_create_vendors_table.php
+    - database/migrations/2024_06_14_101020_create_transfer_orders_table.php
+    - database/migrations/2024_06_14_101021_create_deliveries_table.php
+    - database/migrations/2024_06_14_101022_create_inventory_adjustments_table.php
+    - database/migrations/2024_06_14_101023_create_invoices_table.php
+    - database/migrations/2024_06_14_101024_create_sales_table.php
+    - database/migrations/2024_06_14_101025_create_credit_limits_table.php
+    - database/migrations/2024_06_14_101026_create_credit_sales_table.php
+    - database/migrations/2024_06_14_101027_create_customers_table.php
+    - database/migrations/2024_06_14_101028_create_payment_receiveds_table.php
+    - database/migrations/2024_06_14_101029_create_sales_receipts_table.php
+    - database/migrations/2024_06_14_101030_create_payment_vouchers_table.php
+    - database/migrations/2024_06_14_101031_create_vendor_credits_table.php
+    - database/migrations/2024_06_14_101032_create_purchase_received_details_table.php
+    - database/migrations/2024_06_14_101033_create_roles_table.php
+    - database/migrations/2024_06_14_101034_create_users_table.php
+    - database/migrations/2024_06_14_101035_create_new_purchase_orders_table.php
+    - database/migrations/2024_06_14_101036_create_new_purchase_receiveds_table.php
+    - database/migrations/2024_06_14_101037_create_new_payments_table.php
+    - database/migrations/2024_06_14_101038_create_payment_voucher_details_table.php
+    - database/migrations/2024_06_14_101039_create_purchase_order_details_table.php
+    - app/Models/ItemCategory.php
+    - app/Models/PaymentTerm.php
+    - app/Models/ItemType.php
+    - app/Models/Unit.php
+    - app/Models/Dimension.php
+    - app/Models/Weight.php
+    - app/Models/ExpenseAccount.php
+    - app/Models/AdjustmentType.php
+    - app/Models/Status.php
+    - app/Models/CustomerType.php
+    - app/Models/Branch.php
+    - app/Models/Title.php
+    - app/Models/Warehouse.php
+    - app/Models/Tax.php
+    - app/Models/Discount.php
+    - app/Models/PaymentMode.php
+    - app/Models/Carrier.php
+    - app/Models/PaymentType.php
+    - app/Models/Designation.php
+    - app/Models/Bank.php
+    - app/Models/Manufacturer.php
+    - app/Models/VendorType.php
+    - app/Models/Reason.php
+    - app/Models/Brand.php
+    - app/Models/Attribute.php
+    - app/Models/Country.php
+    - app/Models/State.php
+    - app/Models/CreateItem.php
+    - app/Models/Vendor.php
+    - app/Models/TransferOrder.php
+    - app/Models/Delivery.php
+    - app/Models/InventoryAdjustment.php
+    - app/Models/Invoice.php
+    - app/Models/Sale.php
+    - app/Models/CreditLimit.php
+    - app/Models/CreditSale.php
+    - app/Models/Customer.php
+    - app/Models/PaymentReceived.php
+    - app/Models/SalesReceipt.php
+    - app/Models/PaymentVoucher.php
+    - app/Models/VendorCredit.php
+    - app/Models/PurchaseReceivedDetail.php
+    - app/Models/Role.php
+    - app/Models/User.php
+    - app/Models/NewPurchaseOrder.php
+    - app/Models/NewPurchaseReceived.php
+    - app/Models/NewPayment.php
+    - app/Models/PaymentVoucherDetail.php
+    - app/Models/PurchaseOrderDetail.php
+    - database/seeders/ItemCategorySeeder.php
+    - database/seeders/CreateItemSeeder.php
+    - database/seeders/DimensionSeeder.php
+    - database/seeders/RoleSeeder.php
+    - database/seeders/AdjustmentTypeSeeder.php
+    - database/seeders/WeightSeeder.php
+    - database/seeders/ItemTypeSeeder.php
+    - database/seeders/StatusSeeder.php
+    - database/seeders/BranchSeeder.php
+    - database/seeders/CustomerTypeSeeder.php
+    - database/seeders/WarehouseSeeder.php
+    - database/seeders/UnitSeeder.php
+    - database/seeders/PaymentTermSeeder.php
+    - database/seeders/DiscountSeeder.php
+    - database/seeders/TaxSeeder.php
+    - database/seeders/CarrierSeeder.php
+    - database/seeders/PaymentModeSeeder.php
+    - database/seeders/PaymentTypeSeeder.php
+    - database/seeders/DesignationSeeder.php
+    - database/seeders/BrandSeeder.php
+    - database/seeders/AttributeSeeder.php
+    - database/seeders/CountrySeeder.php
+    - database/seeders/StateSeeder.php
+    - database/seeders/BankSeeder.php
+    - database/seeders/VendorTypeSeeder.php
+    - database/seeders/CreateItemSeeder.php
+    - tests/Feature/Http/Controllers/ItemCategoryControllerTest.php
+    - tests/Feature/Http/Controllers/CreateItemControllerTest.php
+    - tests/Feature/Http/Controllers/DimensionControllerTest.php
+    - tests/Feature/Http/Controllers/RolesControllerTest.php
+    - tests/Feature/Http/Controllers/AdjustmentTypeControllerTest.php
+    - tests/Feature/Http/Controllers/WeightControllerTest.php
+    - tests/Feature/Http/Controllers/ItemTypeControllerTest.php
+    - tests/Feature/Http/Controllers/StatusControllerTest.php
+    - tests/Feature/Http/Controllers/BranchControllerTest.php
+    - tests/Feature/Http/Controllers/CustomerTypeControllerTest.php
+    - tests/Feature/Http/Controllers/WarehouseControllerTest.php
+    - tests/Feature/Http/Controllers/UnitControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentTermControllerTest.php
+    - tests/Feature/Http/Controllers/DiscountControllerTest.php
+    - tests/Feature/Http/Controllers/TaxControllerTest.php
+    - tests/Feature/Http/Controllers/CarrierControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentModeControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentTypeControllerTest.php
+    - tests/Feature/Http/Controllers/DesignationControllerTest.php
+    - tests/Feature/Http/Controllers/ManufacturerControllerTest.php
+    - tests/Feature/Http/Controllers/BrandControllerTest.php
+    - tests/Feature/Http/Controllers/AttributeControllerTest.php
+    - tests/Feature/Http/Controllers/CountryControllerTest.php
+    - tests/Feature/Http/Controllers/StateControllerTest.php
+    - tests/Feature/Http/Controllers/BankControllerTest.php
+    - tests/Feature/Http/Controllers/VendorTypeControllerTest.php
+    - tests/Feature/Http/Controllers/VendorControllerTest.php
+    - tests/Feature/Http/Controllers/TransferOrderControllerTest.php
+    - tests/Feature/Http/Controllers/DeliveryControllerTest.php
+    - tests/Feature/Http/Controllers/SaleControllerTest.php
+    - tests/Feature/Http/Controllers/InventoryAdjustmentControllerTest.php
+    - tests/Feature/Http/Controllers/InvoiceControllerTest.php
+    - tests/Feature/Http/Controllers/CreditSaleControllerTest.php
+    - tests/Feature/Http/Controllers/CustomerControllerTest.php
+    - tests/Feature/Http/Controllers/SalesReceiptControllerTest.php
+    - tests/Feature/Http/Controllers/CreditLimitControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentReceivedControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentVoucherControllerTest.php
+    - tests/Feature/Http/Controllers/VendorCreditControllerTest.php
+    - tests/Feature/Http/Controllers/PurchaseReceivedDetailControllerTest.php
+    - tests/Feature/Http/Controllers/NewPurchaseOrderControllerTest.php
+    - tests/Feature/Http/Controllers/UsersControllerTest.php
+    - tests/Feature/Http/Controllers/NewPurchaseReceivedControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentVoucherDetailControllerTest.php
+    - tests/Feature/Http/Controllers/NewPaymentControllerTest.php
+    - tests/Feature/Http/Controllers/PurchaseOrderDetailControllerTest.php
+    - app/Http/Requests/NewPurchaseReceivedStoreRequest.php
+    - app/Http/Requests/NewPurchaseReceivedUpdateRequest.php
+    - app/Http/Resources/NewPurchaseReceivedCollection.php
+    - app/Http/Resources/NewPurchaseReceivedResource.php
+    - app/Http/Resources/PaymentVoucherDetailCollection.php
+    - app/Http/Resources/PaymentVoucherDetailResource.php
+    - app/Http/Resources/NewPaymentCollection.php
+    - app/Http/Resources/NewPaymentResource.php
+    - app/Http/Resources/PurchaseOrderDetailCollection.php
+    - app/Http/Resources/PurchaseOrderDetailResource.php
+updated:
+    - routes/api.php
+models:
+    ItemCategory: { id: 'uuid primary', name: string }
+    ItemType: { id: 'uuid primary', name: string }
+    Unit: { id: 'uuid primary', name: string }
+    Dimension: { id: 'uuid primary', name: string }
+    Weight: { id: 'uuid primary', name: string }
+    ExpenseAccount: { id: 'uuid primary', name: string }
+    AdjustmentType: { id: 'uuid primary', name: string }
+    Status: { id: 'uuid primary', name: string }
+    CustomerType: { id: 'uuid primary', name: string }
+    Branch: { id: 'uuid primary', name: string, address: string, contact_person: string, email: string, phone: string, state_id: 'id foreign:states', country_id: 'id foreign:countries' }
+    Title: { id: 'uuid primary', name: string }
+    Warehouse: { id: 'uuid primary', name: string, branch_id: 'id foreign:branches', warehouse_address: string, zipcode: string, contact_person: string, email: string, phone: string }
+    PaymentTerm: { id: 'uuid primary', name: string }
+    Tax: { id: 'uuid primary', name: string }
+    Discount: { id: 'uuid primary', name: string }
+    PaymentMode: { id: 'uuid primary', name: string }
+    Carrier: { id: 'uuid primary', name: string }
+    PaymentType: { id: 'uuid primary', name: string }
+    Designation: { id: 'uuid primary', name: string }
+    Bank: { id: 'uuid primary', name: string }
+    Manufacturer: { id: 'uuid primary', name: string }
+    VendorType: { id: 'uuid primary', name: string }
+    Reason: { id: 'uuid primary', name: string }
+    Brand: { id: 'uuid primary', name: string }
+    Attribute: { id: 'uuid primary', name: string }
+    Country: { id: 'uuid primary', name: string }
+    State: { id: 'uuid primary', name: string }
+    CreateItem: { id: 'uuid primary', name: string, item_category_id: 'id foreign:item_categories', item_type_id: 'id foriegn:item_types', description: string, batch_number: string, unit_id: 'id foreign:units', brand_id: 'id foreign:brands', cost_price: float, selling_price: float, reorder_level: string, dimension_id: 'id foreign:dimensions', weight_id: 'id foreign:weights', branch_id: 'id foreign:branches', warehouse: 'id foreign:warehouses', vendor_id: 'id foreign:vendors', image_url: string, barcode: string }
+    Vendor: { id: 'uuid primary', name: string, address: string, contact_title: string, contact_designation: string, contact_surname: string, contact_firstname: string, contact_middlename: string, contact_fullname: string, vendor_type_id: 'id foreign:vendor_types', phone_number: string, email: string, image_url: string, tin: string, bank_id: 'id foriegn:banks', account_number: string }
+    TransferOrder: { id: 'uuid primary', transfer_order_number: string, transfer_date: timestamp, transfer_reason: string, source_warehouse_id: 'id foreign:warehouses', destination_warehouse_id: 'id foreign:warehouses', image_url: string, transfer_quantity: string, item_id: 'id foreign:create_items' }
+    Delivery: { id: 'uuid primary', customer_id: 'id foreign:customers', sales_order_number: string, delivery_order_number: string, delivery_date: timestamp, carrier_id: 'id foreign:carriers', notes: string }
+    InventoryAdjustment: { id: 'uuid primary', item_id: 'id foreign:create_items', adjustment_type_id: 'id foreign:adjustment_types', date: timestamp, reason_id: 'id foreign:reasons', branch_id: 'id foreign:branchs', warehouse_id: 'id foreign:warehouses', description: string, item_category_id: 'id foreign:item_categories', cost_price: float, selling_price: float, quantity: string }
+    Invoice: { id: 'uuid primary', branch_id: 'id foriegn:branches', warehouse_id: 'id foreign:warehouses', customer_id: 'id foreign:customerss', invoice_number: string, order_number: string, invoice_date: timestamp, item_id: 'id foreign:create_items', rate: string, quantity: string, discount_id: 'id foreign:discounts', tax_id: 'id foreign:taxes', amount: string }
+    Sale: { id: 'uuid primary', customer_id: 'id foreign:customerss', product_id: 'id foreign:create_items', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', quantity: float, price: float, discount_id: 'id foreign:discounts', discount: float, sales_order_number: string, total_amount: flaot, amount_paid: float, balance_amount: float, payment_mode: 'id foreign:payment_modes' }
+    CreditLimit: { id: 'uuid primary', name: string }
+    CreditSale: { id: 'uuid primary', customer_id: 'id foreign:customerss', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', product_id: 'id foreign:create_items', credit_limit: 'id foreign:credit_limits', credit_amount: string, credit_balance: string }
+    Customer: { id: 'uuid primary', customer_type_id: 'id foreign:customer_types', title_id: 'id foreign:titles', surname: string, firstname: string, middlename: string, phone_number: string, fullname: string }
+    PaymentReceived: { id: 'uuid primary', customer_id: 'id foreign:customers', amount_received: string, bank_charges: float, payment_number: string, deposit_bank_id: 'id foreign:banks', payment_mode_id: 'id foreign:payment_modes', invoice_number: string }
+    SalesReceipt: { id: 'uuid primary', customer_id: 'id foreign:customers', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', product_id: 'id foreign:create_items', tax_id: 'id foreign:taxes', payment_mode_id: 'id foreign:payment_modes', discount_id: 'id foreign:discounts', quantity: string, rate: string, amount: string, receipt_date: timestamp, customer_note: string }
+    PaymentVoucher: { id: 'uuid primary', product_id: 'id foreign:create_items', expense_date: timestamp, amount: string, description: string, branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', tax_id: 'id foreign:taxes', vendor_id: 'id foreign:vendors', payment_mode_id: 'id foreign:payment_modes', expense_account_id: string }
+    VendorCredit: { id: 'uuid primary', vendor_id: 'id foreign:vendors', warehouse_id: 'id foreign:warehouses', credit_number: string, purchase_order_number: string, vendor_credit_date: date }
+    PurchaseReceivedDetail: { id: 'uuid primary', new_purchased_received_id: 'id foreign:new_purchase_receiveds', item_category_id: 'id foreign:item_categories', item_id: 'id foreign:create_items', unit_price: string, quantity: string, unit_id: 'id foreign:units' }
+    Role: { id: 'uuid primary', name: string, description: string }
+    User: { id: 'uuid primary', role_id: 'id foreign:role', user_name: string, user_email: string, password: string, status_id: 'id foreign:statuses' }
+    NewPurchaseOrder: { id: 'uuid primary', item_category_id: 'id foreign:item_categories', item_id: 'id foreign:create_items', vendor_id: 'id foreign:vendors', branch_id: 'id foreign:branches', payment_mode_id: 'id foreign:payment_modes', purchase_order_number: string, purchase_amount: string, purchase_date: timestamp, expected_delivery_date: date, payment_type_id: 'id foreign:payment_types' }
+    NewPurchaseReceived: { id: 'uuid primary', vendor_id: 'id foreign:vendors', purchase_order_number: string, purchase_received_number: string, received_date: date }
+    NewPayment: { id: 'uuid primary', vendor_id: 'id foreign:vendors', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', payment_amount: string, payment_mode_id: 'id foreign:payment_modes', description: string }
+    PaymentVoucherDetail: { id: 'uuid primary', Expense_account_id: int, amount: string, quantity: string, item_id: 'id foreign:create_items' }
+    PurchaseOrderDetail: { item_category_id: 'id foreign:item_categories', purchase_order_id: int, item_id: 'id foreign:create_items', unit_price: string, quantity: string, unit_id: 'id foreign:units' }

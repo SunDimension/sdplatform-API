@@ -2,10 +2,14 @@ models:
   ItemCategory:
     id: uuid primary
     name: string
-       
-  ItemType:
+
+  PaymentTerm:
     id: uuid primary
     name: string
+       
+  ItemType:
+     id: uuid primary
+     name: string
      
   Unit:
     id: uuid primary
@@ -339,7 +343,7 @@ models:
     password: string
     status_id: id foreign:statuses
 
-  NewPurchasOrder:
+  NewPurchaseOrder:
     id: uuid primary
     item_category_id: id foreign:item_categories
     item_id: id foreign:create_items
@@ -442,8 +446,6 @@ controllers:
     resource: api
   Vendor:
     resource: api
-  CreateItem:
-    resource: api
   TransferOrder:
     resource: api
   Delivery:
@@ -462,7 +464,7 @@ controllers:
     resource: api
   CreditLimit:
     resource: api
-  PaymentReceive:
+  PaymentReceived:
     resource: api
   PaymentVoucher:
     resource: api
@@ -474,7 +476,7 @@ controllers:
     resource: api
   Users:
     resource: api
-  NewPurchaseReceive:
+  NewPurchaseReceived:
     resource: api
   PaymentVoucherDetail:
     resource: api
