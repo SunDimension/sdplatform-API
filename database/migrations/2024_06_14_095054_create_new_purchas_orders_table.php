@@ -24,7 +24,7 @@ return new class extends Migration
             $table->string('purchase_amount');
             $table->timestamp('purchase_date');
             $table->date('expected_delivery_date');
-            $table->foreignId('payment_type_id')->constrained();
+            $table->unsignedBigInteger('payment_type_id')->constrained();
             $table->timestamps();
         });
 

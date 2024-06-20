@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('warehouse_id')->constrained();
             $table->foreignId('product_id')->constrained('create_items');
-            $table->foreignId('credit_limit')->constrained('credit_limits', 'limit');
+            $table->unsignedBigInteger('credit_limit')->constrained('credit_limits', 'limit');
             $table->string('credit_amount');
             $table->string('credit_balance');
             $table->timestamps();

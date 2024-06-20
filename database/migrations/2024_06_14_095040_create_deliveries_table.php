@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('sales_order_number');
             $table->string('delivery_order_number');
             $table->timestamp('delivery_date');
-            $table->foreignId('carrier_id')->constrained();
+            $table->unsignedBigInteger('carrier_id')->constrained();
             $table->string('notes');
             $table->timestamps();
         });

@@ -14,21 +14,21 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('create_items', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->bigIncrements('id');
             $table->string('name');
             $table->foreignId('item_category_id')->constrained();
             $table->foreignId('item_type_id');
             $table->string('description');
             $table->string('batch_number');
             $table->foreignId('unit_id')->constrained();
-            $table->foreignId('brand_id')->constrained();
+            $table->unsignedBigInteger('brand_id')->constrained();
             $table->float('cost_price');
             $table->float('selling_price');
             $table->string('reorder_level');
             $table->foreignId('dimension_id')->constrained();
             $table->foreignId('weight_id')->constrained();
             $table->foreignId('branch_id')->constrained();
-            $table->foreignId('warehouse')->constrained('warehouses', 'warehouse');
+            $table->unsignedBigInteger('warehouse _id')->constrained('warehouses', 'warehouse');
             $table->foreignId('vendor_id')->constrained();
             $table->string('image_url');
             $table->string('barcode');

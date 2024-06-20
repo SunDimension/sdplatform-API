@@ -24,8 +24,8 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained('create_items');
             $table->string('rate');
             $table->string('quantity');
-            $table->foreignId('discount_id')->constrained();
-            $table->foreignId('tax_id')->constrained();
+            $table->unsignedBigInteger('discount_id')->constrained();
+            $table->unsignedBigInteger('tax_id')->constrained();
             $table->string('amount');
             $table->timestamps();
         });

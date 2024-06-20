@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('item_id')->constrained('create_items');
             $table->foreignId('adjustment_type_id')->constrained();
             $table->timestamp('date');
-            $table->foreignId('reason_id')->constrained();
+            $table->unsignedBigInteger('reason_id')->constrained();
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('warehouse_id')->constrained();
             $table->string('description');

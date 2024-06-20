@@ -12,6 +12,11 @@ class StateSeeder extends Seeder
      */
     public function run(): void
     {
-        State::factory()->count(5)->create();
+            State::insert([
+        ['name' => 'Abia'],
+        ['name' => 'Adamawa'],
+        ['name' => 'Akwa Ibom'],
+        ['name'=>'Kano'],
+       ]);
     }
 }

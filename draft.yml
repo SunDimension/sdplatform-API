@@ -311,7 +311,7 @@ models:
     tax_id: id foreign:taxes
     vendor_id: id foreign:vendors
     payment_mode_id: id foreign:payment_modes
-    expense_account_id: string ## should be foreign key to accounts
+    expense_account_id: id foreign:expense_account_id
 
   VendorCredit:
     id: uuid primary
@@ -342,6 +342,8 @@ models:
     user_email: string
     password: string
     status_id: id foreign:statuses
+    branch_id: id foreign:branches
+    warehouse_id: id foreign:warehouses
 
   NewPurchaseOrder:
     id: uuid primary

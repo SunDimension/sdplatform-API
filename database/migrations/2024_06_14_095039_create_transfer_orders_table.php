@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('destination_warehouse_id')->constrained('warehouses');
             $table->string('image_url');
             $table->string('transfer_quantity');
-            $table->foreignId('item_id')->constrained('create_items');
+            $table->unsignedBigInteger('item_id')->constrained('create_items');
             $table->timestamps();
         });
 

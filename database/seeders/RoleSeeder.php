@@ -12,6 +12,15 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        Role::factory()->count(5)->create();
+        Role::insert([
+        ['name' => 'Super Admin'],
+        ['name' => 'Accountant'],
+        ['name' => 'Inventory'],
+        ['name'=>'cashier'],
+        ['name'=>'Chief Cashier'],
+        ['name'=>'Sales'],
+        ]);
+        
+        
     }
 }

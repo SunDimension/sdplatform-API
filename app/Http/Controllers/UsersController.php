@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UsersStoreRequest;
-use App\Http\Requests\UsersUpdateRequest;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\Branch;
+use App\Models\Warehouse;
+use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -19,21 +22,28 @@ class UsersController extends Controller
         return new UserCollection($users);
     }
 
-    public function store(UsersStoreRequest $request): UserResource
+    public function store(UserStoreRequest $request): UserResource
     {
-        $user = User::create($request->validated());
+        $user = User::create($request->all());
+        $user->roles()->sync($request->input('roles',[]));
+        $user->branch()->sync($request->input('branch',[]));
+        $user->warehouse()->sync($request->input('warehouse',[]));
 
         return new UserResource($user);
     }
 
     public function show(Request $request, User $user): UserResource
     {
-        return new UserResource($user);
+        return new UserResource($user->load(['roles','branch','warehouse']));
     }
 
-    public function update(UsersUpdateRequest $request, User $user): UserResource
+    public function update(UserUpdateRequest $request, User $user): UserResource
     {
-        $user->update($request->validated());
+        $user->update($request->all());
+        
+        $user->roles()->sync($request->input('roles',[]));
+        $user->branch()->sync($request->input('branch',[]));
+        $user->warehouse()->sync($request->input('warehouse',[]));
 
         return new UserResource($user);
     }

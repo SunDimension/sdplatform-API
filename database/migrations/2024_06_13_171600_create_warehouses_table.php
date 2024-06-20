@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('warehouses', function (Blueprint $table) {
-            $table->id();
+            $table->bigIncrements('id');
             $table->string('warehouse_name');
             $table->foreignId('branch_id')->constrained();
             $table->string('warehouse_address');

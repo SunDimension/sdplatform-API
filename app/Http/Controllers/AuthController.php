@@ -6,28 +6,33 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
 use App\Models\User;
 
 class AuthController extends Controller
 {
 
 
-// Define AuthController class which extends Controller
-
-// Function to handle user registration
 public function register(Request $request)
 {
-// Validate incoming request fields
-    $request->validate([
-    'name' => 'required|string|max:255', // Name must be a string, not exceed 255 characters and it is required
-    'email' => 'required|string|email|max:255|unique:users', // Email must be a string, a valid email, not exceed 255 characters, it is required and it must be unique in the users table
-    'password' => 'required|string|min:6', // Password must be a string, at least 6 characters and it is required
-]);
 
+$this->validate($request,[
+    'name' => 'required|string|max:255', 
+    'email' => 'required|string|email|max:255|unique:users', 
+    'password' => 'required|string|min:6', 
+    'role_id'=>'required',
+    'status_id'=>'required',
+    'branch_id'=>'required',
+    'warehouse_id'=>'required',
+]);
 // Create new User
 $user = User::create([
 'name' => $request->name,
 'email' => $request->email,
+'role_id'=>$request->role_id,
+'status_id'=>$request->status_id,
+  'branch_id'=>$request->branch_id,
+  'warehouse_id'=>$request->warehouse_id,
 'password' => bcrypt($request->password), // Hash the password
 ]);
 

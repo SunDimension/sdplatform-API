@@ -15,11 +15,11 @@ return new class extends Migration
 
         Schema::create('payment_receiveds', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('customer_id')->constrained();
+            $table->unsignedBigInteger('customer_id')->constrained();
             $table->string('amount_received');
             $table->float('bank_charges');
             $table->string('payment_number');
-            $table->foreignId('deposit_bank_id')->constrained('banks');
+            $table->unsignedBigInteger('deposit_bank_id')->constrained('banks');
             $table->foreignId('payment_mode_id')->constrained();
             $table->string('invoice_number');
             $table->timestamps();

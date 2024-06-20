@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RolesStoreRequest;
-use App\Http\Requests\RolesUpdateRequest;
+use App\Http\Requests\RoleStoreRequest;
+use App\Http\Requests\RoleUpdateRequest;
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
@@ -14,26 +14,29 @@ class RolesController extends Controller
 {
     public function index(Request $request): RoleCollection
     {
-        $roles = Role::all();
+        // $roles = Role::all();
 
-        return new RoleCollection($roles);
+        return new RoleCollection (Role::with(['permissions'])->get());
     }
 
-    public function store(RolesStoreRequest $request): RoleResource
+    public function store(RoleStoreRequest $request): RoleResource
     {
-        $role = Role::create($request->validated());
+        
+        $role = Role::create($request->all());
+        $role->permissions()->sync($request->input('permissions', []));
 
         return new RoleResource($role);
     }
 
     public function show(Request $request, Role $role): RoleResource
     {
-        return new RoleResource($role);
+        return new RoleResource($role->load(['permissions']));
     }
 
-    public function update(RolesUpdateRequest $request, Role $role): RoleResource
-    {
-        $role->update($request->validated());
+    public function update(RoleUpdateRequest $request, Role $role): RoleResource
+    { 
+        $role->update($request->all());
+        $role->permissions()->sync($request->input('permissions', []));
 
         return new RoleResource($role);
     }

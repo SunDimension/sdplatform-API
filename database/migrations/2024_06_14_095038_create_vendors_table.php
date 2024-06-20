@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('vendors', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->bigIncrements('id');
             $table->string('name');
             $table->string('address');
             $table->string('contact_title');
@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('contact_firstname');
             $table->string('contact_middlename');
             $table->string('contact_fullname');
-            $table->foreignId('vendor_type_id')->constrained();
+            $table->unsignedBigInteger('vendor_type_id')->constrained();
             $table->string('phone_number');
             $table->string('email');
             $table->string('image_url');

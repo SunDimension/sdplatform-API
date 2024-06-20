@@ -27,7 +27,7 @@ return new class extends Migration
             $table->string('total_amount');
             $table->float('amount_paid');
             $table->float('balance_amount');
-            $table->foreignId('payment_mode')->constrained('payment_modes', 'mode');
+            $table->unsignedBigInteger('payment_mode')->constrained('payment_modes', 'mode');
             $table->timestamps();
         });
 

@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('customers', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+            $table->bigIncrements('id');
             $table->foreignId('customer_type_id')->constrained();
             $table->foreignId('title_id')->constrained();
             $table->string('surname');

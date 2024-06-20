@@ -22,7 +22,7 @@ return new class extends Migration
             $table->foreignId('branch_id')->constrained();
             $table->foreignId('warehouse_id')->constrained();
             $table->foreignId('tax_id')->constrained();
-            $table->foreignId('vendor_id')->constrained();
+            $table->unsignedBigInteger('vendor_id')->constrained();
             $table->foreignId('payment_mode_id')->constrained();
             $table->string('expense_account_id');
             $table->timestamps();

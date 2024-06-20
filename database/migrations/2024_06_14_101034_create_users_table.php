@@ -14,11 +14,15 @@ return new class extends Migration
         Schema::disableForeignKeyConstraints();
 
         Schema::create('users', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreignId('role_id')->constrained();
-            $table->string('user_name');
-            $table->string('user_email');
+            $table->id();
+            $table->unsignedBigInteger('role_id')->constrained();
+            $table->string('name');
+            $table->string('email')->unique();
+             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->rememberToken();
+            $table->foreignId('branch_id')->constrained();
+            $table->foreignId('warehouse_id')->constrained();
             $table->foreignId('status_id')->constrained();
             $table->timestamps();
         });
