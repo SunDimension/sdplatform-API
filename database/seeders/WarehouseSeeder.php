@@ -12,9 +12,6 @@ class WarehouseSeeder extends Seeder
      */
     public function run(): void
     {
-          Warehouse::insert([
-        ['warehouse_name' => 'Kano-Main','branch_id'=>'1','warehouse_address'=>'wuye','zipcode'=>'125452','contact_person'=>'Emeka','email'=>'kay@gap.com','phone'=>'087565552365'],
-       
-        ]);
+        Warehouse::factory()->count(5)->create();
     }
 }

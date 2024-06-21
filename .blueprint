@@ -94,55 +94,55 @@ created:
     - database/factories/NewPaymentFactory.php
     - database/factories/PaymentVoucherDetailFactory.php
     - database/factories/PurchaseOrderDetailFactory.php
-    - database/migrations/2024_06_14_100951_create_item_categories_table.php
-    - database/migrations/2024_06_14_100952_create_payment_terms_table.php
-    - database/migrations/2024_06_14_100953_create_item_types_table.php
-    - database/migrations/2024_06_14_100954_create_units_table.php
-    - database/migrations/2024_06_14_100955_create_dimensions_table.php
-    - database/migrations/2024_06_14_100956_create_weights_table.php
-    - database/migrations/2024_06_14_100957_create_expense_accounts_table.php
-    - database/migrations/2024_06_14_100958_create_adjustment_types_table.php
-    - database/migrations/2024_06_14_100959_create_statuses_table.php
-    - database/migrations/2024_06_14_101000_create_customer_types_table.php
-    - database/migrations/2024_06_14_101001_create_branches_table.php
-    - database/migrations/2024_06_14_101002_create_titles_table.php
-    - database/migrations/2024_06_14_101003_create_warehouses_table.php
-    - database/migrations/2024_06_14_101004_create_taxes_table.php
-    - database/migrations/2024_06_14_101005_create_discounts_table.php
-    - database/migrations/2024_06_14_101006_create_payment_modes_table.php
-    - database/migrations/2024_06_14_101007_create_carriers_table.php
-    - database/migrations/2024_06_14_101008_create_payment_types_table.php
-    - database/migrations/2024_06_14_101009_create_designations_table.php
-    - database/migrations/2024_06_14_101010_create_banks_table.php
-    - database/migrations/2024_06_14_101011_create_manufacturers_table.php
-    - database/migrations/2024_06_14_101012_create_vendor_types_table.php
-    - database/migrations/2024_06_14_101013_create_reasons_table.php
-    - database/migrations/2024_06_14_101014_create_brands_table.php
-    - database/migrations/2024_06_14_101015_create_attributes_table.php
-    - database/migrations/2024_06_14_101016_create_countries_table.php
-    - database/migrations/2024_06_14_101017_create_states_table.php
-    - database/migrations/2024_06_14_101018_create_create_items_table.php
-    - database/migrations/2024_06_14_101019_create_vendors_table.php
-    - database/migrations/2024_06_14_101020_create_transfer_orders_table.php
-    - database/migrations/2024_06_14_101021_create_deliveries_table.php
-    - database/migrations/2024_06_14_101022_create_inventory_adjustments_table.php
-    - database/migrations/2024_06_14_101023_create_invoices_table.php
-    - database/migrations/2024_06_14_101024_create_sales_table.php
-    - database/migrations/2024_06_14_101025_create_credit_limits_table.php
-    - database/migrations/2024_06_14_101026_create_credit_sales_table.php
-    - database/migrations/2024_06_14_101027_create_customers_table.php
-    - database/migrations/2024_06_14_101028_create_payment_receiveds_table.php
-    - database/migrations/2024_06_14_101029_create_sales_receipts_table.php
-    - database/migrations/2024_06_14_101030_create_payment_vouchers_table.php
-    - database/migrations/2024_06_14_101031_create_vendor_credits_table.php
-    - database/migrations/2024_06_14_101032_create_purchase_received_details_table.php
-    - database/migrations/2024_06_14_101033_create_roles_table.php
-    - database/migrations/2024_06_14_101034_create_users_table.php
-    - database/migrations/2024_06_14_101035_create_new_purchase_orders_table.php
-    - database/migrations/2024_06_14_101036_create_new_purchase_receiveds_table.php
-    - database/migrations/2024_06_14_101037_create_new_payments_table.php
-    - database/migrations/2024_06_14_101038_create_payment_voucher_details_table.php
-    - database/migrations/2024_06_14_101039_create_purchase_order_details_table.php
+    - database/migrations/2024_06_21_161610_create_item_categories_table.php
+    - database/migrations/2024_06_21_161611_create_payment_terms_table.php
+    - database/migrations/2024_06_21_161612_create_item_types_table.php
+    - database/migrations/2024_06_21_161613_create_units_table.php
+    - database/migrations/2024_06_21_161614_create_dimensions_table.php
+    - database/migrations/2024_06_21_161615_create_weights_table.php
+    - database/migrations/2024_06_21_161616_create_expense_accounts_table.php
+    - database/migrations/2024_06_21_161617_create_adjustment_types_table.php
+    - database/migrations/2024_06_21_161618_create_statuses_table.php
+    - database/migrations/2024_06_21_161619_create_customer_types_table.php
+    - database/migrations/2024_06_21_161620_create_branches_table.php
+    - database/migrations/2024_06_21_161621_create_titles_table.php
+    - database/migrations/2024_06_21_161622_create_warehouses_table.php
+    - database/migrations/2024_06_21_161623_create_taxes_table.php
+    - database/migrations/2024_06_21_161624_create_discounts_table.php
+    - database/migrations/2024_06_21_161625_create_payment_modes_table.php
+    - database/migrations/2024_06_21_161626_create_carriers_table.php
+    - database/migrations/2024_06_21_161627_create_payment_types_table.php
+    - database/migrations/2024_06_21_161628_create_designations_table.php
+    - database/migrations/2024_06_21_161629_create_banks_table.php
+    - database/migrations/2024_06_21_161630_create_manufacturers_table.php
+    - database/migrations/2024_06_21_161631_create_vendor_types_table.php
+    - database/migrations/2024_06_21_161632_create_reasons_table.php
+    - database/migrations/2024_06_21_161633_create_brands_table.php
+    - database/migrations/2024_06_21_161634_create_attributes_table.php
+    - database/migrations/2024_06_21_161635_create_countries_table.php
+    - database/migrations/2024_06_21_161636_create_states_table.php
+    - database/migrations/2024_06_21_161637_create_create_items_table.php
+    - database/migrations/2024_06_21_161638_create_vendors_table.php
+    - database/migrations/2024_06_21_161639_create_transfer_orders_table.php
+    - database/migrations/2024_06_21_161640_create_deliveries_table.php
+    - database/migrations/2024_06_21_161641_create_inventory_adjustments_table.php
+    - database/migrations/2024_06_21_161642_create_invoices_table.php
+    - database/migrations/2024_06_21_161643_create_sales_table.php
+    - database/migrations/2024_06_21_161644_create_credit_limits_table.php
+    - database/migrations/2024_06_21_161645_create_credit_sales_table.php
+    - database/migrations/2024_06_21_161646_create_customers_table.php
+    - database/migrations/2024_06_21_161647_create_payment_receiveds_table.php
+    - database/migrations/2024_06_21_161648_create_sales_receipts_table.php
+    - database/migrations/2024_06_21_161649_create_payment_vouchers_table.php
+    - database/migrations/2024_06_21_161650_create_vendor_credits_table.php
+    - database/migrations/2024_06_21_161651_create_purchase_received_details_table.php
+    - database/migrations/2024_06_21_161652_create_roles_table.php
+    - database/migrations/2024_06_21_161653_create_users_table.php
+    - database/migrations/2024_06_21_161654_create_new_purchase_orders_table.php
+    - database/migrations/2024_06_21_161655_create_new_purchase_receiveds_table.php
+    - database/migrations/2024_06_21_161656_create_new_payments_table.php
+    - database/migrations/2024_06_21_161657_create_payment_voucher_details_table.php
+    - database/migrations/2024_06_21_161658_create_purchase_order_details_table.php
     - app/Models/ItemCategory.php
     - app/Models/PaymentTerm.php
     - app/Models/ItemType.php
@@ -264,65 +264,147 @@ created:
     - tests/Feature/Http/Controllers/PaymentVoucherDetailControllerTest.php
     - tests/Feature/Http/Controllers/NewPaymentControllerTest.php
     - tests/Feature/Http/Controllers/PurchaseOrderDetailControllerTest.php
+    - app/Http/Requests/ItemCategoryStoreRequest.php
+    - app/Http/Requests/ItemCategoryUpdateRequest.php
+    - app/Http/Requests/CreateItemStoreRequest.php
+    - app/Http/Requests/CreateItemUpdateRequest.php
+    - app/Http/Requests/DimensionStoreRequest.php
+    - app/Http/Requests/DimensionUpdateRequest.php
+    - app/Http/Requests/RoleStoreRequest.php
+    - app/Http/Requests/RoleUpdateRequest.php
+    - app/Http/Requests/AdjustmentTypeStoreRequest.php
+    - app/Http/Requests/AdjustmentTypeUpdateRequest.php
+    - app/Http/Requests/WeightStoreRequest.php
+    - app/Http/Requests/WeightUpdateRequest.php
+    - app/Http/Requests/ItemTypeStoreRequest.php
+    - app/Http/Requests/ItemTypeUpdateRequest.php
+    - app/Http/Requests/StatusStoreRequest.php
+    - app/Http/Requests/StatusUpdateRequest.php
+    - app/Http/Requests/BranchStoreRequest.php
+    - app/Http/Requests/BranchUpdateRequest.php
+    - app/Http/Requests/CustomerTypeStoreRequest.php
+    - app/Http/Requests/CustomerTypeUpdateRequest.php
+    - app/Http/Requests/WarehouseStoreRequest.php
+    - app/Http/Requests/WarehouseUpdateRequest.php
+    - app/Http/Requests/UnitStoreRequest.php
+    - app/Http/Requests/UnitUpdateRequest.php
+    - app/Http/Requests/PaymentTermStoreRequest.php
+    - app/Http/Requests/PaymentTermUpdateRequest.php
+    - app/Http/Requests/DiscountStoreRequest.php
+    - app/Http/Requests/DiscountUpdateRequest.php
+    - app/Http/Requests/TaxStoreRequest.php
+    - app/Http/Requests/TaxUpdateRequest.php
+    - app/Http/Requests/CarrierStoreRequest.php
+    - app/Http/Requests/CarrierUpdateRequest.php
+    - app/Http/Requests/PaymentModeStoreRequest.php
+    - app/Http/Requests/PaymentModeUpdateRequest.php
+    - app/Http/Requests/PaymentTypeStoreRequest.php
+    - app/Http/Requests/PaymentTypeUpdateRequest.php
+    - app/Http/Requests/DesignationStoreRequest.php
+    - app/Http/Requests/DesignationUpdateRequest.php
+    - app/Http/Requests/ManufacturerStoreRequest.php
+    - app/Http/Requests/ManufacturerUpdateRequest.php
+    - app/Http/Requests/BrandStoreRequest.php
+    - app/Http/Requests/BrandUpdateRequest.php
+    - app/Http/Requests/AttributeStoreRequest.php
+    - app/Http/Requests/AttributeUpdateRequest.php
+    - app/Http/Requests/CountryStoreRequest.php
+    - app/Http/Requests/CountryUpdateRequest.php
+    - app/Http/Requests/StateStoreRequest.php
+    - app/Http/Requests/StateUpdateRequest.php
+    - app/Http/Requests/BankStoreRequest.php
+    - app/Http/Requests/BankUpdateRequest.php
+    - app/Http/Requests/VendorTypeStoreRequest.php
+    - app/Http/Requests/VendorTypeUpdateRequest.php
+    - app/Http/Requests/VendorStoreRequest.php
+    - app/Http/Requests/VendorUpdateRequest.php
+    - app/Http/Requests/TransferOrderStoreRequest.php
+    - app/Http/Requests/TransferOrderUpdateRequest.php
+    - app/Http/Requests/DeliveryStoreRequest.php
+    - app/Http/Requests/DeliveryUpdateRequest.php
+    - app/Http/Requests/SaleStoreRequest.php
+    - app/Http/Requests/SaleUpdateRequest.php
+    - app/Http/Requests/InventoryAdjustmentStoreRequest.php
+    - app/Http/Requests/InventoryAdjustmentUpdateRequest.php
+    - app/Http/Requests/InvoiceStoreRequest.php
+    - app/Http/Requests/InvoiceUpdateRequest.php
+    - app/Http/Requests/CreditSaleStoreRequest.php
+    - app/Http/Requests/CreditSaleUpdateRequest.php
+    - app/Http/Requests/CustomerStoreRequest.php
+    - app/Http/Requests/CustomerUpdateRequest.php
+    - app/Http/Requests/SalesReceiptStoreRequest.php
+    - app/Http/Requests/SalesReceiptUpdateRequest.php
+    - app/Http/Requests/CreditLimitStoreRequest.php
+    - app/Http/Requests/CreditLimitUpdateRequest.php
+    - app/Http/Requests/PaymentReceivedStoreRequest.php
+    - app/Http/Requests/PaymentReceivedUpdateRequest.php
+    - app/Http/Requests/PaymentVoucherStoreRequest.php
+    - app/Http/Requests/PaymentVoucherUpdateRequest.php
+    - app/Http/Requests/VendorCreditStoreRequest.php
+    - app/Http/Requests/VendorCreditUpdateRequest.php
+    - app/Http/Requests/PurchaseReceivedDetailStoreRequest.php
+    - app/Http/Requests/PurchaseReceivedDetailUpdateRequest.php
+    - app/Http/Requests/NewPurchaseOrderStoreRequest.php
+    - app/Http/Requests/NewPurchaseOrderUpdateRequest.php
+    - app/Http/Requests/UserStoreRequest.php
+    - app/Http/Requests/UserUpdateRequest.php
     - app/Http/Requests/NewPurchaseReceivedStoreRequest.php
     - app/Http/Requests/NewPurchaseReceivedUpdateRequest.php
-    - app/Http/Resources/NewPurchaseReceivedCollection.php
-    - app/Http/Resources/NewPurchaseReceivedResource.php
-    - app/Http/Resources/PaymentVoucherDetailCollection.php
-    - app/Http/Resources/PaymentVoucherDetailResource.php
-    - app/Http/Resources/NewPaymentCollection.php
-    - app/Http/Resources/NewPaymentResource.php
-    - app/Http/Resources/PurchaseOrderDetailCollection.php
-    - app/Http/Resources/PurchaseOrderDetailResource.php
+    - app/Http/Requests/PaymentVoucherDetailStoreRequest.php
+    - app/Http/Requests/PaymentVoucherDetailUpdateRequest.php
+    - app/Http/Requests/NewPaymentStoreRequest.php
+    - app/Http/Requests/NewPaymentUpdateRequest.php
+    - app/Http/Requests/PurchaseOrderDetailStoreRequest.php
+    - app/Http/Requests/PurchaseOrderDetailUpdateRequest.php
 updated:
     - routes/api.php
 models:
-    ItemCategory: { id: 'uuid primary', name: string }
-    ItemType: { id: 'uuid primary', name: string }
-    Unit: { id: 'uuid primary', name: string }
-    Dimension: { id: 'uuid primary', name: string }
-    Weight: { id: 'uuid primary', name: string }
-    ExpenseAccount: { id: 'uuid primary', name: string }
-    AdjustmentType: { id: 'uuid primary', name: string }
-    Status: { id: 'uuid primary', name: string }
-    CustomerType: { id: 'uuid primary', name: string }
-    Branch: { id: 'uuid primary', name: string, address: string, contact_person: string, email: string, phone: string, state_id: 'id foreign:states', country_id: 'id foreign:countries' }
-    Title: { id: 'uuid primary', name: string }
-    Warehouse: { id: 'uuid primary', name: string, branch_id: 'id foreign:branches', warehouse_address: string, zipcode: string, contact_person: string, email: string, phone: string }
-    PaymentTerm: { id: 'uuid primary', name: string }
-    Tax: { id: 'uuid primary', name: string }
-    Discount: { id: 'uuid primary', name: string }
-    PaymentMode: { id: 'uuid primary', name: string }
-    Carrier: { id: 'uuid primary', name: string }
-    PaymentType: { id: 'uuid primary', name: string }
-    Designation: { id: 'uuid primary', name: string }
-    Bank: { id: 'uuid primary', name: string }
-    Manufacturer: { id: 'uuid primary', name: string }
-    VendorType: { id: 'uuid primary', name: string }
-    Reason: { id: 'uuid primary', name: string }
-    Brand: { id: 'uuid primary', name: string }
-    Attribute: { id: 'uuid primary', name: string }
-    Country: { id: 'uuid primary', name: string }
-    State: { id: 'uuid primary', name: string }
-    CreateItem: { id: 'uuid primary', name: string, item_category_id: 'id foreign:item_categories', item_type_id: 'id foriegn:item_types', description: string, batch_number: string, unit_id: 'id foreign:units', brand_id: 'id foreign:brands', cost_price: float, selling_price: float, reorder_level: string, dimension_id: 'id foreign:dimensions', weight_id: 'id foreign:weights', branch_id: 'id foreign:branches', warehouse: 'id foreign:warehouses', vendor_id: 'id foreign:vendors', image_url: string, barcode: string }
-    Vendor: { id: 'uuid primary', name: string, address: string, contact_title: string, contact_designation: string, contact_surname: string, contact_firstname: string, contact_middlename: string, contact_fullname: string, vendor_type_id: 'id foreign:vendor_types', phone_number: string, email: string, image_url: string, tin: string, bank_id: 'id foriegn:banks', account_number: string }
-    TransferOrder: { id: 'uuid primary', transfer_order_number: string, transfer_date: timestamp, transfer_reason: string, source_warehouse_id: 'id foreign:warehouses', destination_warehouse_id: 'id foreign:warehouses', image_url: string, transfer_quantity: string, item_id: 'id foreign:create_items' }
-    Delivery: { id: 'uuid primary', customer_id: 'id foreign:customers', sales_order_number: string, delivery_order_number: string, delivery_date: timestamp, carrier_id: 'id foreign:carriers', notes: string }
-    InventoryAdjustment: { id: 'uuid primary', item_id: 'id foreign:create_items', adjustment_type_id: 'id foreign:adjustment_types', date: timestamp, reason_id: 'id foreign:reasons', branch_id: 'id foreign:branchs', warehouse_id: 'id foreign:warehouses', description: string, item_category_id: 'id foreign:item_categories', cost_price: float, selling_price: float, quantity: string }
-    Invoice: { id: 'uuid primary', branch_id: 'id foriegn:branches', warehouse_id: 'id foreign:warehouses', customer_id: 'id foreign:customerss', invoice_number: string, order_number: string, invoice_date: timestamp, item_id: 'id foreign:create_items', rate: string, quantity: string, discount_id: 'id foreign:discounts', tax_id: 'id foreign:taxes', amount: string }
-    Sale: { id: 'uuid primary', customer_id: 'id foreign:customerss', product_id: 'id foreign:create_items', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', quantity: float, price: float, discount_id: 'id foreign:discounts', discount: float, sales_order_number: string, total_amount: flaot, amount_paid: float, balance_amount: float, payment_mode: 'id foreign:payment_modes' }
-    CreditLimit: { id: 'uuid primary', name: string }
-    CreditSale: { id: 'uuid primary', customer_id: 'id foreign:customerss', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', product_id: 'id foreign:create_items', credit_limit: 'id foreign:credit_limits', credit_amount: string, credit_balance: string }
-    Customer: { id: 'uuid primary', customer_type_id: 'id foreign:customer_types', title_id: 'id foreign:titles', surname: string, firstname: string, middlename: string, phone_number: string, fullname: string }
-    PaymentReceived: { id: 'uuid primary', customer_id: 'id foreign:customers', amount_received: string, bank_charges: float, payment_number: string, deposit_bank_id: 'id foreign:banks', payment_mode_id: 'id foreign:payment_modes', invoice_number: string }
-    SalesReceipt: { id: 'uuid primary', customer_id: 'id foreign:customers', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', product_id: 'id foreign:create_items', tax_id: 'id foreign:taxes', payment_mode_id: 'id foreign:payment_modes', discount_id: 'id foreign:discounts', quantity: string, rate: string, amount: string, receipt_date: timestamp, customer_note: string }
-    PaymentVoucher: { id: 'uuid primary', product_id: 'id foreign:create_items', expense_date: timestamp, amount: string, description: string, branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', tax_id: 'id foreign:taxes', vendor_id: 'id foreign:vendors', payment_mode_id: 'id foreign:payment_modes', expense_account_id: string }
-    VendorCredit: { id: 'uuid primary', vendor_id: 'id foreign:vendors', warehouse_id: 'id foreign:warehouses', credit_number: string, purchase_order_number: string, vendor_credit_date: date }
-    PurchaseReceivedDetail: { id: 'uuid primary', new_purchased_received_id: 'id foreign:new_purchase_receiveds', item_category_id: 'id foreign:item_categories', item_id: 'id foreign:create_items', unit_price: string, quantity: string, unit_id: 'id foreign:units' }
-    Role: { id: 'uuid primary', name: string, description: string }
-    User: { id: 'uuid primary', role_id: 'id foreign:role', user_name: string, user_email: string, password: string, status_id: 'id foreign:statuses' }
-    NewPurchaseOrder: { id: 'uuid primary', item_category_id: 'id foreign:item_categories', item_id: 'id foreign:create_items', vendor_id: 'id foreign:vendors', branch_id: 'id foreign:branches', payment_mode_id: 'id foreign:payment_modes', purchase_order_number: string, purchase_amount: string, purchase_date: timestamp, expected_delivery_date: date, payment_type_id: 'id foreign:payment_types' }
-    NewPurchaseReceived: { id: 'uuid primary', vendor_id: 'id foreign:vendors', purchase_order_number: string, purchase_received_number: string, received_date: date }
-    NewPayment: { id: 'uuid primary', vendor_id: 'id foreign:vendors', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', payment_amount: string, payment_mode_id: 'id foreign:payment_modes', description: string }
-    PaymentVoucherDetail: { id: 'uuid primary', Expense_account_id: int, amount: string, quantity: string, item_id: 'id foreign:create_items' }
+    ItemCategory: { name: string }
+    ItemType: { name: string }
+    Unit: { name: string }
+    Dimension: { name: string }
+    Weight: { name: string }
+    ExpenseAccount: { name: string }
+    AdjustmentType: { name: string }
+    Status: { name: string }
+    CustomerType: { name: string }
+    Branch: { name: string, address: string, contact_person: string, email: string, phone: string, state_id: 'id foreign:states', country_id: 'id foreign:countries' }
+    Title: { name: string }
+    Warehouse: { name: string, branch_id: 'id foreign:branches', warehouse_address: string, zipcode: string, contact_person: string, email: string, phone: string }
+    PaymentTerm: { name: string }
+    Tax: { name: string }
+    Discount: { name: string }
+    PaymentMode: { name: string }
+    Carrier: { name: string }
+    PaymentType: { name: string }
+    Designation: { name: string }
+    Bank: { name: string }
+    Manufacturer: { name: string }
+    VendorType: { name: string }
+    Reason: { name: string }
+    Brand: { name: string }
+    Attribute: { name: string }
+    Country: { name: string }
+    State: { name: string }
+    CreateItem: { name: string, item_category_id: 'id foreign:item_categories', item_type_id: 'id foriegn:item_types', description: string, batch_number: string, unit_id: 'id foreign:units', brand_id: 'id foreign:brands', cost_price: float, selling_price: float, reorder_level: string, dimension_id: 'id foreign:dimensions', weight_id: 'id foreign:weights', branch_id: 'id foreign:branches', warehouse: 'id foreign:warehouses', vendor_id: 'id foreign:vendors', image_url: string, barcode: string }
+    Vendor: { name: string, address: string, contact_title: string, contact_designation: string, contact_surname: string, contact_firstname: string, contact_middlename: string, contact_fullname: string, vendor_type_id: 'id foreign:vendor_types', phone_number: string, email: string, image_url: string, tin: string, bank_id: 'id foriegn:banks', account_number: string }
+    TransferOrder: { transfer_order_number: string, transfer_date: timestamp, transfer_reason: string, source_warehouse_id: 'id foreign:warehouses', destination_warehouse_id: 'id foreign:warehouses', image_url: string, transfer_quantity: string, item_id: 'id foreign:create_items' }
+    Delivery: { customer_id: 'id foreign:customers', sales_order_number: string, delivery_order_number: string, delivery_date: timestamp, carrier_id: 'id foreign:carriers', notes: string }
+    InventoryAdjustment: { item_id: 'id foreign:create_items', adjustment_type_id: 'id foreign:adjustment_types', date: timestamp, reason_id: 'id foreign:reasons', branch_id: 'id foreign:branchs', warehouse_id: 'id foreign:warehouses', description: string, item_category_id: 'id foreign:item_categories', cost_price: float, selling_price: float, quantity: string }
+    Invoice: { branch_id: 'id foriegn:branches', warehouse_id: 'id foreign:warehouses', customer_id: 'id foreign:customerss', invoice_number: string, order_number: string, invoice_date: timestamp, item_id: 'id foreign:create_items', rate: string, quantity: string, discount_id: 'id foreign:discounts', tax_id: 'id foreign:taxes', amount: string }
+    Sale: { customer_id: 'id foreign:customerss', product_id: 'id foreign:create_items', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', quantity: float, price: float, discount_id: 'id foreign:discounts', discount: float, sales_order_number: string, total_amount: flaot, amount_paid: float, balance_amount: float, payment_mode: 'id foreign:payment_modes' }
+    CreditLimit: { name: string }
+    CreditSale: { customer_id: 'id foreign:customerss', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', product_id: 'id foreign:create_items', credit_limit: 'id foreign:credit_limits', credit_amount: string, credit_balance: string }
+    Customer: { customer_type_id: 'id foreign:customer_types', title_id: 'id foreign:titles', surname: string, firstname: string, middlename: string, phone_number: string, fullname: string }
+    PaymentReceived: { customer_id: 'id foreign:customers', amount_received: string, bank_charges: float, payment_number: string, deposit_bank_id: 'id foreign:banks', payment_mode_id: 'id foreign:payment_modes', invoice_number: string }
+    SalesReceipt: { customer_id: 'id foreign:customers', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', product_id: 'id foreign:create_items', tax_id: 'id foreign:taxes', payment_mode_id: 'id foreign:payment_modes', discount_id: 'id foreign:discounts', quantity: string, rate: string, amount: string, receipt_date: timestamp, customer_note: string }
+    PaymentVoucher: { product_id: 'id foreign:create_items', expense_date: timestamp, amount: string, description: string, branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', tax_id: 'id foreign:taxes', vendor_id: 'id foreign:vendors', payment_mode_id: 'id foreign:payment_modes', expense_account_id: 'id foreign:expense_account_id' }
+    VendorCredit: { vendor_id: 'id foreign:vendors', warehouse_id: 'id foreign:warehouses', credit_number: string, purchase_order_number: string, vendor_credit_date: date }
+    PurchaseReceivedDetail: { new_purchased_received_id: 'id foreign:new_purchase_receiveds', item_category_id: 'id foreign:item_categories', item_id: 'id foreign:create_items', unit_price: string, quantity: string, unit_id: 'id foreign:units' }
+    Role: { name: string, description: string }
+    User: { role_id: 'id foreign:role', user_name: string, user_email: string, password: string, status_id: 'id foreign:statuses', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses' }
+    NewPurchaseOrder: { item_category_id: 'id foreign:item_categories', item_id: 'id foreign:create_items', vendor_id: 'id foreign:vendors', branch_id: 'id foreign:branches', payment_mode_id: 'id foreign:payment_modes', purchase_order_number: string, purchase_amount: string, purchase_date: timestamp, expected_delivery_date: date, payment_type_id: 'id foreign:payment_types' }
+    NewPurchaseReceived: { vendor_id: 'id foreign:vendors', purchase_order_number: string, purchase_received_number: string, received_date: date }
+    NewPayment: { vendor_id: 'id foreign:vendors', branch_id: 'id foreign:branches', warehouse_id: 'id foreign:warehouses', payment_amount: string, payment_mode_id: 'id foreign:payment_modes', description: string }
+    PaymentVoucherDetail: { Expense_account_id: int, amount: string, quantity: string, item_id: 'id foreign:create_items' }
     PurchaseOrderDetail: { item_category_id: 'id foreign:item_categories', purchase_order_id: int, item_id: 'id foreign:create_items', unit_price: string, quantity: string, unit_id: 'id foreign:units' }

@@ -19,19 +19,9 @@ class RoleUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-         return [
-            'name'         => [
-                'required',
-            ],
+        return [
+            'name' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'permissions.*' => [
-                'integer',
-            ],
-            'permissions'   => [
-                'required',
-                'array',
-            ],
         ];
     }
-  
 }

@@ -12,11 +12,6 @@ class StatusSeeder extends Seeder
      */
     public function run(): void
     {
-              Status::insert([
-        ['name' => 'Active'],
-        ['name' => 'Inactive'],
-        ['name' => 'Out of Stock'],
-        
-       ]);
+        Status::factory()->count(5)->create();
     }
 }

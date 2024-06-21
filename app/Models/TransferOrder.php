@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class TransferOrder extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -33,6 +32,7 @@ class TransferOrder extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'transfer_date' => 'timestamp',
         'source_warehouse_id' => 'integer',
         'destination_warehouse_id' => 'integer',

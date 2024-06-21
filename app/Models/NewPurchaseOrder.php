@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NewPurchaseOrder extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +34,7 @@ class NewPurchaseOrder extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'item_category_id' => 'integer',
         'item_id' => 'integer',
         'vendor_id' => 'integer',

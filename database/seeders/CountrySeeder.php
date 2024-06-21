@@ -12,11 +12,6 @@ class CountrySeeder extends Seeder
      */
     public function run(): void
     {
-         Country::insert([
-        ['name' => 'Nigeria'],
-        ['name' => 'USA'],
-        ['name' => 'Ghana'],
-        ['name'=>'Niger'],
-       ]);
+        Country::factory()->count(5)->create();
     }
 }

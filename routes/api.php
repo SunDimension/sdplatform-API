@@ -27,6 +27,9 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 
 
 
+
+
+
 Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryController::class);
 
 Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
@@ -56,8 +59,6 @@ Route::apiResource('payment-terms', App\Http\Controllers\PaymentTermController::
 Route::apiResource('discounts', App\Http\Controllers\DiscountController::class);
 
 Route::apiResource('taxes', App\Http\Controllers\TaxController::class);
-
-Route::apiResource('permissions', App\Http\Controllers\PermissionController::class);
 
 Route::apiResource('carriers', App\Http\Controllers\CarrierController::class);
 
@@ -101,7 +102,7 @@ Route::apiResource('sales-receipts', App\Http\Controllers\SalesReceiptController
 
 Route::apiResource('credit-limits', App\Http\Controllers\CreditLimitController::class);
 
-Route::apiResource('payment-receives', App\Http\Controllers\PaymentReceiveController::class);
+Route::apiResource('payment-receiveds', App\Http\Controllers\PaymentReceivedController::class);
 
 Route::apiResource('payment-vouchers', App\Http\Controllers\PaymentVoucherController::class);
 
@@ -113,11 +114,10 @@ Route::apiResource('new-purchase-orders', App\Http\Controllers\NewPurchaseOrderC
 
 Route::apiResource('users', App\Http\Controllers\UsersController::class);
 
-Route::apiResource('new-purchase-receives', App\Http\Controllers\NewPurchaseReceiveController::class);
+Route::apiResource('new-purchase-receiveds', App\Http\Controllers\NewPurchaseReceivedController::class);
 
 Route::apiResource('payment-voucher-details', App\Http\Controllers\PaymentVoucherDetailController::class);
 
 Route::apiResource('new-payments', App\Http\Controllers\NewPaymentController::class);
 
 Route::apiResource('purchase-order-details', App\Http\Controllers\PurchaseOrderDetailController::class);
-

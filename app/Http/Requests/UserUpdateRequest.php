@@ -25,6 +25,8 @@ class UserUpdateRequest extends FormRequest
             'user_email' => ['required', 'string'],
             'password' => ['required', 'password'],
             'status_id' => ['required', 'integer', 'exists:statuses,id'],
+            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
         ];
     }
 }

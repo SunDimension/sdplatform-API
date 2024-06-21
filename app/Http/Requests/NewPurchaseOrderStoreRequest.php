@@ -20,7 +20,16 @@ class NewPurchaseOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'newPurchaseOrder' => ['required'],
+            'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
+            'item_id' => ['required', 'integer', 'exists:items,id'],
+            'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
+            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'payment_mode_id' => ['required', 'integer', 'exists:payment_modes,id'],
+            'purchase_order_number' => ['required', 'string'],
+            'purchase_amount' => ['required', 'string'],
+            'purchase_date' => ['required'],
+            'expected_delivery_date' => ['required', 'date'],
+            'payment_type_id' => ['required', 'integer', 'exists:payment_types,id'],
         ];
     }
 }

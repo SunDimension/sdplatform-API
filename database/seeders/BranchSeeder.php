@@ -12,10 +12,6 @@ class BranchSeeder extends Seeder
      */
     public function run(): void
     {
-         Branch::insert([
-        ['branch_name' => 'Kano','branch_address'=>'Sabon Gare','contact_person'=>'james','branch_email'=>'kano-main@go.com','branch_phone'=>'08755212525','state_id'=>'4','country_id'=>'1'],
-        ]
-        
-        );
+        Branch::factory()->count(5)->create();
     }
 }

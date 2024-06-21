@@ -4,9 +4,11 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Models\Branch;
 use App\Models\Role;
 use App\Models\Status;
 use App\Models\User;
+use App\Models\Warehouse;
 
 class UserFactory extends Factory
 {
@@ -28,6 +30,8 @@ class UserFactory extends Factory
             'user_email' => $this->faker->word(),
             'password' => $this->faker->password(),
             'status_id' => Status::factory(),
+            'branch_id' => Branch::factory(),
+            'warehouse_id' => Warehouse::factory(),
         ];
     }
 }
