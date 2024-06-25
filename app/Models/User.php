@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class User extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -22,6 +21,8 @@ class User extends Model
         'user_email',
         'password',
         'status_id',
+        'branch_id',
+        'warehouse_id',
     ];
 
     /**
@@ -39,8 +40,11 @@ class User extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'role_id' => 'integer',
         'status_id' => 'integer',
+        'branch_id' => 'integer',
+        'warehouse_id' => 'integer',
     ];
 
     public function role(): BelongsTo
@@ -51,5 +55,15 @@ class User extends Model
     public function status(): BelongsTo
     {
         return $this->belongsTo(Status::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
     }
 }

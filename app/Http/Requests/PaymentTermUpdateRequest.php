@@ -20,7 +20,7 @@ class PaymentTermUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'paymentTerm' => ['required'],
+            'name' => ['required', 'string'],
         ];
     }
 }

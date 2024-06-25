@@ -3,6 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Branch;
+use App\Models\ExpenseAccount;
 use App\Models\PaymentMode;
 use App\Models\PaymentVoucher;
 use App\Models\Product;
@@ -57,7 +58,7 @@ final class PaymentVoucherControllerTest extends TestCase
         $tax = Tax::factory()->create();
         $vendor = Vendor::factory()->create();
         $payment_mode = PaymentMode::factory()->create();
-        $expense_account_id = $this->faker->word();
+        $expense_account = ExpenseAccount::factory()->create();
 
         $response = $this->post(route('payment-vouchers.store'), [
             'product_id' => $product->id,
@@ -69,7 +70,7 @@ final class PaymentVoucherControllerTest extends TestCase
             'tax_id' => $tax->id,
             'vendor_id' => $vendor->id,
             'payment_mode_id' => $payment_mode->id,
-            'expense_account_id' => $expense_account_id,
+            'expense_account_id' => $expense_account->id,
         ]);
 
         $paymentVouchers = PaymentVoucher::query()
@@ -82,7 +83,7 @@ final class PaymentVoucherControllerTest extends TestCase
             ->where('tax_id', $tax->id)
             ->where('vendor_id', $vendor->id)
             ->where('payment_mode_id', $payment_mode->id)
-            ->where('expense_account_id', $expense_account_id)
+            ->where('expense_account_id', $expense_account->id)
             ->get();
         $this->assertCount(1, $paymentVouchers);
         $paymentVoucher = $paymentVouchers->first();
@@ -127,7 +128,7 @@ final class PaymentVoucherControllerTest extends TestCase
         $tax = Tax::factory()->create();
         $vendor = Vendor::factory()->create();
         $payment_mode = PaymentMode::factory()->create();
-        $expense_account_id = $this->faker->word();
+        $expense_account = ExpenseAccount::factory()->create();
 
         $response = $this->put(route('payment-vouchers.update', $paymentVoucher), [
             'product_id' => $product->id,
@@ -139,7 +140,7 @@ final class PaymentVoucherControllerTest extends TestCase
             'tax_id' => $tax->id,
             'vendor_id' => $vendor->id,
             'payment_mode_id' => $payment_mode->id,
-            'expense_account_id' => $expense_account_id,
+            'expense_account_id' => $expense_account->id,
         ]);
 
         $paymentVoucher->refresh();
@@ -156,7 +157,7 @@ final class PaymentVoucherControllerTest extends TestCase
         $this->assertEquals($tax->id, $paymentVoucher->tax_id);
         $this->assertEquals($vendor->id, $paymentVoucher->vendor_id);
         $this->assertEquals($payment_mode->id, $paymentVoucher->payment_mode_id);
-        $this->assertEquals($expense_account_id, $paymentVoucher->expense_account_id);
+        $this->assertEquals($expense_account->id, $paymentVoucher->expense_account_id);
     }
 
 

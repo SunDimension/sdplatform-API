@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Branch;
 use App\Models\CreateItem;
+use App\Models\ExpenseAccountId;
 use App\Models\PaymentMode;
 use App\Models\PaymentVoucher;
 use App\Models\Tax;
@@ -36,7 +37,7 @@ class PaymentVoucherFactory extends Factory
             'tax_id' => Tax::factory(),
             'vendor_id' => Vendor::factory(),
             'payment_mode_id' => PaymentMode::factory(),
-            'expense_account_id' => $this->faker->word(),
+            'expense_account_id' => ExpenseAccountId::factory(),
         ];
     }
 }

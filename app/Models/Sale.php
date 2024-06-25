@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Sale extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -38,6 +37,7 @@ class Sale extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'customer_id' => 'integer',
         'product_id' => 'integer',
         'branch_id' => 'integer',

@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class NewPayment extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -31,6 +30,7 @@ class NewPayment extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'vendor_id' => 'integer',
         'branch_id' => 'integer',
         'warehouse_id' => 'integer',

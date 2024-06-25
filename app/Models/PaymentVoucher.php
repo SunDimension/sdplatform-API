@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaymentVoucher extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -35,6 +34,7 @@ class PaymentVoucher extends Model
      * @var array
      */
     protected $casts = [
+        'id' => 'integer',
         'product_id' => 'integer',
         'expense_date' => 'timestamp',
         'branch_id' => 'integer',
@@ -42,6 +42,7 @@ class PaymentVoucher extends Model
         'tax_id' => 'integer',
         'vendor_id' => 'integer',
         'payment_mode_id' => 'integer',
+        'expense_account_id' => 'integer',
     ];
 
     public function product(): BelongsTo
@@ -72,5 +73,10 @@ class PaymentVoucher extends Model
     public function paymentMode(): BelongsTo
     {
         return $this->belongsTo(PaymentMode::class);
+    }
+
+    public function expenseAccount(): BelongsTo
+    {
+        return $this->belongsTo(ExpenseAccountId::class);
     }
 }

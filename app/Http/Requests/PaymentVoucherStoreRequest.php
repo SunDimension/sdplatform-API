@@ -29,7 +29,7 @@ class PaymentVoucherStoreRequest extends FormRequest
             'tax_id' => ['required', 'integer', 'exists:taxes,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'payment_mode_id' => ['required', 'integer', 'exists:payment_modes,id'],
-            'expense_account_id' => ['required', 'string'],
+            'expense_account_id' => ['required', 'integer', 'exists:expense_accounts,id'],
         ];
     }
 }
