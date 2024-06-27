@@ -1,0 +1,380 @@
+models:
+  Account:
+    AccountGroupID: id foreign:accountgroup
+    AccountTypeID: id foreign:accounttype
+    AccountsSubTypeID: id foreign:accountssubtype
+    AccountCode: string
+    AccountTitle: string
+    AccountOwnerID: int
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+
+  Accountgroup:
+    AccountGroup: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Account,Accounttype
+
+  Accountssubtype:
+    AccountTypeID: id foreign:accounttype
+    AccountsSubType: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Account
+
+  Accounttype:
+    AccountGroupID: id foreign:accountgroup
+    AccountType: string
+    GLCode: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Account,Accountssubtype
+
+  Chart:
+    chart_title: string
+    chart_type_id: int
+    chart_category_id: int
+    sql_query: text
+    isActive: int
+    module_id: int
+    filterColumn: string
+    created_at: timestamp
+    updated_at: timestamp
+    deleted_at: timestamp
+    created_by: id foreign: employees
+    modified_by: id foreign: employees
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Dashboardsetting
+
+  ChartCard:
+    card_title: string
+    card_size: int
+    isActive: int
+    sql_query: text
+    moduleId: int
+    submoduleId: int
+    sequence: int
+    color: string
+    created_at: timestamp
+    updated_at: timestamp
+    deleted_at: timestamp
+    created_by: id foreign: employees
+    modified_by: id foreign: employees
+    deleted_by: id foreign: employees
+    softDeletes
+
+  ChartCategory:
+    chart_provider_id: id foreign:chart_providers
+    chart_category: string
+    created_at: timestamp
+    updated_at: timestamp
+    deleted_at: timestamp
+    created_by: id foreign: employees
+    modified_by: id foreign: employees
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: ChartType,Dashboardsetting
+
+  ChartProvider:
+    chart_provider: string
+    created_at: timestamp
+    updated_at: timestamp
+    deleted_at: timestamp
+    created_by: id foreign: employees
+    modified_by: id foreign: employees
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: ChartCategory
+
+  ChartType:
+    chart_category_id: id foreign:chart_category
+    chart_type: string
+    created_at: timestamp
+    updated_at: timestamp
+    deleted_at: timestamp
+    created_by: id foreign: employees
+    modified_by: id foreign: employees
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Dashboardsetting
+
+  Dashboardsetting:
+    chart_id: id foreign:charts
+    module_id: id foreign:modules
+    chart_type_id: id foreign:chart_types
+    chart_category_id: id foreign:chart_category
+    chart_title: string
+    isActive: int
+    orderby: int
+    isGroup: int
+    subModuleId: int
+    addCondition: int
+    created_at: timestamp
+    updated_at: timestamp
+    deleted_at: timestamp
+    created_by: id foreign: employees
+    modified_by: id foreign: employees
+    deleted_by: id foreign: employees
+    softDeletes
+
+  Payment:
+    PaymentMethodID: id foreign:paymentmethod
+    CompanyID: id foreign:company
+    PaymentTypeID: id foreign:paymenttype
+    PVNumber: string
+    PayingAccountID: int
+    ChequeNo: string
+    PaymentDate: timestamp
+    VATID: int
+    WHTID: int
+    PayeeID: int
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+
+  Paymentmethod:
+    PaymentMethod: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Payment,Ticket
+
+  Paymentplan:
+    PaymentTrancheID: id foreign:paymenttranche
+    ProjectID: id foreign:project
+    PaymentAmount: double
+    PaymentMethod: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+
+  Paymentstatu:
+    CreatedBy: id foreign:employee
+    ModifiedBy: id foreign:employee
+    PaymentStatus: string
+    DateCreated: timestamp
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Ticket
+
+  Paymenttranche:
+    Tranche: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Paymentplan
+
+  Paymenttype:
+    PaymentType: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Payment
+
+  Procurement:
+    ProcurementDate: timestamp
+    RequestBy: int
+    ApprovalStagesID: int
+    ApprovalOfficerID: int
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    ProcurementTitle: string
+    ProjectID: int
+    Comment: text
+    softDeletes
+
+  Procurementdetail:
+    VendorID: id foreign:vendors
+    ProcurementID: int
+    Price: double
+    Quantity: double
+    Description: text
+    Action: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    ProductID: int
+    Product: string
+    Selected: tinyint
+    softDeletes
+
+  Procurementvendor:
+    VendorID: id foreign:vendors
+    ProcurementID: int
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+
+  Vendor:
+    VendorCategoryID: id foreign:vendorcategory
+    VendorName: string
+    VendorPhysicalAddress: text
+    VendorEmail: string
+    VendorPhoneNum: string
+    TIN: string
+    ContactPerson: string
+    ContactEmail: string
+    ContactPhone: string
+    StatusID: int
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+
+  Vendorcategory:
+    VendorCategory: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+    relationships:
+      hasMany: Vendor,Vendor
+
+  Vendor:
+    VendorCategoryID: id foreign:vendorcategory
+    StatusID: id foreign:statuses
+    VendorName: string
+    Address: text
+    TIN: string
+    AccountNumber: string
+    Bank: int
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    ProductCategoryID: int
+    softDeletes
+    relationships:
+      hasMany: Procurementdetail,Procurementvendor
+
+  Vendortype:
+    VendorType: string
+    CreatedBy: int
+    DateCreated: timestamp
+    ModifiedBy: int
+    DateModified: timestamp
+    deleted_at: timestamp
+    deleted_by: id foreign: employees
+    softDeletes
+
+
+controllers:
+  Account:
+    resource: api
+  Accountgroup:
+    resource: api
+  Accountssubtype:
+    resource: api
+  Accounttype:
+    resource: api
+  Chart:
+    resource: api
+  ChartCard:
+    resource: api
+  ChartCategory:
+    resource: api
+  ChartProvider:
+    resource: api
+  ChartType:
+    resource: api
+  Dashboardsetting:
+    resource: api
+  Payment:
+    resource: api
+  Paymentmethod:
+    resource: api
+  Paymentplan:
+    resource: api
+  Paymentstatu:
+    resource: api
+  Paymenttranche:
+    resource: api
+  Paymenttype:
+    resource: api
+  Procurement:
+    resource: api
+  Procurementdetail:
+    resource: api
+  Procurementvendor:
+    resource: api
+  Vendor:
+    resource: api
+  Vendorcategory:
+    resource: api
+  Vendor:
+    resource: api
+  Vendortype:
+    resource: api
