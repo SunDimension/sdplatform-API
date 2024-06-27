@@ -10,6 +10,8 @@ class TransferOrder extends Model
 {
     use HasFactory;
 
+    public $table = "transfer_orders";
+
     /**
      * The attributes that are mass assignable.
      *
@@ -19,8 +21,8 @@ class TransferOrder extends Model
         'transfer_order_number',
         'transfer_date',
         'transfer_reason',
-        'source_warehouse_id',
-        'destination_warehouse_id',
+        'source_id',
+        'destination_id',
         'image_url',
         'transfer_quantity',
         'item_id',
@@ -34,8 +36,8 @@ class TransferOrder extends Model
     protected $casts = [
         'id' => 'integer',
         'transfer_date' => 'timestamp',
-        'source_warehouse_id' => 'integer',
-        'destination_warehouse_id' => 'integer',
+        'source_id' => 'integer',
+        'destination_id' => 'integer',
         'item_id' => 'integer',
     ];
 

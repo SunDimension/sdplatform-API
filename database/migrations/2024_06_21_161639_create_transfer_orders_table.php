@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('transfer_order_number');
             $table->timestamp('transfer_date');
             $table->string('transfer_reason');
-            $table->foreignId('source_warehouse_id')->constrained('warehouses');
-            $table->foreignId('destination_warehouse_id')->constrained('warehouses');
+            $table->foreignId('source_id')->constrained();
+            $table->foreignId('destination_id')->constrained();
             $table->string('image_url');
             $table->string('transfer_quantity');
             $table->foreignId('item_id')->constrained('create_items');

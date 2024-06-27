@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\RolesStoreRequest;
-use App\Http\Requests\RolesUpdateRequest;
+use App\Http\Requests\RoleStoreRequest;
+use App\Http\Requests\RoleUpdateRequest;
 use App\Http\Resources\RoleCollection;
 use App\Http\Resources\RoleResource;
 use App\Models\Role;
@@ -19,7 +19,6 @@ class RolesController extends Controller
         return new RoleCollection($roles);
     }
 
-    public function store(RolesStoreRequest $request): RoleResource
     {
         $role = Role::create($request->validated());
 
@@ -31,7 +30,7 @@ class RolesController extends Controller
         return new RoleResource($role);
     }
 
-    public function update(RolesUpdateRequest $request, Role $role): RoleResource
+    public function update(RoleUpdateRequest $request, Role $role): RoleResource
     {
         $role->update($request->validated());
 

@@ -23,11 +23,11 @@ class TransferOrderStoreRequest extends FormRequest
             'transfer_order_number' => ['required', 'string'],
             'transfer_date' => ['required'],
             'transfer_reason' => ['required', 'string'],
-            'source_warehouse_id' => ['required', 'integer', 'exists:source_warehouses,id'],
-            'destination_warehouse_id' => ['required', 'integer', 'exists:destination_warehouses,id'],
+            'source_id' => ['required', 'integer', 'exists:warehouses,id'],
+            'destination_id' => ['required', 'integer', 'exists:warehouses,id'],
             'image_url' => ['required', 'string'],
             'transfer_quantity' => ['required', 'string'],
-            'item_id' => ['required', 'integer', 'exists:items,id'],
+            'item_id' => ['required', 'integer', 'exists:create_items,id'],
         ];
     }
 }

@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Laravel\Sanctum\HasApiTokens;
 
-class User extends Model
+use Illuminate\Foundation\Auth\User as Authenticatable;
+
+class User extends Authenticatable 
 {
-    use HasFactory;
+    use HasFactory, HasApiTokens;
 
     /**
      * The attributes that are mass assignable.
@@ -17,8 +20,8 @@ class User extends Model
      */
     protected $fillable = [
         'role_id',
-        'user_name',
-        'user_email',
+        'name',
+        'email',
         'password',
         'status_id',
         'branch_id',

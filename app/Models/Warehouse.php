@@ -10,6 +10,8 @@ class Warehouse extends Model
 {
     use HasFactory;
 
+        public $table = "warehouses";
+
     /**
      * The attributes that are mass assignable.
      *
