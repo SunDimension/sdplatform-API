@@ -19,6 +19,7 @@ class RolesController extends Controller
         return new RoleCollection($roles);
     }
 
+    public function store(RoleStoreRequest $request): RoleResource
     {
         $role = Role::create($request->validated());
 
