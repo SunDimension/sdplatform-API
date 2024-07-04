@@ -26,10 +26,10 @@ class PeriodAccountDailyStoreRequest extends FormRequest
             'amount' => ['required', 'numeric'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'account_no' => ['required', 'string'],
-            'account_id' => ['required', 'integer', 'exists:accounts,id'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'account_id' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

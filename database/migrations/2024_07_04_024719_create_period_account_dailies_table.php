@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('journal_entry_details', function (Blueprint $table) {
+        Schema::create('period_account_dailies', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('journal_entry_id')->constrained();
-            $table->foreignId('journal_type_id')->constrained();
+            $table->date('period_date');
+            $table->double('debit');
+            $table->double('credit');
             $table->double('amount');
-            $table->text('description');
-            $table->string('account_id');
+            $table->foreignId('warehouse_id')->constrained();
             $table->string('account_no');
-            $table->string('created_by');
-            $table->string('modified_by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->foreignUuid('account_id')->constrained();
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -36,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('journal_entry_details');
+        Schema::dropIfExists('period_account_dailies');
     }
 };

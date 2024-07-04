@@ -47,18 +47,28 @@ class Chart extends Model
         return $this->hasMany(Dashboardsetting::class);
     }
 
+    public function chartType(): BelongsTo
+    {
+        return $this->belongsTo(ChartType::class);
+    }
+
+    public function chartCategory(): BelongsTo
+    {
+        return $this->belongsTo(ChartCategory::class);
+    }
+
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

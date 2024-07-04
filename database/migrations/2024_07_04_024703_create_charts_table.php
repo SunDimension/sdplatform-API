@@ -13,19 +13,18 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('chart_cards', function (Blueprint $table) {
+        Schema::create('charts', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('card_title');
-            $table->string('card_size');
-            $table->string('is_active');
+            $table->string('chart_title');
+            $table->foreignUuid('chart_type_id')->constrained();
+            $table->foreignUuid('chart_category_id')->constrained();
             $table->text('sql_query');
+            $table->string('is_active');
             $table->string('module_id');
-            $table->string('submodule_id');
-            $table->string('sequence');
-            $table->string('color');
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->string('filterColumn');
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -38,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chart_cards');
+        Schema::dropIfExists('charts');
     }
 };

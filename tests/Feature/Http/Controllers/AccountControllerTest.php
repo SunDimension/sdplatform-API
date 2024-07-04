@@ -6,9 +6,6 @@ use App\Models\Account;
 use App\Models\AccountGroup;
 use App\Models\AccountSubtype;
 use App\Models\AccountType;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -53,9 +50,6 @@ final class AccountControllerTest extends TestCase
         $account_type = AccountType::factory()->create();
         $account_subtype = AccountSubtype::factory()->create();
         $account_owner_id = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('accounts.store'), [
             'name' => $name,
@@ -64,9 +58,6 @@ final class AccountControllerTest extends TestCase
             'account_type_id' => $account_type->id,
             'account_subtype_id' => $account_subtype->id,
             'account_owner_id' => $account_owner_id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accounts = Account::query()
@@ -76,9 +67,6 @@ final class AccountControllerTest extends TestCase
             ->where('account_type_id', $account_type->id)
             ->where('account_subtype_id', $account_subtype->id)
             ->where('account_owner_id', $account_owner_id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $accounts);
         $account = $accounts->first();
@@ -120,9 +108,6 @@ final class AccountControllerTest extends TestCase
         $account_type = AccountType::factory()->create();
         $account_subtype = AccountSubtype::factory()->create();
         $account_owner_id = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('accounts.update', $account), [
             'name' => $name,
@@ -131,9 +116,6 @@ final class AccountControllerTest extends TestCase
             'account_type_id' => $account_type->id,
             'account_subtype_id' => $account_subtype->id,
             'account_owner_id' => $account_owner_id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $account->refresh();
@@ -147,9 +129,6 @@ final class AccountControllerTest extends TestCase
         $this->assertEquals($account_type->id, $account->account_type_id);
         $this->assertEquals($account_subtype->id, $account->account_subtype_id);
         $this->assertEquals($account_owner_id, $account->account_owner_id);
-        $this->assertEquals($created_by->id, $account->created_by);
-        $this->assertEquals($modified_by->id, $account->modified_by);
-        $this->assertEquals($deleted_by->id, $account->deleted_by);
     }
 
 

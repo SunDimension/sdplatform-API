@@ -4,9 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\AccountSubtype;
 use App\Models\AccountType;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -47,24 +44,15 @@ final class AccountSubtypeControllerTest extends TestCase
     {
         $name = $this->faker->name();
         $account_type = AccountType::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('account-subtypes.store'), [
             'name' => $name,
             'account_type_id' => $account_type->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accountSubtypes = AccountSubtype::query()
             ->where('name', $name)
             ->where('account_type_id', $account_type->id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $accountSubtypes);
         $accountSubtype = $accountSubtypes->first();
@@ -102,16 +90,10 @@ final class AccountSubtypeControllerTest extends TestCase
         $accountSubtype = AccountSubtype::factory()->create();
         $name = $this->faker->name();
         $account_type = AccountType::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('account-subtypes.update', $accountSubtype), [
             'name' => $name,
             'account_type_id' => $account_type->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accountSubtype->refresh();
@@ -121,9 +103,6 @@ final class AccountSubtypeControllerTest extends TestCase
 
         $this->assertEquals($name, $accountSubtype->name);
         $this->assertEquals($account_type->id, $accountSubtype->account_type_id);
-        $this->assertEquals($created_by->id, $accountSubtype->created_by);
-        $this->assertEquals($modified_by->id, $accountSubtype->modified_by);
-        $this->assertEquals($deleted_by->id, $accountSubtype->deleted_by);
     }
 
 

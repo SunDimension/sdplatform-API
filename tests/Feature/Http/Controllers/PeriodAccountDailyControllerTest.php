@@ -3,9 +3,6 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Account;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use App\Models\PeriodAccountDaily;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -54,9 +51,6 @@ final class PeriodAccountDailyControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('period-account-dailies.store'), [
             'period_date' => $period_date->toDateString(),
@@ -66,9 +60,6 @@ final class PeriodAccountDailyControllerTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $periodAccountDailies = PeriodAccountDaily::query()
@@ -79,9 +70,6 @@ final class PeriodAccountDailyControllerTest extends TestCase
             ->where('warehouse_id', $warehouse->id)
             ->where('account_no', $account_no)
             ->where('account_id', $account->id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $periodAccountDailies);
         $periodAccountDaily = $periodAccountDailies->first();
@@ -124,9 +112,6 @@ final class PeriodAccountDailyControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('period-account-dailies.update', $periodAccountDaily), [
             'period_date' => $period_date->toDateString(),
@@ -136,9 +121,6 @@ final class PeriodAccountDailyControllerTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $periodAccountDaily->refresh();
@@ -153,9 +135,6 @@ final class PeriodAccountDailyControllerTest extends TestCase
         $this->assertEquals($warehouse->id, $periodAccountDaily->warehouse_id);
         $this->assertEquals($account_no, $periodAccountDaily->account_no);
         $this->assertEquals($account->id, $periodAccountDaily->account_id);
-        $this->assertEquals($created_by->id, $periodAccountDaily->created_by);
-        $this->assertEquals($modified_by->id, $periodAccountDaily->modified_by);
-        $this->assertEquals($deleted_by->id, $periodAccountDaily->deleted_by);
     }
 
 

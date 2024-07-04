@@ -21,15 +21,15 @@ class ChartUpdateRequest extends FormRequest
     {
         return [
             'chart_title' => ['required', 'string'],
-            'chart_type_id' => ['required', 'string'],
-            'chart_category_id' => ['required', 'string'],
+            'chart_type_id' => ['required'],
+            'chart_category_id' => ['required'],
             'sql_query' => ['required', 'string'],
             'is_active' => ['required', 'string'],
             'module_id' => ['required', 'string'],
             'filterColumn' => ['required', 'string'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

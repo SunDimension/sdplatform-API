@@ -3,9 +3,6 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\AccountGroup;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -45,22 +42,22 @@ final class AccountGroupControllerTest extends TestCase
     public function store_saves(): void
     {
         $name = $this->faker->name();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
+        $created_by = $this->faker->word();
+        $modified_by = $this->faker->word();
+        $deleted_by = $this->faker->word();
 
         $response = $this->post(route('account-groups.store'), [
             'name' => $name,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
+            'created_by' => $created_by,
+            'modified_by' => $modified_by,
+            'deleted_by' => $deleted_by,
         ]);
 
         $accountGroups = AccountGroup::query()
             ->where('name', $name)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
+            ->where('created_by', $created_by)
+            ->where('modified_by', $modified_by)
+            ->where('deleted_by', $deleted_by)
             ->get();
         $this->assertCount(1, $accountGroups);
         $accountGroup = $accountGroups->first();
@@ -97,15 +94,15 @@ final class AccountGroupControllerTest extends TestCase
     {
         $accountGroup = AccountGroup::factory()->create();
         $name = $this->faker->name();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
+        $created_by = $this->faker->word();
+        $modified_by = $this->faker->word();
+        $deleted_by = $this->faker->word();
 
         $response = $this->put(route('account-groups.update', $accountGroup), [
             'name' => $name,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
+            'created_by' => $created_by,
+            'modified_by' => $modified_by,
+            'deleted_by' => $deleted_by,
         ]);
 
         $accountGroup->refresh();
@@ -114,9 +111,9 @@ final class AccountGroupControllerTest extends TestCase
         $response->assertJsonStructure([]);
 
         $this->assertEquals($name, $accountGroup->name);
-        $this->assertEquals($created_by->id, $accountGroup->created_by);
-        $this->assertEquals($modified_by->id, $accountGroup->modified_by);
-        $this->assertEquals($deleted_by->id, $accountGroup->deleted_by);
+        $this->assertEquals($created_by, $accountGroup->created_by);
+        $this->assertEquals($modified_by, $accountGroup->modified_by);
+        $this->assertEquals($deleted_by, $accountGroup->deleted_by);
     }
 
 

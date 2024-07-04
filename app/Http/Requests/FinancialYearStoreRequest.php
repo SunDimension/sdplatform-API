@@ -24,9 +24,9 @@ class FinancialYearStoreRequest extends FormRequest
             'date_from' => ['required', 'date'],
             'date_to' => ['required', 'date'],
             'is_active' => ['required'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

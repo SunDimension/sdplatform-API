@@ -13,16 +13,15 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('financial_quarters', function (Blueprint $table) {
+        Schema::create('financial_years', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
             $table->date('date_from');
             $table->date('date_to');
             $table->boolean('is_active');
-            $table->foreignId('financial_year_id')->constrained();
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
         });
 
@@ -34,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('financial_quarters');
+        Schema::dropIfExists('financial_years');
     }
 };

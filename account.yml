@@ -1,57 +1,58 @@
-models:
-  Account:
-    id: uuid primary
-    name: string
-    code: string
-    account_group_id: id foreign:account_groups
-    account_type_id: id foreign:account_types
-    account_subtype_id: id foreign:account_subtypes
-    account_owner_id: int
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
-   
+models: 
   AccountGroup:
     id: uuid primary
     name: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: int 
+    modified_by: int
+    deleted_by: int
     relationships:
       hasMany: Account,AccountType
+
   AccountType:
     id: uuid primary
-    account_group_id: id foreign:account_groups
+    account_group_id: uuid foreign:account_groups
     name: string
     code: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     relationships:
       hasMany: Account,AccountSubtype
 
   AccountSubtype:
     id: uuid primary
     name: string
-    account_type_id: id foreign:account_types
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    account_type_id: uuid foreign:account_types
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     relationships:
       hasMany: Account
+    
+  Account:
+    id: uuid primary
+    name: string
+    code: string
+    account_group_id: uuid foreign:account_groups
+    account_type_id: uuid foreign:account_types
+    account_subtype_id: uuid foreign:account_subtypes
+    account_owner_id: int
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
 
   Chart:
     id: uuid primary
     chart_title: string
-    chart_type_id: int
-    chart_category_id: int
+    chart_type_id: uuid foreign
+    chart_category_id: uuid foreign
     sql_query: text
     is_active: int
     module_id: int
     filterColumn: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
     relationships:
       hasMany: Dashboardsetting
@@ -66,18 +67,18 @@ models:
     submodule_id: int
     sequence: int
     color: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
 
   ChartCategory:
     id: uuid primary
-    chart_provider_id: id foreign:chart_providers
+    chart_provider_id: uuid foreign:chart_providers
     chart_category: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
     relationships:
       hasMany: ChartType,DashboardSetting
@@ -85,39 +86,39 @@ models:
   ChartProvider:
     id: uuid primary
     chart_provider: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
     relationships:
       hasMany: ChartCategory
 
   ChartType:
     id: uuid primary
-    chart_category_id: id foreign:chart_categories
+    chart_category_id: uuid foreign:chart_categories
     chart_type: string
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
     relationships:
       hasMany: DashboardSetting
 
   DashboardSetting:
     id: uuid primary
-    chart_id: id foreign:charts
-    module_id: id foreign:modules
-    chart_type_id: id foreign:chart_types
-    chart_category_id: id foreign:chart_categories
+    chart_id: uuid foreign:charts
+    module_id: uuid foreign:modules
+    chart_type_id: uuid foreign:chart_types
+    chart_category_id: uuid foreign:chart_categories
     chart_title: string
     is_active: int
     order_by: int
     is_group: int
     submodule_Id: int
     add_condition: int
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
 
   FinancialYear:
@@ -126,9 +127,9 @@ models:
     date_from: date
     date_to: date
     is_active: boolean
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     relationships:
       hasMany: FinancialQuarter, FinancialPeriod
   
@@ -138,10 +139,10 @@ models:
     date_from: date
     date_to: date
     is_active: boolean
-    financial_year_id: id foreign:financial_years
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    financial_year_id: uuid foreign:financial_years
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     relationships:
       hasMany: FinancialPeriod
   
@@ -151,11 +152,11 @@ models:
     date_from: date
     date_to: date
     is_active: boolean
-    financial_year_id: id foreign:financial_years
-    financial_quarter_id: id foreign:financial_quarters
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    financial_year_id: uuid foreign:financial_years
+    financial_quarter_id: uuid foreign:financial_quarters
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     relationships:
       hasMany: Transaction
   
@@ -170,30 +171,29 @@ models:
     payment_date: timestamp
     warehouse_id: id foreign:warehouses
     vendor_id: int
-    created_by: int
-    modified_by: int
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
     relationships:
       hasMany: JournalEntryDetail
 
   JournalEntryDetail:
     id: uuid primary
-    journal_entry_id: id foreign:journal_entries
-    journal_type_id: id foreign:journal_types
+    journal_entry_id: uuid foreign:journal_entries
+    journal_type_id: uuid foreign:journal_types
     amount: double
     description: text
-    account_id: int:accounts,id
+    account_id: uuid:foreign:accounts
     account_no: string
-
-    created_by: int
-    modified_by: int
-    deleted_by: id foreign:employees,id
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
 
   Transaction:
     id: uuid primary
-    financial_period_id: id foreign:financial_periods
+    financial_period_id: uuid foreign:financial_periods
     transaction_date: date
     transcode: string
     transtype: string
@@ -203,53 +203,53 @@ models:
     amount: double
     warehouse_id: id foreign:warehouses
     account_no: string
-    account_id: id foreign:accounts,id
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    account_id: uuid foreign:accounts
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
 
   AccountOpeningBalance:
     id: uuid primary
-    financial_year_id: id foreign:financial_years
-    financial_period_id: id foreign:financial_periods
+    financial_year_id: uuid foreign:financial_years
+    financial_period_id: uuid foreign:financial_periods
     debit: double
     credit: double
     amount: double
     warehouse_id: id foreign:warehouses
     account_no: string
-    account_id: id foreign:accounts,id
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    account_id: uuid foreign:accounts
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
   
   PeriodAccount:
     id: uuid primary
-    financial_period_id: id foreign:financial_periods
+    financial_period_id: uuid foreign:financial_periods
     debit: double
     credit: double
     amount: double
     warehouse_id: id foreign:warehouses
-    account_no: string
-    account_id: id foreign:accounts,id
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    account_no: string nullable
+    account_id: uuid foreign:accounts
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
   
   PeriodAccountYear:
     id: uuid primary
-    financial_year_id: id foreign:financial_years
+    financial_year_id: uuid foreign:financial_years
     debit: double
     credit: double
     amount: double
     warehouse_id: id foreign:warehouses
-    account_no: string
-    account_id: id foreign:accounts,id
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    account_no: string  nullable
+    account_id: uuid foreign:accounts
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
   
 
@@ -261,10 +261,10 @@ models:
     amount: double
     warehouse_id: id foreign:warehouses
     account_no: string
-    account_id: id foreign:accounts,id
-    created_by: id foreign:employees,id
-    modified_by: id foreign:employees,id
-    deleted_by: id foreign:employees,id
+    account_id: uuid foreign:accounts
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
     softDeletes
   
 

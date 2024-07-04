@@ -20,11 +20,11 @@ class ChartCategoryStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'chart_provider_id' => ['required', 'integer', 'exists:chart_providers,id'],
+            'chart_provider_id' => ['required'],
             'chart_category' => ['required', 'string'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

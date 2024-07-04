@@ -40,13 +40,11 @@ class Transaction extends Model
      * @var array
      */
     protected $casts = [
-        'financial_period_id' => 'integer',
         'transaction_date' => 'date',
         'debit' => 'double',
         'credit' => 'double',
         'amount' => 'double',
         'warehouse_id' => 'integer',
-        'account_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -64,21 +62,21 @@ class Transaction extends Model
 
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Accounts,id::class);
+        return $this->belongsTo(Account::class);
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

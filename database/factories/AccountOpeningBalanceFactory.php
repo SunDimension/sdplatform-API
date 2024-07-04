@@ -4,11 +4,11 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
+use App\Models\Account;
 use App\Models\AccountOpeningBalance;
-use App\Models\Accounts,id;
-use App\Models\Employees,id;
 use App\Models\FinancialPeriod;
 use App\Models\FinancialYear;
+use App\Models\User;
 use App\Models\Warehouse;
 
 class AccountOpeningBalanceFactory extends Factory
@@ -33,10 +33,10 @@ class AccountOpeningBalanceFactory extends Factory
             'amount' => $this->faker->randomFloat(0, 0, 9999999999.),
             'warehouse_id' => Warehouse::factory(),
             'account_no' => $this->faker->word(),
-            'account_id' => Accounts,id::factory(),
-            'created_by' => Employees,id::factory()->create()->created_by,
-            'modified_by' => Employees,id::factory()->create()->modified_by,
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'account_id' => Account::factory(),
+            'created_by' => User::factory(),
+            'modified_by' => User::factory(),
+            'deleted_by' => User::factory(),
         ];
     }
 }

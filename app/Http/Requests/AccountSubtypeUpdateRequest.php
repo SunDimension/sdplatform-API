@@ -21,10 +21,10 @@ class AccountSubtypeUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'account_type_id' => ['required', 'integer', 'exists:account_types,id'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'account_type_id' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

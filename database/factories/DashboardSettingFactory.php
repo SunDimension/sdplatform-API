@@ -8,8 +8,8 @@ use App\Models\Chart;
 use App\Models\ChartCategory;
 use App\Models\ChartType;
 use App\Models\DashboardSetting;
-use App\Models\Employees,id;
 use App\Models\Module;
+use App\Models\User;
 
 class DashboardSettingFactory extends Factory
 {
@@ -36,9 +36,9 @@ class DashboardSettingFactory extends Factory
             'is_group' => $this->faker->word(),
             'submodule_Id' => $this->faker->word(),
             'add_condition' => $this->faker->word(),
-            'created_by' => Employees,id::factory()->create()->created_by,
-            'modified_by' => Employees,id::factory()->create()->modified_by,
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'created_by' => User::factory(),
+            'modified_by' => User::factory(),
+            'deleted_by' => User::factory(),
         ];
     }
 }

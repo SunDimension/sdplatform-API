@@ -24,9 +24,9 @@ class JournalEntryUpdateRequest extends FormRequest
             'payment_date' => ['required'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'vendor_id' => ['required', 'string'],
-            'created_by' => ['required', 'string'],
-            'modified_by' => ['required', 'string'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

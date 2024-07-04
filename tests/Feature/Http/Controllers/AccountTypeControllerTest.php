@@ -4,9 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\AccountGroup;
 use App\Models\AccountType;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -48,26 +45,17 @@ final class AccountTypeControllerTest extends TestCase
         $account_group = AccountGroup::factory()->create();
         $name = $this->faker->name();
         $code = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('account-types.store'), [
             'account_group_id' => $account_group->id,
             'name' => $name,
             'code' => $code,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accountTypes = AccountType::query()
             ->where('account_group_id', $account_group->id)
             ->where('name', $name)
             ->where('code', $code)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $accountTypes);
         $accountType = $accountTypes->first();
@@ -106,17 +94,11 @@ final class AccountTypeControllerTest extends TestCase
         $account_group = AccountGroup::factory()->create();
         $name = $this->faker->name();
         $code = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('account-types.update', $accountType), [
             'account_group_id' => $account_group->id,
             'name' => $name,
             'code' => $code,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accountType->refresh();
@@ -127,9 +109,6 @@ final class AccountTypeControllerTest extends TestCase
         $this->assertEquals($account_group->id, $accountType->account_group_id);
         $this->assertEquals($name, $accountType->name);
         $this->assertEquals($code, $accountType->code);
-        $this->assertEquals($created_by->id, $accountType->created_by);
-        $this->assertEquals($modified_by->id, $accountType->modified_by);
-        $this->assertEquals($deleted_by->id, $accountType->deleted_by);
     }
 
 

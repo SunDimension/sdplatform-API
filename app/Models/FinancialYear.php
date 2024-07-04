@@ -53,16 +53,16 @@ class FinancialYear extends Model
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

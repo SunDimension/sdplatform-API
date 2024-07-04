@@ -4,9 +4,6 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\ChartCategory;
 use App\Models\ChartProvider;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -47,24 +44,15 @@ final class ChartCategoryControllerTest extends TestCase
     {
         $chart_provider = ChartProvider::factory()->create();
         $chart_category = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('chart-categories.store'), [
             'chart_provider_id' => $chart_provider->id,
             'chart_category' => $chart_category,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chartCategories = ChartCategory::query()
             ->where('chart_provider_id', $chart_provider->id)
             ->where('chart_category', $chart_category)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $chartCategories);
         $chartCategory = $chartCategories->first();
@@ -102,16 +90,10 @@ final class ChartCategoryControllerTest extends TestCase
         $chartCategory = ChartCategory::factory()->create();
         $chart_provider = ChartProvider::factory()->create();
         $chart_category = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('chart-categories.update', $chartCategory), [
             'chart_provider_id' => $chart_provider->id,
             'chart_category' => $chart_category,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chartCategory->refresh();
@@ -121,9 +103,6 @@ final class ChartCategoryControllerTest extends TestCase
 
         $this->assertEquals($chart_provider->id, $chartCategory->chart_provider_id);
         $this->assertEquals($chart_category, $chartCategory->chart_category);
-        $this->assertEquals($created_by->id, $chartCategory->created_by);
-        $this->assertEquals($modified_by->id, $chartCategory->modified_by);
-        $this->assertEquals($deleted_by->id, $chartCategory->deleted_by);
     }
 
 

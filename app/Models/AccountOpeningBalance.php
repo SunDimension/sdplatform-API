@@ -37,13 +37,10 @@ class AccountOpeningBalance extends Model
      * @var array
      */
     protected $casts = [
-        'financial_year_id' => 'integer',
-        'financial_period_id' => 'integer',
         'debit' => 'double',
         'credit' => 'double',
         'amount' => 'double',
         'warehouse_id' => 'integer',
-        'account_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -66,21 +63,21 @@ class AccountOpeningBalance extends Model
 
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Accounts,id::class);
+        return $this->belongsTo(Account::class);
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

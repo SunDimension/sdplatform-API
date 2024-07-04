@@ -20,15 +20,15 @@ class JournalEntryDetailUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'journal_entry_id' => ['required', 'integer', 'exists:journal_entries,id'],
-            'journal_type_id' => ['required', 'integer', 'exists:journal_types,id'],
+            'journal_entry_id' => ['required'],
+            'journal_type_id' => ['required'],
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string'],
-            'account_id' => ['required', 'string'],
+            'account_id' => ['required'],
             'account_no' => ['required', 'string'],
-            'created_by' => ['required', 'string'],
-            'modified_by' => ['required', 'string'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

@@ -20,12 +20,12 @@ class AccountTypeUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'account_group_id' => ['required', 'integer', 'exists:account_groups,id'],
+            'account_group_id' => ['required'],
             'name' => ['required', 'string'],
             'code' => ['required', 'string'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

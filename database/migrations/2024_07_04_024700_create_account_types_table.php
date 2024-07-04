@@ -13,12 +13,14 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('account_groups', function (Blueprint $table) {
+        Schema::create('account_types', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('account_group_id')->constrained();
             $table->string('name');
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->string('code');
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
         });
 
@@ -30,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('account_groups');
+        Schema::dropIfExists('account_types');
     }
 };

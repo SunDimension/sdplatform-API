@@ -3,9 +3,6 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\ChartCard;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -52,9 +49,6 @@ final class ChartCardControllerTest extends TestCase
         $submodule_id = $this->faker->word();
         $sequence = $this->faker->word();
         $color = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('chart-cards.store'), [
             'card_title' => $card_title,
@@ -65,9 +59,6 @@ final class ChartCardControllerTest extends TestCase
             'submodule_id' => $submodule_id,
             'sequence' => $sequence,
             'color' => $color,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chartCards = ChartCard::query()
@@ -79,9 +70,6 @@ final class ChartCardControllerTest extends TestCase
             ->where('submodule_id', $submodule_id)
             ->where('sequence', $sequence)
             ->where('color', $color)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $chartCards);
         $chartCard = $chartCards->first();
@@ -125,9 +113,6 @@ final class ChartCardControllerTest extends TestCase
         $submodule_id = $this->faker->word();
         $sequence = $this->faker->word();
         $color = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('chart-cards.update', $chartCard), [
             'card_title' => $card_title,
@@ -138,9 +123,6 @@ final class ChartCardControllerTest extends TestCase
             'submodule_id' => $submodule_id,
             'sequence' => $sequence,
             'color' => $color,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chartCard->refresh();
@@ -156,9 +138,6 @@ final class ChartCardControllerTest extends TestCase
         $this->assertEquals($submodule_id, $chartCard->submodule_id);
         $this->assertEquals($sequence, $chartCard->sequence);
         $this->assertEquals($color, $chartCard->color);
-        $this->assertEquals($created_by->id, $chartCard->created_by);
-        $this->assertEquals($modified_by->id, $chartCard->modified_by);
-        $this->assertEquals($deleted_by->id, $chartCard->deleted_by);
     }
 
 

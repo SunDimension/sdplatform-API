@@ -13,13 +13,15 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('chart_categories', function (Blueprint $table) {
+        Schema::create('journal_entries', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('chart_provider_id')->constrained();
-            $table->string('chart_category');
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->string('description');
+            $table->timestamp('payment_date');
+            $table->foreignId('warehouse_id')->constrained();
+            $table->string('vendor_id');
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -32,6 +34,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('chart_categories');
+        Schema::dropIfExists('journal_entries');
     }
 };

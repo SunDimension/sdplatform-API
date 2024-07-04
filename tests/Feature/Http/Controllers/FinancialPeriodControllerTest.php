@@ -2,12 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
 use App\Models\FinancialPeriod;
 use App\Models\FinancialQuarter;
 use App\Models\FinancialYear;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
@@ -53,9 +50,6 @@ final class FinancialPeriodControllerTest extends TestCase
         $is_active = $this->faker->boolean();
         $financial_year = FinancialYear::factory()->create();
         $financial_quarter = FinancialQuarter::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('financial-periods.store'), [
             'name' => $name,
@@ -64,9 +58,6 @@ final class FinancialPeriodControllerTest extends TestCase
             'is_active' => $is_active,
             'financial_year_id' => $financial_year->id,
             'financial_quarter_id' => $financial_quarter->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $financialPeriods = FinancialPeriod::query()
@@ -76,9 +67,6 @@ final class FinancialPeriodControllerTest extends TestCase
             ->where('is_active', $is_active)
             ->where('financial_year_id', $financial_year->id)
             ->where('financial_quarter_id', $financial_quarter->id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $financialPeriods);
         $financialPeriod = $financialPeriods->first();
@@ -120,9 +108,6 @@ final class FinancialPeriodControllerTest extends TestCase
         $is_active = $this->faker->boolean();
         $financial_year = FinancialYear::factory()->create();
         $financial_quarter = FinancialQuarter::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('financial-periods.update', $financialPeriod), [
             'name' => $name,
@@ -131,9 +116,6 @@ final class FinancialPeriodControllerTest extends TestCase
             'is_active' => $is_active,
             'financial_year_id' => $financial_year->id,
             'financial_quarter_id' => $financial_quarter->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $financialPeriod->refresh();
@@ -147,9 +129,6 @@ final class FinancialPeriodControllerTest extends TestCase
         $this->assertEquals($is_active, $financialPeriod->is_active);
         $this->assertEquals($financial_year->id, $financialPeriod->financial_year_id);
         $this->assertEquals($financial_quarter->id, $financialPeriod->financial_quarter_id);
-        $this->assertEquals($created_by->id, $financialPeriod->created_by);
-        $this->assertEquals($modified_by->id, $financialPeriod->modified_by);
-        $this->assertEquals($deleted_by->id, $financialPeriod->deleted_by);
     }
 
 

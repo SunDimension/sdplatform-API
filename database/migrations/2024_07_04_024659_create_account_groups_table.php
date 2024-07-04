@@ -11,22 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::disableForeignKeyConstraints();
-
-        Schema::create('journal_entries', function (Blueprint $table) {
+        Schema::create('account_groups', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('description');
-            $table->timestamp('payment_date');
-            $table->foreignId('warehouse_id')->constrained();
-            $table->string('vendor_id');
+            $table->string('name');
             $table->string('created_by');
             $table->string('modified_by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->string('deleted_by');
             $table->timestamps();
-            $table->softDeletes();
         });
-
-        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -34,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('journal_entries');
+        Schema::dropIfExists('account_groups');
     }
 };

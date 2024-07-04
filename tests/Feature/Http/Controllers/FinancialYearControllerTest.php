@@ -2,10 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
 use App\Models\FinancialYear;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
@@ -49,18 +46,12 @@ final class FinancialYearControllerTest extends TestCase
         $date_from = Carbon::parse($this->faker->date());
         $date_to = Carbon::parse($this->faker->date());
         $is_active = $this->faker->boolean();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('financial-years.store'), [
             'name' => $name,
             'date_from' => $date_from->toDateString(),
             'date_to' => $date_to->toDateString(),
             'is_active' => $is_active,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $financialYears = FinancialYear::query()
@@ -68,9 +59,6 @@ final class FinancialYearControllerTest extends TestCase
             ->where('date_from', $date_from)
             ->where('date_to', $date_to)
             ->where('is_active', $is_active)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $financialYears);
         $financialYear = $financialYears->first();
@@ -110,18 +98,12 @@ final class FinancialYearControllerTest extends TestCase
         $date_from = Carbon::parse($this->faker->date());
         $date_to = Carbon::parse($this->faker->date());
         $is_active = $this->faker->boolean();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('financial-years.update', $financialYear), [
             'name' => $name,
             'date_from' => $date_from->toDateString(),
             'date_to' => $date_to->toDateString(),
             'is_active' => $is_active,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $financialYear->refresh();
@@ -133,9 +115,6 @@ final class FinancialYearControllerTest extends TestCase
         $this->assertEquals($date_from, $financialYear->date_from);
         $this->assertEquals($date_to, $financialYear->date_to);
         $this->assertEquals($is_active, $financialYear->is_active);
-        $this->assertEquals($created_by->id, $financialYear->created_by);
-        $this->assertEquals($modified_by->id, $financialYear->modified_by);
-        $this->assertEquals($deleted_by->id, $financialYear->deleted_by);
     }
 
 

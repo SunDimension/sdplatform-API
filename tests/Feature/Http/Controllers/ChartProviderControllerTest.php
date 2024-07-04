@@ -3,9 +3,6 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\ChartProvider;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -45,22 +42,13 @@ final class ChartProviderControllerTest extends TestCase
     public function store_saves(): void
     {
         $chart_provider = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('chart-providers.store'), [
             'chart_provider' => $chart_provider,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chartProviders = ChartProvider::query()
             ->where('chart_provider', $chart_provider)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $chartProviders);
         $chartProvider = $chartProviders->first();
@@ -97,15 +85,9 @@ final class ChartProviderControllerTest extends TestCase
     {
         $chartProvider = ChartProvider::factory()->create();
         $chart_provider = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('chart-providers.update', $chartProvider), [
             'chart_provider' => $chart_provider,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chartProvider->refresh();
@@ -114,9 +96,6 @@ final class ChartProviderControllerTest extends TestCase
         $response->assertJsonStructure([]);
 
         $this->assertEquals($chart_provider, $chartProvider->chart_provider);
-        $this->assertEquals($created_by->id, $chartProvider->created_by);
-        $this->assertEquals($modified_by->id, $chartProvider->modified_by);
-        $this->assertEquals($deleted_by->id, $chartProvider->deleted_by);
     }
 
 

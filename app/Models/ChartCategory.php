@@ -32,7 +32,6 @@ class ChartCategory extends Model
      * @var array
      */
     protected $casts = [
-        'chart_provider_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -55,16 +54,16 @@ class ChartCategory extends Model
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

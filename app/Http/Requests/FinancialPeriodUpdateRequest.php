@@ -24,11 +24,11 @@ class FinancialPeriodUpdateRequest extends FormRequest
             'date_from' => ['required', 'date'],
             'date_to' => ['required', 'date'],
             'is_active' => ['required'],
-            'financial_year_id' => ['required', 'integer', 'exists:financial_years,id'],
-            'financial_quarter_id' => ['required', 'integer', 'exists:financial_quarters,id'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'financial_year_id' => ['required'],
+            'financial_quarter_id' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

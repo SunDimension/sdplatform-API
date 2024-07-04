@@ -13,18 +13,18 @@ return new class extends Migration
     {
         Schema::disableForeignKeyConstraints();
 
-        Schema::create('period_account_dailies', function (Blueprint $table) {
+        Schema::create('period_accounts', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->date('period_date');
+            $table->foreignUuid('financial_period_id')->constrained();
             $table->double('debit');
             $table->double('credit');
             $table->double('amount');
             $table->foreignId('warehouse_id')->constrained();
-            $table->string('account_no');
-            $table->foreignId('account_id')->constrained('accounts,ids');
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->string('account_no')->nullable();
+            $table->foreignUuid('account_id')->constrained();
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -37,6 +37,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('period_account_dailies');
+        Schema::dropIfExists('period_accounts');
     }
 };

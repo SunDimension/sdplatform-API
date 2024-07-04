@@ -4,11 +4,8 @@ namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\AccountOpeningBalance;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
 use App\Models\FinancialPeriod;
 use App\Models\FinancialYear;
-use App\Models\ModifiedBy;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -56,9 +53,6 @@ final class AccountOpeningBalanceControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('account-opening-balances.store'), [
             'financial_year_id' => $financial_year->id,
@@ -69,9 +63,6 @@ final class AccountOpeningBalanceControllerTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accountOpeningBalances = AccountOpeningBalance::query()
@@ -83,9 +74,6 @@ final class AccountOpeningBalanceControllerTest extends TestCase
             ->where('warehouse_id', $warehouse->id)
             ->where('account_no', $account_no)
             ->where('account_id', $account->id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $accountOpeningBalances);
         $accountOpeningBalance = $accountOpeningBalances->first();
@@ -129,9 +117,6 @@ final class AccountOpeningBalanceControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('account-opening-balances.update', $accountOpeningBalance), [
             'financial_year_id' => $financial_year->id,
@@ -142,9 +127,6 @@ final class AccountOpeningBalanceControllerTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $accountOpeningBalance->refresh();
@@ -160,9 +142,6 @@ final class AccountOpeningBalanceControllerTest extends TestCase
         $this->assertEquals($warehouse->id, $accountOpeningBalance->warehouse_id);
         $this->assertEquals($account_no, $accountOpeningBalance->account_no);
         $this->assertEquals($account->id, $accountOpeningBalance->account_id);
-        $this->assertEquals($created_by->id, $accountOpeningBalance->created_by);
-        $this->assertEquals($modified_by->id, $accountOpeningBalance->modified_by);
-        $this->assertEquals($deleted_by->id, $accountOpeningBalance->deleted_by);
     }
 
 

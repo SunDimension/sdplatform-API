@@ -164,3 +164,304 @@ Route::apiResource('financial-years', App\Http\Controllers\FinancialYearControll
 Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
 
 Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
+
+
+Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
+
+Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
+
+Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
+
+Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
+
+Route::apiResource('charts', App\Http\Controllers\ChartController::class);
+
+Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
+
+Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
+
+Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
+
+Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
+
+Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
+
+Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
+
+Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+
+Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
+
+Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
+
+Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
+
+Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
+
+Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
+
+Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
+
+Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
+
+Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
+
+Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);

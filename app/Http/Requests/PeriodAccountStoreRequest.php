@@ -20,16 +20,16 @@ class PeriodAccountStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'financial_period_id' => ['required', 'integer', 'exists:financial_periods,id'],
+            'financial_period_id' => ['required'],
             'debit' => ['required', 'numeric'],
             'credit' => ['required', 'numeric'],
             'amount' => ['required', 'numeric'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'account_no' => ['required', 'string'],
-            'account_id' => ['required', 'integer', 'exists:accounts,id'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'account_no' => ['nullable', 'string'],
+            'account_id' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

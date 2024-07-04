@@ -41,7 +41,6 @@ class PeriodAccountDaily extends Model
         'credit' => 'double',
         'amount' => 'double',
         'warehouse_id' => 'integer',
-        'account_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -54,21 +53,21 @@ class PeriodAccountDaily extends Model
 
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Accounts,id::class);
+        return $this->belongsTo(Account::class);
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

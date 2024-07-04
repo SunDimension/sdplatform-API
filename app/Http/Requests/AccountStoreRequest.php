@@ -22,13 +22,13 @@ class AccountStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'code' => ['required', 'string'],
-            'account_group_id' => ['required', 'integer', 'exists:account_groups,id'],
-            'account_type_id' => ['required', 'integer', 'exists:account_types,id'],
-            'account_subtype_id' => ['required', 'integer', 'exists:account_subtypes,id'],
+            'account_group_id' => ['required'],
+            'account_type_id' => ['required'],
+            'account_subtype_id' => ['required'],
             'account_owner_id' => ['required', 'string'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

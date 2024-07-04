@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\DeletedBy;
 use App\Models\JournalEntry;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -48,18 +47,12 @@ final class JournalEntryControllerTest extends TestCase
         $payment_date = Carbon::parse($this->faker->dateTime());
         $warehouse = Warehouse::factory()->create();
         $vendor_id = $this->faker->word();
-        $created_by = $this->faker->word();
-        $modified_by = $this->faker->word();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('journal-entries.store'), [
             'description' => $description,
             'payment_date' => $payment_date->toDateTimeString(),
             'warehouse_id' => $warehouse->id,
             'vendor_id' => $vendor_id,
-            'created_by' => $created_by,
-            'modified_by' => $modified_by,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $journalEntries = JournalEntry::query()
@@ -67,9 +60,6 @@ final class JournalEntryControllerTest extends TestCase
             ->where('payment_date', $payment_date)
             ->where('warehouse_id', $warehouse->id)
             ->where('vendor_id', $vendor_id)
-            ->where('created_by', $created_by)
-            ->where('modified_by', $modified_by)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $journalEntries);
         $journalEntry = $journalEntries->first();
@@ -109,18 +99,12 @@ final class JournalEntryControllerTest extends TestCase
         $payment_date = Carbon::parse($this->faker->dateTime());
         $warehouse = Warehouse::factory()->create();
         $vendor_id = $this->faker->word();
-        $created_by = $this->faker->word();
-        $modified_by = $this->faker->word();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('journal-entries.update', $journalEntry), [
             'description' => $description,
             'payment_date' => $payment_date->toDateTimeString(),
             'warehouse_id' => $warehouse->id,
             'vendor_id' => $vendor_id,
-            'created_by' => $created_by,
-            'modified_by' => $modified_by,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $journalEntry->refresh();
@@ -132,9 +116,6 @@ final class JournalEntryControllerTest extends TestCase
         $this->assertEquals($payment_date->timestamp, $journalEntry->payment_date);
         $this->assertEquals($warehouse->id, $journalEntry->warehouse_id);
         $this->assertEquals($vendor_id, $journalEntry->vendor_id);
-        $this->assertEquals($created_by, $journalEntry->created_by);
-        $this->assertEquals($modified_by, $journalEntry->modified_by);
-        $this->assertEquals($deleted_by->id, $journalEntry->deleted_by);
     }
 
 

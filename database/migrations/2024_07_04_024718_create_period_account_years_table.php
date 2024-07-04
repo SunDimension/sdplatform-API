@@ -15,16 +15,16 @@ return new class extends Migration
 
         Schema::create('period_account_years', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignId('financial_year_id')->constrained();
+            $table->foreignUuid('financial_year_id')->constrained();
             $table->double('debit');
             $table->double('credit');
             $table->double('amount');
             $table->foreignId('warehouse_id')->constrained();
-            $table->string('account_no');
-            $table->foreignId('account_id')->constrained('accounts,ids');
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->string('account_no')->nullable();
+            $table->foreignUuid('account_id')->constrained();
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
             $table->softDeletes();
         });

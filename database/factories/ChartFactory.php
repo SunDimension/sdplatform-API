@@ -5,7 +5,9 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\Chart;
-use App\Models\Employees,id;
+use App\Models\ChartCategory;
+use App\Models\ChartType;
+use App\Models\User;
 
 class ChartFactory extends Factory
 {
@@ -23,15 +25,15 @@ class ChartFactory extends Factory
     {
         return [
             'chart_title' => $this->faker->word(),
-            'chart_type_id' => $this->faker->word(),
-            'chart_category_id' => $this->faker->word(),
+            'chart_type_id' => ChartType::factory(),
+            'chart_category_id' => ChartCategory::factory(),
             'sql_query' => $this->faker->text(),
             'is_active' => $this->faker->word(),
             'module_id' => $this->faker->word(),
             'filterColumn' => $this->faker->word(),
-            'created_by' => Employees,id::factory()->create()->created_by,
-            'modified_by' => Employees,id::factory()->create()->modified_by,
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'created_by' => User::factory(),
+            'modified_by' => User::factory(),
+            'deleted_by' => User::factory(),
         ];
     }
 }

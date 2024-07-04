@@ -4,8 +4,8 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
-use App\Models\Employees,id;
 use App\Models\JournalEntry;
+use App\Models\User;
 use App\Models\Warehouse;
 
 class JournalEntryFactory extends Factory
@@ -27,9 +27,9 @@ class JournalEntryFactory extends Factory
             'payment_date' => $this->faker->dateTime(),
             'warehouse_id' => Warehouse::factory(),
             'vendor_id' => $this->faker->word(),
-            'created_by' => $this->faker->word(),
-            'modified_by' => $this->faker->word(),
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'created_by' => User::factory(),
+            'modified_by' => User::factory(),
+            'deleted_by' => User::factory(),
         ];
     }
 }

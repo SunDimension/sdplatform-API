@@ -5,7 +5,7 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\ChartCard;
-use App\Models\Employees,id;
+use App\Models\User;
 
 class ChartCardFactory extends Factory
 {
@@ -30,9 +30,9 @@ class ChartCardFactory extends Factory
             'submodule_id' => $this->faker->word(),
             'sequence' => $this->faker->word(),
             'color' => $this->faker->word(),
-            'created_by' => Employees,id::factory()->create()->created_by,
-            'modified_by' => Employees,id::factory()->create()->modified_by,
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'created_by' => User::factory(),
+            'modified_by' => User::factory(),
+            'deleted_by' => User::factory(),
         ];
     }
 }

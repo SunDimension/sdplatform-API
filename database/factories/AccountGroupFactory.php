@@ -5,7 +5,6 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\AccountGroup;
-use App\Models\Employees,id;
 
 class AccountGroupFactory extends Factory
 {
@@ -23,9 +22,9 @@ class AccountGroupFactory extends Factory
     {
         return [
             'name' => $this->faker->name(),
-            'created_by' => Employees,id::factory()->create()->created_by,
-            'modified_by' => Employees,id::factory()->create()->modified_by,
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'created_by' => $this->faker->word(),
+            'modified_by' => $this->faker->word(),
+            'deleted_by' => $this->faker->word(),
         ];
     }
 }

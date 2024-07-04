@@ -35,9 +35,9 @@ class JournalEntryDetail extends Model
      * @var array
      */
     protected $casts = [
-        'journal_entry_id' => 'integer',
-        'journal_type_id' => 'integer',
         'amount' => 'double',
+        'created_by' => 'integer',
+        'modified_by' => 'integer',
         'deleted_by' => 'integer',
     ];
 
@@ -51,8 +51,23 @@ class JournalEntryDetail extends Model
         return $this->belongsTo(JournalType::class);
     }
 
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Foreign::class);
+    }
+
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function modifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

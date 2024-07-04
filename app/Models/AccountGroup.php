@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class AccountGroup extends Model
@@ -24,17 +23,6 @@ class AccountGroup extends Model
         'deleted_by',
     ];
 
-    /**
-     * The attributes that should be cast to native types.
-     *
-     * @var array
-     */
-    protected $casts = [
-        'created_by' => 'integer',
-        'modified_by' => 'integer',
-        'deleted_by' => 'integer',
-    ];
-
     public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
@@ -43,20 +31,5 @@ class AccountGroup extends Model
     public function accountTypes(): HasMany
     {
         return $this->hasMany(AccountType::class);
-    }
-
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(Employees,id::class);
-    }
-
-    public function modifiedBy(): BelongsTo
-    {
-        return $this->belongsTo(Employees,id::class);
-    }
-
-    public function deletedBy(): BelongsTo
-    {
-        return $this->belongsTo(Employees,id::class);
     }
 }

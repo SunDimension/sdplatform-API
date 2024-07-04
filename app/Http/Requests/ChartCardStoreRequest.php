@@ -28,9 +28,9 @@ class ChartCardStoreRequest extends FormRequest
             'submodule_id' => ['required', 'string'],
             'sequence' => ['required', 'string'],
             'color' => ['required', 'string'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

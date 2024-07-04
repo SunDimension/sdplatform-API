@@ -36,6 +36,8 @@ class JournalEntry extends Model
     protected $casts = [
         'payment_date' => 'timestamp',
         'warehouse_id' => 'integer',
+        'created_by' => 'integer',
+        'modified_by' => 'integer',
         'deleted_by' => 'integer',
     ];
 
@@ -49,8 +51,18 @@ class JournalEntry extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
+    public function createdBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function modifiedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(Employees,id::class);
+        return $this->belongsTo(User::class);
     }
 }

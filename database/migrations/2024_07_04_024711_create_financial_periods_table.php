@@ -19,11 +19,11 @@ return new class extends Migration
             $table->date('date_from');
             $table->date('date_to');
             $table->boolean('is_active');
-            $table->foreignId('financial_year_id')->constrained();
-            $table->foreignId('financial_quarter_id')->constrained();
-            $table->foreignId('created_by')->constrained('employees,ids', 'by');
-            $table->foreignId('modified_by')->constrained('employees,ids', 'by');
-            $table->foreignId('deleted_by')->constrained('employees,ids', 'by');
+            $table->foreignUuid('financial_year_id')->constrained();
+            $table->foreignUuid('financial_quarter_id')->constrained();
+            $table->foreignId('created_by')->nullable()->constrained('users');
+            $table->foreignId('modified_by')->nullable()->constrained('users');
+            $table->foreignId('deleted_by')->nullable()->constrained('users');
             $table->timestamps();
         });
 

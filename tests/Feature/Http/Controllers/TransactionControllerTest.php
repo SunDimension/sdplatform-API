@@ -3,10 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Account;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
 use App\Models\FinancialPeriod;
-use App\Models\ModifiedBy;
 use App\Models\Transaction;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -59,9 +56,6 @@ final class TransactionControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('transactions.store'), [
             'financial_period_id' => $financial_period->id,
@@ -75,9 +69,6 @@ final class TransactionControllerTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $transactions = Transaction::query()
@@ -92,9 +83,6 @@ final class TransactionControllerTest extends TestCase
             ->where('warehouse_id', $warehouse->id)
             ->where('account_no', $account_no)
             ->where('account_id', $account->id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $transactions);
         $transaction = $transactions->first();
@@ -141,9 +129,6 @@ final class TransactionControllerTest extends TestCase
         $warehouse = Warehouse::factory()->create();
         $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('transactions.update', $transaction), [
             'financial_period_id' => $financial_period->id,
@@ -157,9 +142,6 @@ final class TransactionControllerTest extends TestCase
             'warehouse_id' => $warehouse->id,
             'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $transaction->refresh();
@@ -178,9 +160,6 @@ final class TransactionControllerTest extends TestCase
         $this->assertEquals($warehouse->id, $transaction->warehouse_id);
         $this->assertEquals($account_no, $transaction->account_no);
         $this->assertEquals($account->id, $transaction->account_id);
-        $this->assertEquals($created_by->id, $transaction->created_by);
-        $this->assertEquals($modified_by->id, $transaction->modified_by);
-        $this->assertEquals($deleted_by->id, $transaction->deleted_by);
     }
 
 

@@ -3,10 +3,7 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Account;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
 use App\Models\FinancialPeriod;
-use App\Models\ModifiedBy;
 use App\Models\PeriodAccount;
 use App\Models\Warehouse;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -52,11 +49,7 @@ final class PeriodAccountControllerTest extends TestCase
         $credit = $this->faker->randomFloat(/** double_attributes **/);
         $amount = $this->faker->randomFloat(/** double_attributes **/);
         $warehouse = Warehouse::factory()->create();
-        $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('period-accounts.store'), [
             'financial_period_id' => $financial_period->id,
@@ -64,11 +57,7 @@ final class PeriodAccountControllerTest extends TestCase
             'credit' => $credit,
             'amount' => $amount,
             'warehouse_id' => $warehouse->id,
-            'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $periodAccounts = PeriodAccount::query()
@@ -77,11 +66,7 @@ final class PeriodAccountControllerTest extends TestCase
             ->where('credit', $credit)
             ->where('amount', $amount)
             ->where('warehouse_id', $warehouse->id)
-            ->where('account_no', $account_no)
             ->where('account_id', $account->id)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $periodAccounts);
         $periodAccount = $periodAccounts->first();
@@ -122,11 +107,7 @@ final class PeriodAccountControllerTest extends TestCase
         $credit = $this->faker->randomFloat(/** double_attributes **/);
         $amount = $this->faker->randomFloat(/** double_attributes **/);
         $warehouse = Warehouse::factory()->create();
-        $account_no = $this->faker->word();
         $account = Account::factory()->create();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('period-accounts.update', $periodAccount), [
             'financial_period_id' => $financial_period->id,
@@ -134,11 +115,7 @@ final class PeriodAccountControllerTest extends TestCase
             'credit' => $credit,
             'amount' => $amount,
             'warehouse_id' => $warehouse->id,
-            'account_no' => $account_no,
             'account_id' => $account->id,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $periodAccount->refresh();
@@ -151,11 +128,7 @@ final class PeriodAccountControllerTest extends TestCase
         $this->assertEquals($credit, $periodAccount->credit);
         $this->assertEquals($amount, $periodAccount->amount);
         $this->assertEquals($warehouse->id, $periodAccount->warehouse_id);
-        $this->assertEquals($account_no, $periodAccount->account_no);
         $this->assertEquals($account->id, $periodAccount->account_id);
-        $this->assertEquals($created_by->id, $periodAccount->created_by);
-        $this->assertEquals($modified_by->id, $periodAccount->modified_by);
-        $this->assertEquals($deleted_by->id, $periodAccount->deleted_by);
     }
 
 

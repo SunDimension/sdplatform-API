@@ -20,11 +20,11 @@ class ChartTypeUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'chart_category_id' => ['required', 'integer', 'exists:chart_categories,id'],
+            'chart_category_id' => ['required'],
             'chart_type' => ['required', 'string'],
-            'created_by' => ['required'],
-            'modified_by' => ['required'],
-            'deleted_by' => ['required'],
+            'created_by' => ['nullable'],
+            'modified_by' => ['nullable'],
+            'deleted_by' => ['nullable'],
         ];
     }
 }

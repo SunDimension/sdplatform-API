@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\DeletedBy;
+use App\Models\Foreign;
 use App\Models\JournalEntry;
 use App\Models\JournalEntryDetail;
 use App\Models\JournalType;
@@ -48,22 +48,16 @@ final class JournalEntryDetailControllerTest extends TestCase
         $journal_type = JournalType::factory()->create();
         $amount = $this->faker->randomFloat(/** double_attributes **/);
         $description = $this->faker->text();
-        $account_id = $this->faker->word();
+        $account = Foreign::factory()->create();
         $account_no = $this->faker->word();
-        $created_by = $this->faker->word();
-        $modified_by = $this->faker->word();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('journal-entry-details.store'), [
             'journal_entry_id' => $journal_entry->id,
             'journal_type_id' => $journal_type->id,
             'amount' => $amount,
             'description' => $description,
-            'account_id' => $account_id,
+            'account_id' => $account->id,
             'account_no' => $account_no,
-            'created_by' => $created_by,
-            'modified_by' => $modified_by,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $journalEntryDetails = JournalEntryDetail::query()
@@ -71,11 +65,8 @@ final class JournalEntryDetailControllerTest extends TestCase
             ->where('journal_type_id', $journal_type->id)
             ->where('amount', $amount)
             ->where('description', $description)
-            ->where('account_id', $account_id)
+            ->where('account_id', $account->id)
             ->where('account_no', $account_no)
-            ->where('created_by', $created_by)
-            ->where('modified_by', $modified_by)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $journalEntryDetails);
         $journalEntryDetail = $journalEntryDetails->first();
@@ -115,22 +106,16 @@ final class JournalEntryDetailControllerTest extends TestCase
         $journal_type = JournalType::factory()->create();
         $amount = $this->faker->randomFloat(/** double_attributes **/);
         $description = $this->faker->text();
-        $account_id = $this->faker->word();
+        $account = Foreign::factory()->create();
         $account_no = $this->faker->word();
-        $created_by = $this->faker->word();
-        $modified_by = $this->faker->word();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('journal-entry-details.update', $journalEntryDetail), [
             'journal_entry_id' => $journal_entry->id,
             'journal_type_id' => $journal_type->id,
             'amount' => $amount,
             'description' => $description,
-            'account_id' => $account_id,
+            'account_id' => $account->id,
             'account_no' => $account_no,
-            'created_by' => $created_by,
-            'modified_by' => $modified_by,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $journalEntryDetail->refresh();
@@ -142,11 +127,8 @@ final class JournalEntryDetailControllerTest extends TestCase
         $this->assertEquals($journal_type->id, $journalEntryDetail->journal_type_id);
         $this->assertEquals($amount, $journalEntryDetail->amount);
         $this->assertEquals($description, $journalEntryDetail->description);
-        $this->assertEquals($account_id, $journalEntryDetail->account_id);
+        $this->assertEquals($account->id, $journalEntryDetail->account_id);
         $this->assertEquals($account_no, $journalEntryDetail->account_no);
-        $this->assertEquals($created_by, $journalEntryDetail->created_by);
-        $this->assertEquals($modified_by, $journalEntryDetail->modified_by);
-        $this->assertEquals($deleted_by->id, $journalEntryDetail->deleted_by);
     }
 
 

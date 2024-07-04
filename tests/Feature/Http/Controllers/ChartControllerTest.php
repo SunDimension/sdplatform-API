@@ -3,9 +3,8 @@
 namespace Tests\Feature\Http\Controllers;
 
 use App\Models\Chart;
-use App\Models\CreatedBy;
-use App\Models\DeletedBy;
-use App\Models\ModifiedBy;
+use App\Models\ChartCategory;
+use App\Models\ChartType;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -45,40 +44,31 @@ final class ChartControllerTest extends TestCase
     public function store_saves(): void
     {
         $chart_title = $this->faker->word();
-        $chart_type_id = $this->faker->word();
-        $chart_category_id = $this->faker->word();
+        $chart_type = ChartType::factory()->create();
+        $chart_category = ChartCategory::factory()->create();
         $sql_query = $this->faker->text();
         $is_active = $this->faker->word();
         $module_id = $this->faker->word();
         $filterColumn = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->post(route('charts.store'), [
             'chart_title' => $chart_title,
-            'chart_type_id' => $chart_type_id,
-            'chart_category_id' => $chart_category_id,
+            'chart_type_id' => $chart_type->id,
+            'chart_category_id' => $chart_category->id,
             'sql_query' => $sql_query,
             'is_active' => $is_active,
             'module_id' => $module_id,
             'filterColumn' => $filterColumn,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $charts = Chart::query()
             ->where('chart_title', $chart_title)
-            ->where('chart_type_id', $chart_type_id)
-            ->where('chart_category_id', $chart_category_id)
+            ->where('chart_type_id', $chart_type->id)
+            ->where('chart_category_id', $chart_category->id)
             ->where('sql_query', $sql_query)
             ->where('is_active', $is_active)
             ->where('module_id', $module_id)
             ->where('filterColumn', $filterColumn)
-            ->where('created_by', $created_by->id)
-            ->where('modified_by', $modified_by->id)
-            ->where('deleted_by', $deleted_by->id)
             ->get();
         $this->assertCount(1, $charts);
         $chart = $charts->first();
@@ -115,27 +105,21 @@ final class ChartControllerTest extends TestCase
     {
         $chart = Chart::factory()->create();
         $chart_title = $this->faker->word();
-        $chart_type_id = $this->faker->word();
-        $chart_category_id = $this->faker->word();
+        $chart_type = ChartType::factory()->create();
+        $chart_category = ChartCategory::factory()->create();
         $sql_query = $this->faker->text();
         $is_active = $this->faker->word();
         $module_id = $this->faker->word();
         $filterColumn = $this->faker->word();
-        $created_by = CreatedBy::factory()->create();
-        $modified_by = ModifiedBy::factory()->create();
-        $deleted_by = DeletedBy::factory()->create();
 
         $response = $this->put(route('charts.update', $chart), [
             'chart_title' => $chart_title,
-            'chart_type_id' => $chart_type_id,
-            'chart_category_id' => $chart_category_id,
+            'chart_type_id' => $chart_type->id,
+            'chart_category_id' => $chart_category->id,
             'sql_query' => $sql_query,
             'is_active' => $is_active,
             'module_id' => $module_id,
             'filterColumn' => $filterColumn,
-            'created_by' => $created_by->id,
-            'modified_by' => $modified_by->id,
-            'deleted_by' => $deleted_by->id,
         ]);
 
         $chart->refresh();
@@ -144,15 +128,12 @@ final class ChartControllerTest extends TestCase
         $response->assertJsonStructure([]);
 
         $this->assertEquals($chart_title, $chart->chart_title);
-        $this->assertEquals($chart_type_id, $chart->chart_type_id);
-        $this->assertEquals($chart_category_id, $chart->chart_category_id);
+        $this->assertEquals($chart_type->id, $chart->chart_type_id);
+        $this->assertEquals($chart_category->id, $chart->chart_category_id);
         $this->assertEquals($sql_query, $chart->sql_query);
         $this->assertEquals($is_active, $chart->is_active);
         $this->assertEquals($module_id, $chart->module_id);
         $this->assertEquals($filterColumn, $chart->filterColumn);
-        $this->assertEquals($created_by->id, $chart->created_by);
-        $this->assertEquals($modified_by->id, $chart->modified_by);
-        $this->assertEquals($deleted_by->id, $chart->deleted_by);
     }
 
 

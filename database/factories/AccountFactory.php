@@ -8,7 +8,7 @@ use App\Models\Account;
 use App\Models\AccountGroup;
 use App\Models\AccountSubtype;
 use App\Models\AccountType;
-use App\Models\Employees,id;
+use App\Models\User;
 
 class AccountFactory extends Factory
 {
@@ -31,9 +31,9 @@ class AccountFactory extends Factory
             'account_type_id' => AccountType::factory(),
             'account_subtype_id' => AccountSubtype::factory(),
             'account_owner_id' => $this->faker->word(),
-            'created_by' => Employees,id::factory()->create()->created_by,
-            'modified_by' => Employees,id::factory()->create()->modified_by,
-            'deleted_by' => Employees,id::factory()->create()->deleted_by,
+            'created_by' => User::factory(),
+            'modified_by' => User::factory(),
+            'deleted_by' => User::factory(),
         ];
     }
 }
