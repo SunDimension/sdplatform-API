@@ -38,10 +38,12 @@ class WarehouseController extends Controller
         return new WarehouseResource($warehouse);
     }
 
-    public function destroy(Request $request, Warehouse $warehouse): Response
-    {
-        $warehouse->delete();
+   public function destroy($id): Response
+    {   
+       
+        Warehouse::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -38,10 +38,12 @@ class TransferOrderController extends Controller
         return new TransferOrderResource($transferOrder);
     }
 
-    public function destroy(Request $request, TransferOrder $transferOrder): Response
-    {
-        $transferOrder->delete();
+ public function destroy($id): Response
+    {   
+       
+        TransferOrder::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

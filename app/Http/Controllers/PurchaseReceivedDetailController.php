@@ -38,10 +38,12 @@ class PurchaseReceivedDetailController extends Controller
         return new PurchaseReceivedDetailResource($purchaseReceivedDetail);
     }
 
-    public function destroy(Request $request, PurchaseReceivedDetail $purchaseReceivedDetail): Response
-    {
-        $purchaseReceivedDetail->delete();
+  public function destroy($id): Response
+    {   
+       
+        PurchaseReceivedDetail::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

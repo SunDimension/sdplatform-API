@@ -14,34 +14,39 @@ class RolesController extends Controller
 {
     public function index(Request $request): RoleCollection
     {
-        $roles = Role::all();
+        // $roles = Role::all();
 
-        return new RoleCollection($roles);
+        return new RoleCollection(Role::with(['permissions'])->get());
     }
 
     public function store(RoleStoreRequest $request): RoleResource
     {
         $role = Role::create($request->validated());
+        $role->permissions()->sync($request->input('permissions', []));
 
         return new RoleResource($role);
+        
     }
 
     public function show(Request $request, Role $role): RoleResource
     {
-        return new RoleResource($role);
+        return new RoleResource($role->load(['permissions']));
     }
 
     public function update(RoleUpdateRequest $request, Role $role): RoleResource
     {
         $role->update($request->validated());
+        $role->permissions()->sync($request->input('permissions', []));
 
         return new RoleResource($role);
     }
 
-    public function destroy(Request $request, Role $role): Response
-    {
-        $role->delete();
+   public function destroy($id): Response
+    {   
+       
+        Role::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

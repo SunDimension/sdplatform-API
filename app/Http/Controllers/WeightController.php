@@ -38,10 +38,12 @@ class WeightController extends Controller
         return new WeightResource($weight);
     }
 
-    public function destroy(Request $request, Weight $weight): Response
-    {
-        $weight->delete();
+  public function destroy($id): Response
+    {   
+       
+        Weight::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

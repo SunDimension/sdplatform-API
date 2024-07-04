@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\TitleController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\AuthController;
+use App\Models\Bank;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -60,6 +62,8 @@ Route::apiResource('discounts', App\Http\Controllers\DiscountController::class);
 
 Route::apiResource('taxes', App\Http\Controllers\TaxController::class);
 
+Route::apiResource('titles', App\Http\Controllers\TitleController::class);
+
 Route::apiResource('carriers', App\Http\Controllers\CarrierController::class);
 
 Route::apiResource('payment-modes', App\Http\Controllers\PaymentModeController::class);
@@ -79,6 +83,9 @@ Route::apiResource('countries', App\Http\Controllers\CountryController::class);
 Route::apiResource('states', App\Http\Controllers\StateController::class);
 
 Route::apiResource('banks', App\Http\Controllers\BankController::class);
+
+Route::apiResource('permissions', App\Http\Controllers\PermissionController::class);
+
 
 Route::apiResource('vendor-types', App\Http\Controllers\VendorTypeController::class);
 
@@ -121,3 +128,5 @@ Route::apiResource('payment-voucher-details', App\Http\Controllers\PaymentVouche
 Route::apiResource('new-payments', App\Http\Controllers\NewPaymentController::class);
 
 Route::apiResource('purchase-order-details', App\Http\Controllers\PurchaseOrderDetailController::class);
+
+

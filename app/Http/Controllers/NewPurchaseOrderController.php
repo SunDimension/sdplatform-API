@@ -38,10 +38,12 @@ class NewPurchaseOrderController extends Controller
         return new NewPurchaseOrderResource($newPurchaseOrder);
     }
 
-    public function destroy(Request $request, NewPurchaseOrder $newPurchaseOrder): Response
-    {
-        $newPurchaseOrder->delete();
+    public function destroy($id): Response
+    {   
+       
+        NewPurchaseOrder::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

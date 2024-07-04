@@ -38,10 +38,10 @@ class CountryController extends Controller
         return new CountryResource($country);
     }
 
-    public function destroy(Request $request, Country $country): Response
+    public function destroy($id): Response
     {
-        $country->delete();
+        Country::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

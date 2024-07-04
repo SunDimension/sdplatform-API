@@ -38,10 +38,12 @@ class ItemTypeController extends Controller
         return new ItemTypeResource($itemType);
     }
 
-    public function destroy(Request $request, ItemType $itemType): Response
-    {
-        $itemType->delete();
+    public function destroy($id): Response
+    {   
+       
+        ItemType::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

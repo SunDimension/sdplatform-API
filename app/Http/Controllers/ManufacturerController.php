@@ -38,10 +38,12 @@ class ManufacturerController extends Controller
         return new ManufacturerResource($manufacturer);
     }
 
-    public function destroy(Request $request, Manufacturer $manufacturer): Response
-    {
-        $manufacturer->delete();
+    public function destroy($id): Response
+    {   
+       
+        Manufacturer::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

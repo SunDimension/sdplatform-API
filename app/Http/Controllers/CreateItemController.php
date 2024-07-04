@@ -38,10 +38,10 @@ class CreateItemController extends Controller
         return new CreateItemResource($createItem);
     }
 
-    public function destroy(Request $request, CreateItem $createItem): Response
+    public function destroy($id): Response
     {
-        $createItem->delete();
+        CreateItem::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

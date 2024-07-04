@@ -38,10 +38,12 @@ class VendorController extends Controller
         return new VendorResource($vendor);
     }
 
-    public function destroy(Request $request, Vendor $vendor): Response
-    {
-        $vendor->delete();
+   public function destroy($id): Response
+    {   
+       
+        Vendor::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

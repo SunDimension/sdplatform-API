@@ -38,10 +38,12 @@ class BankController extends Controller
         return new BankResource($bank);
     }
 
-    public function destroy(Request $request, Bank $bank): Response
-    {
-        $bank->delete();
+    public function destroy($id): Response
+    {   
+       
+        Bank::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -38,10 +38,12 @@ class PaymentTermController extends Controller
         return new PaymentTermResource($paymentTerm);
     }
 
-    public function destroy(Request $request, PaymentTerm $paymentTerm): Response
-    {
-        $paymentTerm->delete();
+   public function destroy($id): Response
+    {   
+       
+        PaymentTerm::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

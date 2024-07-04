@@ -38,10 +38,12 @@ class StatusController extends Controller
         return new StatusResource($status);
     }
 
-    public function destroy(Request $request, Status $status): Response
-    {
-        $status->delete();
+   public function destroy($id): Response
+    {   
+       
+        Status::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

@@ -38,10 +38,10 @@ class DeliveryController extends Controller
         return new DeliveryResource($delivery);
     }
 
-    public function destroy(Request $request, Delivery $delivery): Response
+    public function destroy($id): Response
     {
-        $delivery->delete();
+       Delivery::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

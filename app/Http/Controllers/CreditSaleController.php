@@ -38,10 +38,10 @@ class CreditSaleController extends Controller
         return new CreditSaleResource($creditSale);
     }
 
-    public function destroy(Request $request, CreditSale $creditSale): Response
+  public function destroy($id): Response
     {
-        $creditSale->delete();
+       CreditSale::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

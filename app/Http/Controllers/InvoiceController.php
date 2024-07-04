@@ -38,10 +38,13 @@ class InvoiceController extends Controller
         return new InvoiceResource($invoice);
     }
 
-    public function destroy(Request $request, Invoice $invoice): Response
-    {
-        $invoice->delete();
+        
+    public function destroy($id): Response
+    {   
+       
+        Invoice::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

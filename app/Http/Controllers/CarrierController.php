@@ -38,10 +38,10 @@ class CarrierController extends Controller
         return new CarrierResource($carrier);
     }
 
-    public function destroy(Request $request, Carrier $carrier): Response
+    public function destroy($id): Response
     {
-        $carrier->delete();
+       Carrier::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

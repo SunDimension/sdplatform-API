@@ -37,11 +37,12 @@ class SaleController extends Controller
 
         return new SaleResource($sale);
     }
+public function destroy($id): Response
+    {   
+       
+        Sale::destroy($id);
 
-    public function destroy(Request $request, Sale $sale): Response
-    {
-        $sale->delete();
-
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

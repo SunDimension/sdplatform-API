@@ -38,10 +38,12 @@ class ItemCategoryController extends Controller
         return new ItemCategoryResource($itemCategory);
     }
 
-    public function destroy(Request $request, ItemCategory $itemCategory): Response
-    {
-        $itemCategory->delete();
+    public function destroy($id): Response
+    {   
+       
+        ItemCategory::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

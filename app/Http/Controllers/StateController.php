@@ -38,10 +38,12 @@ class StateController extends Controller
         return new StateResource($state);
     }
 
-    public function destroy(Request $request, State $state): Response
-    {
-        $state->delete();
+  public function destroy($id): Response
+    {   
+       
+        State::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

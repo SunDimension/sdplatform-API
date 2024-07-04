@@ -38,10 +38,12 @@ class NewPaymentController extends Controller
         return new NewPaymentResource($newPayment);
     }
 
-    public function destroy(Request $request, NewPayment $newPayment): Response
-    {
-        $newPayment->delete();
+    public function destroy($id): Response
+    {   
+       
+        NewPayment::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

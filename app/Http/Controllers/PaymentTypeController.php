@@ -37,11 +37,12 @@ class PaymentTypeController extends Controller
 
         return new PaymentTypeResource($paymentType);
     }
+public function destroy($id): Response
+    {   
+       
+        PaymentType::destroy($id);
 
-    public function destroy(Request $request, PaymentType $paymentType): Response
-    {
-        $paymentType->delete();
-
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

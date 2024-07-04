@@ -37,11 +37,13 @@ class InventoryAdjustmentController extends Controller
 
         return new InventoryAdjustmentResource($inventoryAdjustment);
     }
+    
+    public function destroy($id): Response
+    {   
+       
+        InventoryAdjustment::destroy($id);
 
-    public function destroy(Request $request, InventoryAdjustment $inventoryAdjustment): Response
-    {
-        $inventoryAdjustment->delete();
-
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

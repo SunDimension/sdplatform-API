@@ -38,9 +38,9 @@ class AdjustmentTypeController extends Controller
         return new AdjustmentTypeResource($adjustmentType);
     }
 
-    public function destroy(Request $request, AdjustmentType $adjustmentType): Response
+    public function destroy($id): Response
     {
-        $adjustmentType->delete();
+        AdjustmentType::destroy($id);
 
         return response()->noContent();
     }

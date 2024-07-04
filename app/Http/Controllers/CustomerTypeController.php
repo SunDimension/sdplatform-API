@@ -38,10 +38,10 @@ class CustomerTypeController extends Controller
         return new CustomerTypeResource($customerType);
     }
 
-    public function destroy(Request $request, CustomerType $customerType): Response
+   public function destroy($id): Response
     {
-        $customerType->delete();
+       CustomerType::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

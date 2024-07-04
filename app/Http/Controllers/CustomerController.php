@@ -37,11 +37,10 @@ class CustomerController extends Controller
 
         return new CustomerResource($customer);
     }
-
-    public function destroy(Request $request, Customer $customer): Response
+ public function destroy($id): Response
     {
-        $customer->delete();
+       Customer::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

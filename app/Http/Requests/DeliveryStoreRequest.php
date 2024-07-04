@@ -23,7 +23,7 @@ class DeliveryStoreRequest extends FormRequest
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'sales_order_number' => ['required', 'string'],
             'delivery_order_number' => ['required', 'string'],
-            'delivery_date' => ['required'],
+            'delivery_date' => ['required','string'],
             'carrier_id' => ['required', 'integer', 'exists:carriers,id'],
             'notes' => ['required', 'string'],
         ];

@@ -38,10 +38,12 @@ class VendorCreditController extends Controller
         return new VendorCreditResource($vendorCredit);
     }
 
-    public function destroy(Request $request, VendorCredit $vendorCredit): Response
-    {
-        $vendorCredit->delete();
+   public function destroy($id): Response
+    {   
+       
+        VendorCredit::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

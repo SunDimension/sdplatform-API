@@ -38,10 +38,12 @@ class PurchaseOrderDetailController extends Controller
         return new PurchaseOrderDetailResource($purchaseOrderDetail);
     }
 
-    public function destroy(Request $request, PurchaseOrderDetail $purchaseOrderDetail): Response
-    {
-        $purchaseOrderDetail->delete();
+   public function destroy($id): Response
+    {   
+       
+        PurchaseOrderDetail::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

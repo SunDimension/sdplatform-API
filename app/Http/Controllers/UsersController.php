@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UsersStoreRequest;
-use App\Http\Requests\UsersUpdateRequest;
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
@@ -19,7 +19,7 @@ class UsersController extends Controller
         return new UserCollection($users);
     }
 
-    public function store(UsersStoreRequest $request): UserResource
+    public function store(UserStoreRequest $request): UserResource
     {
         $user = User::create($request->validated());
 
@@ -31,17 +31,19 @@ class UsersController extends Controller
         return new UserResource($user);
     }
 
-    public function update(UsersUpdateRequest $request, User $user): UserResource
+    public function update(UserUpdateRequest $request, User $user): UserResource
     {
         $user->update($request->validated());
 
         return new UserResource($user);
     }
 
-    public function destroy(Request $request, User $user): Response
-    {
-        $user->delete();
+  public function destroy($id): Response
+    {   
+       
+        User::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

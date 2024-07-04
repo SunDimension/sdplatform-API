@@ -38,10 +38,10 @@ class DesignationController extends Controller
         return new DesignationResource($designation);
     }
 
-    public function destroy(Request $request, Designation $designation): Response
+     public function destroy($id): Response
     {
-        $designation->delete();
+       Designation::destroy($id);
 
-        return response()->noContent();
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

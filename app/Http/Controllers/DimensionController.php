@@ -38,10 +38,12 @@ class DimensionController extends Controller
         return new DimensionResource($dimension);
     }
 
-    public function destroy(Request $request, Dimension $dimension): Response
-    {
-        $dimension->delete();
+ public function destroy($id): Response
+    {   
+       
+        Dimension::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

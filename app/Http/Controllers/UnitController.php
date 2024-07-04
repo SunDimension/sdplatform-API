@@ -38,10 +38,12 @@ class UnitController extends Controller
         return new UnitResource($unit);
     }
 
-    public function destroy(Request $request, Unit $unit): Response
-    {
-        $unit->delete();
+   public function destroy($id): Response
+    {   
+       
+        Unit::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }

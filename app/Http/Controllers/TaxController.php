@@ -38,10 +38,12 @@ class TaxController extends Controller
         return new TaxResource($tax);
     }
 
-    public function destroy(Request $request, Tax $tax): Response
-    {
-        $tax->delete();
+    public function destroy($id): Response
+    {   
+       
+        Tax::destroy($id);
 
-        return response()->noContent();
+        
+        return response(null, Response::HTTP_NO_CONTENT);
     }
 }
