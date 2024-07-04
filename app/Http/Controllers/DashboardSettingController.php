@@ -12,14 +12,14 @@ use Illuminate\Http\Response;
 
 class DashboardSettingController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): DashboardSettingCollection
     {
         $dashboardSettings = DashboardSetting::all();
 
         return new DashboardSettingCollection($dashboardSettings);
     }
 
-    public function store(DashboardSettingStoreRequest $request): Response
+    public function store(DashboardSettingStoreRequest $request): DashboardSettingResource
     {
         $dashboardSetting = DashboardSetting::create($request->validated());
 
