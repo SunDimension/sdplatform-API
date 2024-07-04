@@ -1,0 +1,303 @@
+models:
+  Account:
+    id: uuid primary
+    name: string
+    code: string
+    account_group_id: id foreign:account_groups
+    account_type_id: id foreign:account_types
+    account_subtype_id: id foreign:account_subtypes
+    account_ownerid: int
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+   
+  AccountGroup:
+    id: uuid primary
+    name: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    relationships:
+      hasMany: Account,AccountType
+  AccountType:
+    id: uuid primary
+    account_group_id: id foreign:account_groups
+    name: string
+    code: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    relationships:
+      hasMany: Account,AccountSubtype
+
+  AccountSubtype:
+    id: uuid primary
+    name: string
+    account_type_id: id foreign:account_types
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    relationships:
+      hasMany: Account
+
+  Chart:
+    id: uuid primary
+    chart_title: string
+    chart_type_id: int
+    chart_category_id: int
+    sql_query: text
+    is_active: int
+    module_id: int
+    filterColumn: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: Dashboardsetting
+
+  ChartCard:
+    id: uuid primary
+    card_title: string
+    card_size: int
+    is_active: int
+    sql_query: text
+    module_id: int
+    submodule_id: int
+    sequence: int
+    color: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+
+  ChartCategory:
+    id: uuid primary
+    chart_provider_id: id foreign:chart_providers
+    chart_category: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: ChartType,Dashboardsetting
+
+  ChartProvider:
+    id: uuid primary
+    chart_provider: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: ChartCategory
+
+  ChartType:
+    id: uuid primary
+    chart_category_id: id foreign:chart_categories
+    chart_type: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: Dashboardsetting
+
+  DashboardSetting:
+    id: uuid primary
+    chart_id: id foreign:charts
+    module_id: id foreign:modules
+    chart_type_id: id foreign:chart_types
+    chart_category_id: id foreign:chart_categories
+    chart_title: string
+    is_active: int
+    order_by: int
+    is_group: int
+    submodule_Id: int
+    add_condition: int
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+
+  PaymentVoucher:
+    payment_method_id: id foreign:payment_methods
+    company_id: id foreign:companies
+    payment_type_id: id foreign:payment_types
+    pv_number: string
+    paying_account_id: int:accounts,id
+    cheque_no: string
+    payment_date: timestamp
+    vat_id: int
+    wht_id: int
+    payee_id: int
+    warehouse_id: id foreign:warehouses
+    created_by: int
+    modified_by: int
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: PaymentVoucherDetail
+
+  PaymentVoucherDetaii:
+    payment_voucher_id: id foreign:payment_methods
+    price: double
+    quantity: double
+    description: text
+    account_id: int:accounts,id
+    created_by: int
+    modified_by: int
+    deleted_by: id foreign:employees,id
+    softDeletes
+
+  PaymentMethod:
+    name: string
+    created_by: int
+    modified_by: int
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: PaymentVoucher,Ticket
+
+  PaymentPlan:
+    payment_voucher_id: id foreign:payment_vouches
+    percentage: double
+    amount: double
+    payment_method_id: id foreign:payment_methods
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+
+  PaymentStatus:
+    name: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: Ticket
+
+  PaymentType:
+    name: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: PaymentVoucher
+
+  ProcurementOrder:
+    ProcurementDate: timestamp
+    request_by: int
+    approval_stage_id: id foreign:approval_stages
+    approval_officer_id: id foreign:employees
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    title: string
+    comment: text
+    softDeletes
+    relationships:
+      hasMany: ProcurementDetail
+
+  ProcurementDetail:
+    vendor_id: id foreign:vendors
+    procurement_order_id: id foreign:procurement_orders
+    price: double
+    quantity: double
+    description: text
+    action: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    item_id: id foreign:create_items,id
+    selected: tinyint
+    softDeletes
+
+  ProcurementVendor:
+    vendor_id: id foreign:vendors
+    procurement_order_id: id foreign:procurement_orders
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+
+  VendorCategory:
+    name: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: Vendors
+
+  VendorType:
+    name: string
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+
+  Vendor:
+    vendor_category_id: id foreign:vendor_categories
+    name: string
+    physical_address: text
+    email: string
+    phone_num: string
+    tin: string
+    contact_person: string
+    contact_email: string
+    contact_phone: string
+    bank_id: id foreign:banks
+    account_number: string
+    status_id: int
+    created_by: id foreign:employees,id
+    modified_by: id foreign:employees,id
+    deleted_by: id foreign:employees,id
+    softDeletes
+    relationships:
+      hasMany: ProcurementDetail,ProcurementVendor
+
+controllers:
+  Account:
+    resource: api
+  AccountGroup:
+    resource: api
+  AccountSubtype:
+    resource: api
+  AccountType:
+    resource: api
+  Chart:
+    resource: api
+  ChartCard:
+    resource: api
+  ChartCategory:
+    resource: api
+  ChartProvider:
+    resource: api
+  ChartType:
+    resource: api
+  DashboardSetting:
+    resource: api
+  
+
+
+seeders: 
+  Account,
+  AccountGroup,
+  AccountSubtype,
+  AccountType,
+  Chart,
+  ChartCard,
+  ChartCategory,
+  ChartProvider,
+  ChartType,
+  DashboardSetting,
+  PaymentMethod,
+  PaymentPlan,
+  PaymentStatus,
+  PaymentType,
+  Vendor,
+  VendorCategory,
+  VendorType
