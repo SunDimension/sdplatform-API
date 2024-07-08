@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Attribute;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class AttributeSeeder extends Seeder
 {
@@ -12,6 +13,10 @@ class AttributeSeeder extends Seeder
      */
     public function run(): void
     {
-        Attribute::factory()->count(5)->create();
+        DB::table('attributes')->insert([
+        
+            ['name'=>'Size'],
+            ['name'=>'Colour']
+        ]);
     }
 }

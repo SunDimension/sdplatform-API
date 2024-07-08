@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Designation;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DesignationSeeder extends Seeder
 {
@@ -12,6 +13,14 @@ class DesignationSeeder extends Seeder
      */
     public function run(): void
     {
-        Designation::factory()->count(5)->create();
+        DB::table('designations')->insert([
+
+        ['name'=>'Customer Service Manager'],
+        ['name'=>'Human Resource Manager'],
+        ['name'=>'Accountant'],
+       
+        
+
+      ]);
     }
 }

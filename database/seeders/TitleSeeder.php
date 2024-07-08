@@ -2,21 +2,24 @@
 
 namespace Database\Seeders;
 
-use App\Models\Tax;
+use App\Models\Title;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
-class TaxSeeder extends Seeder
+class TitleSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-      DB::table('taxes')->insert([
+      DB::table('titles')->insert([
 
-        ['name'=>'VAT'],
-        ['name'=>'No Tax']
+        ['name'=>'Mr.'],
+        ['name'=>'Mrs.'],
+        ['name'=>'Alhaji'],
+        ['name'=>'Hajiya'],
+        
 
       ]);
     }

@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ItemType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ItemTypeSeeder extends Seeder
 {
@@ -12,6 +13,11 @@ class ItemTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        ItemType::factory()->count(5)->create();
+         DB::table('item_types')->insert([
+
+            ['name'=>'Goods'],
+            ['name'=>'Service',],
+            
+       ]);
     }
 }

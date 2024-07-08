@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Brand;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class BrandSeeder extends Seeder
 {
@@ -12,6 +13,15 @@ class BrandSeeder extends Seeder
      */
     public function run(): void
     {
-        Brand::factory()->count(5)->create();
+       DB::table('brands')->insert([
+
+            ['name'=>'Dangote Industries Limited'],
+            ['name'=>'Cadbury Nigeria Plc'],
+            ['name'=>'Nestle Nigeria'],
+            ['name'=>'Ayoola Foods'],
+            ['name'=>'Crown Flour Mill Limited'],
+            ['name'=>'DUFIL Prima Foods Plc'],
+            ['name'=>'UAC Foods Limited'],
+       ]);
     }
 }

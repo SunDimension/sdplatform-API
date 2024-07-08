@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\ItemCategory;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class ItemCategorySeeder extends Seeder
 {
@@ -12,6 +13,14 @@ class ItemCategorySeeder extends Seeder
      */
     public function run(): void
     {
-        ItemCategory::factory()->count(5)->create();
+        DB::table('item_categories')->insert([
+
+            ['name'=>'Dairy Product'],
+            ['name'=>'Drink'],
+            ['name'=>'Condiment'],
+            ['name'=>'Personal care'],
+            ['name'=>'Beverages snacks'],
+            ['name'=>'Pasta'],
+        ]);
     }
 }

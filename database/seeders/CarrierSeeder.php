@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Carrier;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CarrierSeeder extends Seeder
 {
@@ -12,6 +13,16 @@ class CarrierSeeder extends Seeder
      */
     public function run(): void
     {
-        Carrier::factory()->count(5)->create();
+         DB::table('carriers')->insert([
+
+        ['name'=>'Kwik Delivery'],
+        ['name'=>'Gokada'],
+        ['name'=>'GIG Logistics'],
+        ['name'=>'DHL Delivery Company'],
+        
+        
+        
+
+      ]);
     }
 }

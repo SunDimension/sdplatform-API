@@ -12,14 +12,14 @@ use Illuminate\Http\Response;
 
 class ChartController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request): ChartCollection
     {
         $charts = Chart::all();
 
         return new ChartCollection($charts);
     }
 
-    public function store(ChartStoreRequest $request): Response
+    public function store(ChartStoreRequest $request): ChartResource
     {
         $chart = Chart::create($request->validated());
 

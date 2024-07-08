@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Unit;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class UnitSeeder extends Seeder
 {
@@ -12,6 +13,18 @@ class UnitSeeder extends Seeder
      */
     public function run(): void
     {
-        Unit::factory()->count(5)->create();
+        DB::table('units')->insert([
+
+            ['name'=>'cm'],
+             ['name'=>'ft'],
+             ['name'=>'g'],
+             ['name'=>'kg'],
+             ['name'=>'mg'],
+             ['name'=>'m'],
+             ['name'=>'Ib'],
+             ['name'=>'in'],
+             ['name'=>'pcs'],
+        
+        ]);
     }
 }

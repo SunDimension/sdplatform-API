@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\PaymentTerm;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB; 
 
 class PaymentTermSeeder extends Seeder
 {
@@ -12,6 +13,13 @@ class PaymentTermSeeder extends Seeder
      */
     public function run(): void
     {
-        PaymentTerm::factory()->count(5)->create();
+        
+         DB::table('payment_terms')->insert([
+
+            ['name'=>'Immediately'],
+            ['name'=>'Due on expected release date'],
+            ['name'=>'Due end of the week'],
+            ['name'=>'Due end of the month']
+         ]);
     }
 }

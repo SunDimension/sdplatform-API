@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\AdjustmentType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB; 
 
 class AdjustmentTypeSeeder extends Seeder
 {
@@ -12,6 +13,11 @@ class AdjustmentTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        AdjustmentType::factory()->count(5)->create();
+       DB::table('adjustment_types')->insert([
+
+        ['name'=>'Quantity Adjustment'],
+        ['name'=>'Value Adjustment']
+
+       ]);
     }
 }

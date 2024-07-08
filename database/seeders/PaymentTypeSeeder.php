@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\PaymentType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class PaymentTypeSeeder extends Seeder
 {
@@ -12,6 +13,12 @@ class PaymentTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        PaymentType::factory()->count(5)->create();
+        DB::table('payment_types')->insert([
+
+        ['name'=>'Payment before delivery'],
+        
+        
+
+      ]);
     }
 }

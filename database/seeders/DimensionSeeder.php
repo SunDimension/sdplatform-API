@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Dimension;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB; 
 
 class DimensionSeeder extends Seeder
 {
@@ -12,6 +13,9 @@ class DimensionSeeder extends Seeder
      */
     public function run(): void
     {
-        Dimension::factory()->count(5)->create();
+         DB::table('dimensions')->insert([
+            ['name'=>'cm'],
+            ['name'=>'in']
+         ]);
     }
 }

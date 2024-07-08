@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\Weight;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB; 
 
 class WeightSeeder extends Seeder
 {
@@ -12,6 +13,11 @@ class WeightSeeder extends Seeder
      */
     public function run(): void
     {
-        Weight::factory()->count(5)->create();
+         DB::table('weights')->insert([
+
+            ['name'=>'kg'],
+            ['name'=>'g'],
+            ['name'=>'ib']
+         ]);
     }
 }

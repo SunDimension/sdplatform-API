@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\VendorType;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class VendorTypeSeeder extends Seeder
 {
@@ -12,6 +13,15 @@ class VendorTypeSeeder extends Seeder
      */
     public function run(): void
     {
-        VendorType::factory()->count(5)->create();
+        DB::table('vendor_types')->insert([
+
+        ['name'=>'Service provider'],
+        ['name'=>'Manufacturer'],
+        ['name'=>'Retailer'],
+        ['name'=>'Distributors'],
+       
+        
+
+      ]);
     }
 }
