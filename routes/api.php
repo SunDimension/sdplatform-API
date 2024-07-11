@@ -130,6 +130,18 @@ Route::apiResource('new-payments', App\Http\Controllers\NewPaymentController::cl
 Route::apiResource('purchase-order-details', App\Http\Controllers\PurchaseOrderDetailController::class);
 
 
+Route::apiResource('refund-types', App\Http\Controllers\RefundTypeController::class);
+
+
+Route::apiResource('sales-type', App\Http\Controllers\SalesTypeController::class);
+
+
+Route::apiResource('store-types', App\Http\Controllers\StoreTypeController::class);
+
+
+Route::apiResource('stores', App\Http\Controllers\StoreController::class);
+
+
 
 
 Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
