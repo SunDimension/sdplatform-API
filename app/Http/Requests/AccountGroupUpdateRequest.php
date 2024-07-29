@@ -21,9 +21,6 @@ class AccountGroupUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'created_by' => ['required', 'string'],
-            'modified_by' => ['required', 'string'],
-            'deleted_by' => ['required', 'string'],
         ];
     }
 }

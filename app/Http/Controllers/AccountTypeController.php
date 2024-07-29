@@ -12,33 +12,32 @@ use Illuminate\Http\Response;
 
 class AccountTypeController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $accountTypes = AccountType::all();
-
         return new AccountTypeCollection($accountTypes);
     }
 
-    public function store(AccountTypeStoreRequest $request): Response
+    public function store(AccountTypeStoreRequest $request)
     {
         $accountType = AccountType::create($request->validated());
 
         return new AccountTypeResource($accountType);
     }
 
-    public function show(Request $request, AccountType $accountType): Response
+    public function show(Request $request, AccountType $accountType)
     {
         return new AccountTypeResource($accountType);
     }
 
-    public function update(AccountTypeUpdateRequest $request, AccountType $accountType): Response
+    public function update(AccountTypeUpdateRequest $request, AccountType $accountType)
     {
         $accountType->update($request->validated());
 
         return new AccountTypeResource($accountType);
     }
 
-    public function destroy(Request $request, AccountType $accountType): Response
+    public function destroy(Request $request, AccountType $accountType)
     {
         $accountType->delete();
 

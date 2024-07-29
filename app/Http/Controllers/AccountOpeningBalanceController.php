@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class AccountOpeningBalanceController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $accountOpeningBalances = AccountOpeningBalance::all();
 
         return new AccountOpeningBalanceCollection($accountOpeningBalances);
     }
 
-    public function store(AccountOpeningBalanceStoreRequest $request): Response
+    public function store(AccountOpeningBalanceStoreRequest $request)
     {
         $accountOpeningBalance = AccountOpeningBalance::create($request->validated());
 
         return new AccountOpeningBalanceResource($accountOpeningBalance);
     }
 
-    public function show(Request $request, AccountOpeningBalance $accountOpeningBalance): Response
+    public function show(Request $request, AccountOpeningBalance $accountOpeningBalance)
     {
         return new AccountOpeningBalanceResource($accountOpeningBalance);
     }
 
-    public function update(AccountOpeningBalanceUpdateRequest $request, AccountOpeningBalance $accountOpeningBalance): Response
+    public function update(AccountOpeningBalanceUpdateRequest $request, AccountOpeningBalance $accountOpeningBalance)
     {
         $accountOpeningBalance->update($request->validated());
 
         return new AccountOpeningBalanceResource($accountOpeningBalance);
     }
 
-    public function destroy(Request $request, AccountOpeningBalance $accountOpeningBalance): Response
+    public function destroy(Request $request, AccountOpeningBalance $accountOpeningBalance)
     {
         $accountOpeningBalance->delete();
 

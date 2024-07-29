@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('account_groups', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->string('created_by');
-            $table->string('modified_by');
-            $table->string('deleted_by');
+            $table->integer('created_by')->nullable();
+            $table->integer('modified_by')->nullable();
+            $table->integer('deleted_by')->nullable();
             $table->timestamps();
         });
     }

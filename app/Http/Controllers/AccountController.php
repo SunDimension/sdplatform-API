@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class AccountController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $accounts = Account::all();
 
         return new AccountCollection($accounts);
     }
 
-    public function store(AccountStoreRequest $request): Response
+    public function store(AccountStoreRequest $request)
     {
         $account = Account::create($request->validated());
 
         return new AccountResource($account);
     }
 
-    public function show(Request $request, Account $account): Response
+    public function show(Request $request, Account $account)
     {
         return new AccountResource($account);
     }
 
-    public function update(AccountUpdateRequest $request, Account $account): Response
+    public function update(AccountUpdateRequest $request, Account $account)
     {
         $account->update($request->validated());
 
         return new AccountResource($account);
     }
 
-    public function destroy(Request $request, Account $account): Response
+    public function destroy(Request $request, Account $account)
     {
         $account->delete();
 

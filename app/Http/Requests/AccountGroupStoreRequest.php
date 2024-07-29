@@ -20,10 +20,7 @@ class AccountGroupStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'created_by' => ['required', 'string'],
-            'modified_by' => ['required', 'string'],
-            'deleted_by' => ['required', 'string'],
+            'name' => ['required', 'string']
         ];
     }
 }

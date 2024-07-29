@@ -11,12 +11,21 @@ class UserSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
+    public function run()
     {
-          DB::table('users')->insert([
+        
+        DB::table('users')->insert([
+            [
+                'name' => 'App',
+                'email' => 'admin@app.com',
+                'password' => bcrypt('password'),
+                'role_id' => 1,
+                'status_id' => 1,
+                'branch_id' => 1,
+                'warehouse_id' => 1,
+                'created_at' => now()
+            ]
+        ]);
 
-            ['role_id'=>2,'name'=>'Admin','email'=>'admin@app.com','password'=>'password','status_id'=>1,'branch_id'=>1,'warehouse'=>1],
-            
-       ]);
     }
 }

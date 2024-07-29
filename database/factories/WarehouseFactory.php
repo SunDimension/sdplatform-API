@@ -15,20 +15,22 @@ class WarehouseFactory extends Factory
      * @var string
      */
     protected $model = Warehouse::class;
-
+    protected static $templates = [['Warehouse 1', 1, 'Address', '','Joseph','a@a.com','o8080809']];
     /**
      * Define the model's default state.
      */
     public function definition(): array
     {
+        //$template = $this->template;
+        $template =  $this->faker->unique()->randomElement(self::$templates);
         return [
-            'name' => $this->faker->name(),
-            'branch_id' => Branch::factory(),
-            'warehouse_address' => $this->faker->word(),
-            'zipcode' => $this->faker->word(),
-            'contact_person' => $this->faker->word(),
-            'email' => $this->faker->safeEmail(),
-            'phone' => $this->faker->phoneNumber(),
+            'name' => $template[0],
+            'branch_id' => $template[1],
+            'warehouse_address' => $template[2],
+            'zipcode' => $template[3],
+            'contact_person' => $template[3],
+            'email' => $template[4],
+            'phone' => $template[1],
         ];
     }
 }
