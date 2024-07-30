@@ -29,6 +29,7 @@ class CreateItemStoreRequest extends FormRequest
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
             'cost_price' => ['required', 'numeric'],
             'selling_price' => ['required', 'numeric'],
+            'quantity' =>['required','string'],
             'reorder_level' => ['required', 'string'],
             'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
             'weight_id' => ['required', 'integer', 'exists:weights,id'],

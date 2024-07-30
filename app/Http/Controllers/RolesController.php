@@ -22,7 +22,7 @@ class RolesController extends Controller
     public function store(RoleStoreRequest $request): RoleResource
     {
         $role = Role::create($request->validated());
-        $role->permissions()->sync($request->input('permissions', []));
+        // $role->permissions()->sync($request->input('permissions', []));
 
         return new RoleResource($role);
         

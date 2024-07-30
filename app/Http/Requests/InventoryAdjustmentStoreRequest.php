@@ -20,7 +20,7 @@ class InventoryAdjustmentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'item_id' => ['required', 'integer', 'exists:items,id'],
+            'item_id' => ['required', 'integer', 'exists:create_items,id'],
             'adjustment_type_id' => ['required', 'integer', 'exists:adjustment_types,id'],
             'date' => ['required'],
             'reason_id' => ['required', 'integer', 'exists:reasons,id'],

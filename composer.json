@@ -13,6 +13,7 @@
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.7",
         "spatie/laravel-ignition": "2.0",
+        "spatie/laravel-permission": "^6.9",
         "tymon/jwt-auth": "^2.0",
         "yajra/laravel-datatables-oracle": "^10.0"
     },

@@ -86,10 +86,14 @@ Route::apiResource('banks', App\Http\Controllers\BankController::class);
 
 Route::apiResource('permissions', App\Http\Controllers\PermissionController::class);
 
+// Route::get('search/{name}', App\Http\Controllers\CreateItemController::class, 'search');
+
 
 Route::apiResource('vendor-types', App\Http\Controllers\VendorTypeController::class);
 
 Route::apiResource('vendors', App\Http\Controllers\VendorController::class);
+
+Route::apiResource('reasons', App\Http\Controllers\ReasonController::class);
 
 Route::apiResource('transfer-orders', App\Http\Controllers\TransferOrderController::class);
 

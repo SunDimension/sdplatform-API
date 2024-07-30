@@ -10,6 +10,12 @@ class CreateItem extends Model
 {
     use HasFactory;
 
+
+      public function getRouteKeyName()
+    {
+        return 'name';
+    }
+
     /**
      * The attributes that are mass assignable.
      *
@@ -23,6 +29,7 @@ class CreateItem extends Model
         'batch_number',
         'unit_id',
         'brand_id',
+        'quantity',
         'cost_price',
         'selling_price',
         'reorder_level',
