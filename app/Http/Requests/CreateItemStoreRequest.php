@@ -38,6 +38,7 @@ class CreateItemStoreRequest extends FormRequest
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'image_url' => ['required', 'string'],
             'barcode' => ['required', 'string'],
+            'store_id' => ['required','integer', 'exist:stores,id']
         ];
     }
 }

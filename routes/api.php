@@ -86,7 +86,7 @@ Route::apiResource('banks', App\Http\Controllers\BankController::class);
 
 Route::apiResource('permissions', App\Http\Controllers\PermissionController::class);
 
-// Route::get('search/{name}', App\Http\Controllers\CreateItemController::class, 'search');
+// Route::apiResource('search', App\Http\Controllers\CreateItemController::class, 'search');
 
 
 Route::apiResource('vendor-types', App\Http\Controllers\VendorTypeController::class);
