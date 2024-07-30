@@ -20,7 +20,7 @@ return new class extends Migration
             $table->foreignUuid('account_group_id')->constrained();
             $table->foreignUuid('account_type_id')->constrained();
             $table->foreignUuid('account_subtype_id')->constrained();
-            $table->string('account_owner_id');
+            $table->string('account_owner_id')->nullable();
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('modified_by')->nullable()->constrained('users');
             $table->foreignId('deleted_by')->nullable()->constrained('users');

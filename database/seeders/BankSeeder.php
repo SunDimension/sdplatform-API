@@ -14,7 +14,7 @@ class BankSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('vendor_types')->insert([
+        DB::table('banks')->insert([
 
         ['name'=>'Access Bank'],
         ['name'=>'First Bank'],

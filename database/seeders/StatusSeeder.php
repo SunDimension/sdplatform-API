@@ -13,9 +13,8 @@ class StatusSeeder extends Seeder
      */
     public function run(): void
     {
-         DB::table('statuses')->insert([
-            ['name'=>'Inactive'],
-         
-         ]);
+        Status::insert([["id" => "1","name" => "Active",]
+			,["id" => "2","name" => "In-Active",]
+			]);
     }
 }

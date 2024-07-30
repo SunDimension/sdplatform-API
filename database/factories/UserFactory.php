@@ -26,8 +26,8 @@ class UserFactory extends Factory
     {
         return [
             'role_id' => Role::factory(),
-            'user_name' => $this->faker->userName(),
-            'user_email' => $this->faker->word(),
+            'name' => $this->faker->userName(),
+            'email' => $this->faker->word(),
             'password' => $this->faker->password(),
             'status_id' => Status::factory(),
             'branch_id' => Branch::factory(),

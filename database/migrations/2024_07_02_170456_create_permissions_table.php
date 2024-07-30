@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('account_groups', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('permissions', function (Blueprint $table) {
+            $table->id();
             $table->string('name');
-            $table->integer('created_by')->nullable();
-            $table->integer('modified_by')->nullable();
-            $table->integer('deleted_by')->nullable();
+            //$table->timestamps('deleted_at');
             $table->timestamps();
         });
     }
@@ -26,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('account_groups');
+        Schema::dropIfExists('permissions');
     }
 };

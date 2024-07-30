@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class AccountGroupController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $accountGroups = AccountGroup::all();
 
         return new AccountGroupCollection($accountGroups);
     }
 
-    public function store(AccountGroupStoreRequest $request): Response
+    public function store(AccountGroupStoreRequest $request)
     {
         $accountGroup = AccountGroup::create($request->validated());
 
         return new AccountGroupResource($accountGroup);
     }
-
-    public function show(Request $request, AccountGroup $accountGroup): Response
+ 
+    public function show(Request $request, AccountGroup $accountGroup)
     {
         return new AccountGroupResource($accountGroup);
     }
 
-    public function update(AccountGroupUpdateRequest $request, AccountGroup $accountGroup): Response
+    public function update(AccountGroupUpdateRequest $request, AccountGroup $accountGroup)
     {
         $accountGroup->update($request->validated());
 
         return new AccountGroupResource($accountGroup);
     }
 
-    public function destroy(Request $request, AccountGroup $accountGroup): Response
+    public function destroy(Request $request, AccountGroup $accountGroup)
     {
         $accountGroup->delete();
 

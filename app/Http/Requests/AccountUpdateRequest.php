@@ -25,7 +25,7 @@ class AccountUpdateRequest extends FormRequest
             'account_group_id' => ['required'],
             'account_type_id' => ['required'],
             'account_subtype_id' => ['required'],
-            'account_owner_id' => ['required', 'string'],
+            'account_owner_id' => ['nullable', 'string'],
             'created_by' => ['nullable'],
             'modified_by' => ['nullable'],
             'deleted_by' => ['nullable'],
