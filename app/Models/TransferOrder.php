@@ -36,6 +36,7 @@ class TransferOrder extends Model
     protected $casts = [
         'id' => 'integer',
         'transfer_date' => 'timestamp',
+        'transfer_reason' => 'integer',
         'source_id' => 'integer',
         'destination_id' => 'integer',
         'item_id' => 'integer',

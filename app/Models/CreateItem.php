@@ -11,10 +11,10 @@ class CreateItem extends Model
     use HasFactory;
 
 
-      public function getRouteKeyName()
-    {
-        return 'name';
-    }
+    //   public function getRouteKeyName()
+    // {
+    //     return 'name';
+    // }
 
     /**
      * The attributes that are mass assignable.
