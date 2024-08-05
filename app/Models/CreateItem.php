@@ -9,13 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CreateItem extends Model
 {
     use HasFactory;
-    
-    public $table = "create_items";
 
-    //   public function getRouteKeyName()
-    // {
-    //     return 'name';
-    // }
+
+      public function getRouteKeyName()
+    {
+        return 'name';
+    }
 
     /**
      * The attributes that are mass assignable.

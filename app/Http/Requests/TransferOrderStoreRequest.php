@@ -20,12 +20,12 @@ class TransferOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transfer_order_number' => ['required', 'string'],
+            'transfer_order_number' => [ 'string'],
             'transfer_date' => ['required'],
-            'transfer_reason' => ['required', 'string'],
+            'transfer_reason' => ['required', 'integer'],
             'source_id' => ['required', 'integer', 'exists:warehouses,id'],
             'destination_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'image_url' => ['required', 'string'],
+            'image_url' => ['string'],
             'transfer_quantity' => ['required', 'string'],
             'item_id' => ['required', 'integer', 'exists:create_items,id'],
         ];

@@ -24,13 +24,13 @@ class InventoryAdjustmentStoreRequest extends FormRequest
             'adjustment_type_id' => ['required', 'integer', 'exists:adjustment_types,id'],
             'date' => ['required'],
             'reason_id' => ['required', 'integer', 'exists:reasons,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'description' => ['required', 'string'],
-            'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
-            'cost_price' => ['required', 'numeric'],
-            'selling_price' => ['required', 'numeric'],
-            'quantity' => ['required', 'string'],
+            'branch_id' => ['integer', 'exists:branches,id'],
+            'warehouse_id' => [ 'integer', 'exists:warehouses,id'],
+            'description' => ['string'],
+            'item_category_id' => [ 'integer', 'exists:item_categories,id'],
+            'cost_price' => [ 'numeric'],
+            'selling_price' => [ 'numeric'],
+            'quantity' => [ 'string'],
         ];
     }
 }

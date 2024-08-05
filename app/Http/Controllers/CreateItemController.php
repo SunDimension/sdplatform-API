@@ -14,9 +14,20 @@ use Illuminate\Support\Facades\DB;
 
 class CreateItemController extends Controller
 {
-     public function index(Request $request): CreateItemCollection
-    {
-        $createItem = CreateItem::all();
+    public function index(Request $request): CreateItemCollection
+    {   
+        $sname = $request->name;
+        if($sname !==null && $sname !==''){
+
+            $createItems = CreateItem::where('id','=',Auth::user()->id)->get();
+        }
+        else
+        {
+             $createItem = DB::select("SELECT  name,quantity  FROM create_items Where create_items.`name` like '%$sname%'");
+
+            $createItems = $createItem;
+        }
+        
 
         return new CreateItemCollection($createItem);
     }

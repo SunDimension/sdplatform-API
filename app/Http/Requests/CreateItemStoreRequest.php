@@ -23,23 +23,22 @@ class CreateItemStoreRequest extends FormRequest
             'name' => ['required', 'string'],
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
             'item_type_id' => ['required', 'integer', 'exists:item_types,id'],
-            'description' => ['string'],
-            'batch_number' => ['string', 'unique:batch_number'],
-            'quantity'=>['string'],
+            'description' => ['required', 'string'],
+            'batch_number' => ['required', 'string'],
             'unit_id' => ['required', 'integer', 'exists:units,id'],
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
-            'cost_price' => ['numeric'],
-            'selling_price' => ['numeric'],
-            'reorder_level' => ['string'],
+            'cost_price' => ['required', 'numeric'],
+            'selling_price' => ['required', 'numeric'],
+            'quantity' =>['required','string'],
+            'reorder_level' => ['required', 'string'],
             'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
             'weight_id' => ['required', 'integer', 'exists:weights,id'],
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'warehouse' => ['required','integer','exists:warehouses,id'],
+            'warehouse' => ['required'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
-            'image_url' => ['string'],
-            'barcode' => ['string'],
-            'store_id' => ['required','integer', 'exists:stores,id'],
-            'user_id' => ['required', 'integer','exists:users,id']
+            'image_url' => ['required', 'string'],
+            'barcode' => ['required', 'string'],
+            'store_id' => ['required','integer', 'exist:stores,id']
         ];
     }
 }
