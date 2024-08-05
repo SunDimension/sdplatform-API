@@ -29,6 +29,7 @@ class CreateItemResource extends JsonResource
             'weight_id' => $this->weight_id,
             'branch_id' => $this->branch_id,
             'store_id'=> $this->store_id,
+            'user_id'=> $this->user_id,
             'warehouse' => $this->warehouse,
             'vendor_id' => $this->vendor_id,
             'image_url' => $this->image_url,

@@ -12,6 +12,7 @@
         "laravel/passport": "^11.8",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.7",
+        "milon/barcode": "^11.0",
         "spatie/laravel-ignition": "2.0",
         "spatie/laravel-permission": "^6.9",
         "tymon/jwt-auth": "^2.0",

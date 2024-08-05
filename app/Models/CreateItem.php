@@ -9,12 +9,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CreateItem extends Model
 {
     use HasFactory;
+    
+    public $table = "create_items";
 
-
-      public function getRouteKeyName()
-    {
-        return 'name';
-    }
+    //   public function getRouteKeyName()
+    // {
+    //     return 'name';
+    // }
 
     /**
      * The attributes that are mass assignable.
@@ -28,8 +29,8 @@ class CreateItem extends Model
         'description',
         'batch_number',
         'unit_id',
-        'brand_id',
         'quantity',
+        'brand_id',
         'cost_price',
         'selling_price',
         'reorder_level',
@@ -40,6 +41,8 @@ class CreateItem extends Model
         'vendor_id',
         'image_url',
         'barcode',
+        'store_id',
+        'user_id'
     ];
 
     /**
@@ -53,6 +56,7 @@ class CreateItem extends Model
         'item_type_id' => 'integer',
         'unit_id' => 'integer',
         'brand_id' => 'integer',
+        'batch_number'=>'string',
         'cost_price' => 'float',
         'selling_price' => 'float',
         'dimension_id' => 'integer',
@@ -60,7 +64,32 @@ class CreateItem extends Model
         'branch_id' => 'integer',
         'warehouse' => 'integer',
         'vendor_id' => 'integer',
+        'store_id' => 'integer',
+        'user_id' => 'integer'
     ];
+
+   protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function($createItem) {
+        // if (empty($createItem->batch_number)) {
+        // dd($createItem);
+            $createItem->batch_number = static::generateBatchNumber();
+        // }
+    });
+}
+
+private static function generateBatchNumber()
+{
+        // dd('check');
+    $prefix = 'HGV';
+    $timestamp = now()->format('YmdHis'); // Corrected method name
+    $randomNumber = rand();
+
+    return "{$prefix}-{$timestamp}-{$randomNumber}";
+}
+
 
     public function itemCategory(): BelongsTo
     {
@@ -105,5 +134,14 @@ class CreateItem extends Model
     public function vendor(): BelongsTo
     {
         return $this->belongsTo(Vendor::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
+       public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

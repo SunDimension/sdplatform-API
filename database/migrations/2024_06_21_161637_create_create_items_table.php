@@ -19,7 +19,7 @@ return new class extends Migration
             $table->foreignId('item_category_id')->constrained();
             $table->foreignId('item_type_id');
             $table->string('description');
-            $table->string('batch_number');
+            $table->string('batch_number')->unique();
             $table->foreignId('unit_id')->constrained();
             $table->foreignId('brand_id')->constrained();
             $table->float('cost_price');

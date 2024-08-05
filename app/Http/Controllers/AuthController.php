@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\RegisterRequest;
+use Illuminate\Validation\Validator;
 use App\Models\User;
 
 class AuthController extends Controller
@@ -19,9 +19,10 @@ public function register(Request $request)
 $this->validate($request,[
     'name' => 'required|string|max:255', 
     'email' => 'required|string|email|max:255|unique:users', 
-    'password' => 'required|string|min:6', 
+    'password' => 'required|string|min:8', 
     'role_id'=>'required',
     'status_id'=>'required',
+    'store_id'=>'required',
     'branch_id'=>'required',
     'warehouse_id'=>'required',
 ]);
@@ -32,6 +33,7 @@ $user = User::create([
 'role_id'=>$request->role_id,
 'status_id'=>$request->status_id,
   'branch_id'=>$request->branch_id,
+  'store_id'=>$request->store_id,
   'warehouse_id'=>$request->warehouse_id,
 'password' => bcrypt($request->password), // Hash the password
 ]);

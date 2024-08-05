@@ -15,8 +15,8 @@ class StoreSeeder extends Seeder
     {
         DB::table('stores')->insert([
 
-        ['name'=>'Maraba Store', 'branch_id'=>3,'store_type_id'=>1],
-        ['name'=>'Mabushi Store', 'branch_id'=>3,'store_type_id'=>1],
+        ['name'=>'Maraba Store', 'branch_id'=>2,'store_type_id'=>1],
+        ['name'=>'Mabushi Store', 'branch_id'=>3,'store_type_id'=>2],
         
         
         

@@ -15,8 +15,8 @@ class WarehouseSeeder extends Seeder
     {
         DB::table('warehouses')->insert([
 
-        ['name'=>'Kano Warehouse', 'branch_id'=>3,'warehouse_address'=>'Sabon Geri Kano','zipcode'=>'522554','contact_person'=>'Hamza Mohammed','email'=>'ham@app.com','phone'=>'0851115555'],
-        ['name'=>'Abuja Warehouse', 'branch_id'=>5,'warehouse_address'=>'Sabon Geri Kano','zipcode'=>'522554','contact_person'=>'Hamza Mohammed','email'=>'ham@app.com','phone'=>'0851115555'],
+        ['name'=>'Kano Warehouse', 'branch_id'=>1,'warehouse_address'=>'Sabon Geri Kano','zipcode'=>'522554','contact_person'=>'Hamza Mohammed','email'=>'ham@app.com','phone'=>'0851115555'],
+        ['name'=>'Abuja Warehouse', 'branch_id'=>2,'warehouse_address'=>'Sabon Geri Kano','zipcode'=>'522554','contact_person'=>'Hamza Mohammed','email'=>'ham@app.com','phone'=>'0851115555'],
         
         
 
