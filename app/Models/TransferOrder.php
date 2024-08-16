@@ -26,6 +26,8 @@ class TransferOrder extends Model
         'image_url',
         'transfer_quantity',
         'item_id',
+        'created_by',
+        'updated_by'
     ];
 
     /**
@@ -34,26 +36,55 @@ class TransferOrder extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'transfer_date' => 'timestamp',
-        'transfer_reason' => 'integer',
-        'source_id' => 'integer',
-        'destination_id' => 'integer',
-        'item_id' => 'integer',
+        'created_by' => 'integer',
+        'updated_by' => 'integer',
+        'transfer_date' => 'date',
     ];
+
+     protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function($transferOrder) {
+        // if (empty($createItem->batch_number)) {
+        // dd($createItem);
+            $transferOrder->transfer_order_number = static::generateTransferOrderNumber();
+        // }
+    });
+}
+
+private static function generateTransferOrderNumber()
+{
+        // dd('check');
+    $prefix = 'HGV-TO';
+    $timestamp = now()->format('YmdHis'); // Corrected method name
+    $randomNumber = rand();
+
+    return "{$prefix}-{$timestamp}-{$randomNumber}";
+}
 
     public function sourceWarehouse(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Store::class);
     }
 
     public function destinationWarehouse(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Store::class);
     }
 
     public function item(): BelongsTo
     {
         return $this->belongsTo(CreateItem::class);
+    }
+
+    public function creator()
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    public function updater()
+    {
+        return $this->belongsTo(User::class, 'updated_by');
     }
 }

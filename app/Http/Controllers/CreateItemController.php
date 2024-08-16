@@ -16,17 +16,12 @@ class CreateItemController extends Controller
 {
     public function index(Request $request): CreateItemCollection
     {   
-        $sname = $request->name;
-        if($sname !==null && $sname !==''){
 
-            $createItems = CreateItem::where('id','=',Auth::user()->id)->get();
-        }
-        else
-        {
-             $createItem = DB::select("SELECT  name,quantity  FROM create_items Where create_items.`name` like '%$sname%'");
+            $createItem = CreateItem::all();
+      
+           
 
-            $createItems = $createItem;
-        }
+      
         
 
         return new CreateItemCollection($createItem);
@@ -61,20 +56,20 @@ class CreateItemController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-//    public function search(Request $request): CreateItemCollection
-// {
-//     $sname = $request->input('name', '');
+   public function search(Request $request): CreateItemCollection
+{
+    $sname = $request->input('name', '');
 
-//     if (!empty($sname)) {
-//         // Assuming `name` is a column in `create_items`
-//         $createItems = CreateItem::where('name', 'like', "%$sname%")
-//             ->where('user_id', Auth::id())
-//             ->get();
-//     } else {
-//         // Return all items for the authenticated user if no name is provided
-//         $createItems = CreateItem::where('user_id', Auth::id())->get();
-//     }
+    if (!empty($sname)) {
+        // Assuming `name` is a column in `create_items`
+        $createItems = CreateItem::where('name', 'like', "%$sname%")
+            ->where('user_id', Auth::id())
+            ->get();
+    } else {
+        // Return all items for the authenticated user if no name is provided
+        $createItems = CreateItem::where('user_id', Auth::id())->get();
+    }
 
-//     return new CreateItemCollection($createItems);
-// }
+    return new CreateItemCollection($createItems);
+}
 }

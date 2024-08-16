@@ -20,14 +20,16 @@ class TransferOrderStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'transfer_order_number' => [ 'string'],
-            'transfer_date' => ['required'],
-            'transfer_reason' => ['required', 'integer'],
-            'source_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'destination_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'image_url' => ['string'],
-            'transfer_quantity' => ['required', 'string'],
+            'transfer_order_number' => ['string', 'unique:transfer_order_number'], // Nullable if not provided
+            'transfer_date' => ['required', 'date'], // Date format validation
+            'transfer_reason' => ['required', 'integer'], // Use 'in' rule if specific values are needed
+            'source_id' => ['required', 'integer', 'exists:stores,id'],
+            'destination_id' => ['required', 'integer', 'exists:stores,id'],
+            'image_url' => ['nullable', 'string'], // Nullable if not provided
+            'transfer_quantity' => ['required', 'numeric'], // Numeric validation
             'item_id' => ['required', 'integer', 'exists:create_items,id'],
+            'created_by' => ['nullable', 'integer', 'exists:users,id'], // Optional, must exist in users table
+            'updated_by' => ['nullable', 'integer', 'exists:users,id'],
         ];
     }
 }

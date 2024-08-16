@@ -5,9 +5,10 @@ use App\Http\Controllers\TitleController;
 use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\ProductController;
-use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\CreateItemController;
+use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\RolesController;
 use App\Models\Bank;
 use Illuminate\Support\Facades\Route;
 
@@ -29,8 +30,35 @@ Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logo
 
 
 
+Route::prefix('users')->group(function () {
+    Route::post('/{user}/roles/assign', [UsersController::class, 'assignRole'])->name('users.assignRole');
+    Route::post('/{user}/roles/remove', [UsersController::class, 'removeRole'])->name('users.removeRole');
+});
 
+Route::prefix('roles')->group(function () {
+    // Get all roles
+    Route::get('/', [RolesController::class, 'index'])->name('roles.index');
 
+    // Create a new role
+    Route::post('/', [RolesController::class, 'store'])->name('roles.store');
+
+    // Get a specific role
+    Route::get('/{role}', [RolesController::class, 'show'])->name('roles.show');
+
+    // Update a specific role
+    Route::put('/{role}', [RolesController::class, 'update'])->name('roles.update');
+
+    // Delete a specific role
+    Route::delete('/{role}', [RolesController::class, 'destroy'])->name('roles.destroy');
+
+    // Attach a permission to a role
+    Route::post('/{role}/permissions/attach', [RolesController::class, 'attachPermission'])
+        ->name('roles.attachPermission');
+
+    // Detach a permission from a role
+    Route::post('/{role}/permissions/detach', [RolesController::class, 'detachPermission'])
+        ->name('roles.detachPermission');
+});
 
 Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryController::class);
 
@@ -88,7 +116,7 @@ Route::apiResource('permissions', App\Http\Controllers\PermissionController::cla
 
 // Route::apiResource('search', App\Http\Controllers\CreateItemController::class, 'search');
 
-
+Route::get('/create-items/search', [CreateItemController::class, 'search'])->name('createItems.search');
 Route::apiResource('vendor-types', App\Http\Controllers\VendorTypeController::class);
 
 Route::apiResource('vendors', App\Http\Controllers\VendorController::class);

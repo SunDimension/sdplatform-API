@@ -11,22 +11,14 @@ class Permission extends Model
 
     public $table = "permissions";
 
-    protected $dates = [
-
-        'created_at',
-        'updated_at',
-        'deleted_at',
-    ];
 
     protected $fillable = [
         'name',
-        'created_at',
-        'updated_at',
-        'deleted_at',
+        
     ];
 
      public function roles()
     {
-        return $this->belongsToMany(Role::class);
+        return $this->belongsToMany(Role::class,'role_permission');
     }
 }

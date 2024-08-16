@@ -7,8 +7,10 @@ use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserCollection;
 use App\Http\Resources\UserResource;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 
 class UsersController extends Controller
 {
@@ -46,4 +48,27 @@ class UsersController extends Controller
         
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+ public function assignRole(Request $request, User $user): JsonResponse
+    {
+        $role = Role::findOrFail($request->input('role_id'));
+
+        if (!$user->roles->contains($role)) {
+            $user->roles()->attach($role);
+        }
+
+        return response()->json(['message' => 'Role assigned successfully.'], Response::HTTP_OK);
+    }
+
+  public function removeRole(Request $request, User $user): JsonResponse
+    {
+        $role = Role::findOrFail($request->input('role_id'));
+
+        if ($user->roles->contains($role)) {
+            $user->roles()->detach($role);
+        }
+
+        return response()->json(['message' => 'Role removed successfully.'], Response::HTTP_OK);
+    }  
+
 }

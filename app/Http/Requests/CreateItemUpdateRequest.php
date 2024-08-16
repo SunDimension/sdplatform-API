@@ -37,7 +37,7 @@ class CreateItemUpdateRequest extends FormRequest
             'warehouse' => ['required'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'image_url' => ['required', 'string'],
-            'barcode' => ['required', 'string'],
+            'barcode' => ['string','nullable','unique:barcode'],
             'store_id' => ['required','integer', 'exist:stores,id']
         ];
     }

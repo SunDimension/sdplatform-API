@@ -51,9 +51,9 @@ class User extends Authenticatable
         'warehouse_id' => 'integer',
     ];
 
-    public function role(): BelongsTo
+     public function roles()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsToMany(Role::class, 'role_user');
     }
 
     public function status(): BelongsTo

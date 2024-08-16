@@ -7,6 +7,7 @@ use App\Http\Requests\TransferOrderUpdateRequest;
 use App\Http\Resources\TransferOrderCollection;
 use App\Http\Resources\TransferOrderResource;
 use App\Models\TransferOrder;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -22,6 +23,7 @@ class TransferOrderController extends Controller
     public function store(TransferOrderStoreRequest $request): TransferOrderResource
     {
         $transferOrder = TransferOrder::create($request->validated());
+         $transferOrder['created_by'] = Auth::id();
 
         return new TransferOrderResource($transferOrder);
     }
@@ -34,6 +36,7 @@ class TransferOrderController extends Controller
     public function update(TransferOrderUpdateRequest $request, TransferOrder $transferOrder): TransferOrderResource
     {
         $transferOrder->update($request->validated());
+        $transferOrder['updated_by'] = Auth::id();
 
         return new TransferOrderResource($transferOrder);
     }
