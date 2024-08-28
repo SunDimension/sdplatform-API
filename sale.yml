@@ -1,0 +1,112 @@
+models:
+ SalesOrder:
+  sales_order_number: string
+  customer_id: id foreign:customers
+  branch_id: id foreign:branches
+  store_id: id foreign:stores
+  total_amount: numeric
+  credit_limit: id foreign:credit_limit
+  credit_amount: numeric
+  credit_balance: numeric
+
+  ItemSold:
+   name: string
+   sales_order_id: id foreign:salesorder
+   product_id: id foreign:create_items
+   quantity: string
+   unit_price: string
+   amount: string
+   sales_date: date
+
+  SalesReceipt:
+   sales_order_id: id foreign:salesorder
+   sales_invoice_id: id foreign:sales_invoice
+   customer_id: id foreign:customers
+   branch_id: id foreign:branches
+   store_id: id foreign:stores
+   total_amount: string
+   amount_paid: string
+   receipt_date: date
+   payment_mode_id: id foreign:payment_modes
+
+  SalesInvoice:
+   sales_order_id: id foreign:salesorder
+   sales_invoice_number: string
+   invoice_amount: string
+   invoice_date: date
+
+  Customer:
+   customer_type_id: id foreign:customer_types
+   title_id: id foreign:titles
+   surname: string
+   firstname: string
+   middlename: string
+   fullname: string
+   phone_number: string
+   email: string
+   address: string
+   credit_limit: id foreign:credit_limits
+
+  Release:
+   sales_receipt_id: id foreign:sales_receipts
+   branch_id: id foreign:branches
+   store_id: id foreign:stores
+   customer_id: id foreign:customers
+   release_date: date
+
+  ReleaseDetails:
+   release_id: id foreign:releases
+   product_id: id foreign:create_items
+   release_quantity: string
+   amount: string
+
+  Return:
+   release_id: id foreign:releases
+   sales_receipt_id: id foreign:sales_receipts
+   branch_id: id foreign:branches
+   store_id: id foreign:stores
+   return_date: date
+
+  ReturnDetails:
+   return_id: id foreign:returns
+   product_id: id foreign:create_items
+   returned_quantity: string
+
+controllers:
+ SalesOrder:
+  resource: api
+ ItemSold:
+  resource: api
+ SalesReceipt:
+  resource: api
+ SalesInvoice:
+  resource: api
+ Customer:
+  resource: api
+ Release:
+  resource: api
+ ReleaseDetails:
+  resource: api
+ Return:
+  resource: api
+ ReturnDetais:
+  resource: api
+
+seeders:
+ SalesOrder,
+ ItemSold,
+ SalesReceipt,
+ SaleInvoice,
+ Customer,
+ Release,
+ ReleaseDetails
+ Return,
+ ReturnDetails,
+
+
+
+
+
+  
+
+   

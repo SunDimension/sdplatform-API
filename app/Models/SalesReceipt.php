@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesReceipt extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes ;
 
     /**
      * The attributes that are mass assignable.
@@ -18,16 +19,16 @@ class SalesReceipt extends Model
     protected $fillable = [
         'customer_id',
         'branch_id',
-        'warehouse_id',
-        'product_id',
-        'tax_id',
+        'sales_order_id',
+        'sales_invoice_id',
+        'store_id',
+        'sales_receipt_number',
         'payment_mode_id',
-        'discount_id',
         'quantity',
-        'rate',
-        'amount',
+        'total_amount',
+        'amount_paid',
         'receipt_date',
-        'customer_note',
+        
     ];
 
     /**
@@ -38,14 +39,35 @@ class SalesReceipt extends Model
     protected $casts = [
         'id' => 'integer',
         'customer_id' => 'integer',
+        'store_id'=>'integer',
         'branch_id' => 'integer',
-        'warehouse_id' => 'integer',
-        'product_id' => 'integer',
-        'tax_id' => 'integer',
+        'sales_invoice_id' => 'integer',
+        'sales_order_id' => 'integer',
         'payment_mode_id' => 'integer',
-        'discount_id' => 'integer',
-        'receipt_date' => 'timestamp',
+        
     ];
+
+      protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function($salesreceipt) {
+        // if (empty($createItem->batch_number)) {
+        // dd($createItem);
+            $salesreceipt->sales_receipt_number = static::generateSalesReceiptNumber();
+        // }
+    });
+}
+
+private static function generateSalesReceiptNumber()
+{
+        // dd('check');
+    $prefix = 'HGV-SR';
+    $timestamp = now()->format('YmdHis'); // Corrected method name
+    $randomNumber = rand();
+
+    return "{$prefix}-{$timestamp}-{$randomNumber}";
+}
 
     public function customer(): BelongsTo
     {
@@ -57,28 +79,25 @@ class SalesReceipt extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function warehouse(): BelongsTo
+    public function salesorder(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(SalesOrder::class);
     }
 
-    public function product(): BelongsTo
+    public function salesinvoice(): BelongsTo
     {
-        return $this->belongsTo(CreateItem::class);
+        return $this->belongsTo(SalesInvoice::class);
     }
 
-    public function tax(): BelongsTo
-    {
-        return $this->belongsTo(Tax::class);
-    }
 
     public function paymentMode(): BelongsTo
     {
         return $this->belongsTo(PaymentMode::class);
     }
 
-    public function discount(): BelongsTo
+    public function stores(): BelongsTo
     {
-        return $this->belongsTo(Discount::class);
+        return $this->belongsTo(Store::class);
     }
+
 }

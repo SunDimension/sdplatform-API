@@ -64,6 +64,21 @@ Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryControlle
 
 Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
 
+Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
+
+Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController::class);
+
+Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
+
+Route::apiResource('item-sold', App\Http\Controllers\ItemSoldController::class);
+
+Route::apiResource('release', App\Http\Controllers\ReleaseController::class);
+
+Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::class);
+
+Route::apiResource('return-details', App\Http\Controllers\ReturnDetailsController::class);
+
+Route::apiResource('release-details', App\Http\Controllers\ReleaseDetailsController::class);
 Route::apiResource('dimensions', App\Http\Controllers\DimensionController::class);
 
 Route::apiResource('roles', App\Http\Controllers\RolesController::class);
@@ -127,11 +142,11 @@ Route::apiResource('transfer-orders', App\Http\Controllers\TransferOrderControll
 
 Route::apiResource('deliveries', App\Http\Controllers\DeliveryController::class);
 
-Route::apiResource('sales', App\Http\Controllers\SaleController::class);
+// Route::apiResource('sales', App\Http\Controllers\SaleController::class);
 
 Route::apiResource('inventory-adjustments', App\Http\Controllers\InventoryAdjustmentController::class);
 
-Route::apiResource('invoices', App\Http\Controllers\InvoiceController::class);
+// Route::apiResource('invoices', App\Http\Controllers\InvoiceController::class);
 
 Route::apiResource('credit-sales', App\Http\Controllers\CreditSaleController::class);
 

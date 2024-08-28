@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class CustomerStoreRequest extends FormRequest
+class SalesOrderStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,16 +22,12 @@ class CustomerStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'customer_type_id' => ['required', 'integer', 'exists:customer_types,id'],
-            'title_id' => ['required', 'integer','exists:titles,id'],
-            'surname' => ['required', 'string',],
-            'middlename' => ['string',],
-            'firstname' => ['string',],
-            'fullname' => ['string',],
-            'email' => ['string','email'],
-            'address' => ['string'],
-            'phone_number' => ['string'],
-            'credit_limit' => ['integer','exists:credit_limit,id'],
+            'sales_order_number' => ['string', 'unique:sales_order_number'],
+            'customer_id' => ['required', 'integer', 'exists:customers,id'],
+            'branch_id' => ['required', 'integer','exists:branches,id'],
+            'store_id' => ['required', 'integer','exists:stores,id'],
+            'total_amount' => ['required', 'integer',],
+            'credit_limit' => ['required', 'integer','exists:credit_limit,id'],
             'credit_amount' => ['string'],
             'credit_balance' => ['string'],
         ];

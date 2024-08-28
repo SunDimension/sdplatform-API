@@ -9,18 +9,11 @@ class CustomerResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
-        return [
-            'id' => $this->id,
-            'customer_type_id' => $this->customer_type_id,
-            'title_id' => $this->title_id,
-            'surname' => $this->surname,
-            'firstname' => $this->firstname,
-            'middlename' => $this->middlename,
-            'phone_number' => $this->phone_number,
-            'fullname' => $this->fullname,
-        ];
+        return parent::toArray($request);
     }
 }

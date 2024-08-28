@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class SalesReceiptStoreRequest extends FormRequest
+class ReleaseStoreRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -23,17 +23,11 @@ class SalesReceiptStoreRequest extends FormRequest
     {
         return [
             
-            'sales_order_id' => ['required', 'integer', 'exists:sales_order,id'],
+            'store_id' => ['required', 'integer', 'exists:stores,id'],
             'branch_id' => ['required', 'integer','exists:branches,id'],
-            'sales_invoice_id' => ['required', 'integer','exists:sales_invoice,id'],
-            'payment_mode_id' => ['required', 'integer','exists:payment_modes,id'],
             'customer_id' => ['required', 'integer','exists:customers,id'],
-            'store_id' => ['required', 'integer','exists:stores,id'],
-            'sales_receipt_number' => ['string', 'unique:sales_receipt_number'],
-            'total_amount' => ['required', 'string',],
-            'amount_paid' => ['required', 'string'],
-            'receipt_date' => ['string'],
-            
+            'sales_receipt_id' => ['required', 'integer','exists:sales_receipts,id'],
+            'release_date' => ['date'],
         ];
     }
 }

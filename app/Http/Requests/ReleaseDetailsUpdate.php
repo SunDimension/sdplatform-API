@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UnitStoreRequest extends FormRequest
+class ReleaseDetailsUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -16,12 +16,17 @@ class UnitStoreRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string'],
-            'deleted_at'=>['times']
+          
+            'release_id' => ['required', 'integer', 'exists:releases,id'],
+            'products_id' => ['required', 'integer','exists:create_items,id'],
+            'release_quantity' => ['required','string'],
         ];
+     
     }
 }

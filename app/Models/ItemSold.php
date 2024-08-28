@@ -4,9 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Unit extends Model
+class ItemSold extends Model
 {
     use HasFactory, SoftDeletes;
 
@@ -16,23 +17,28 @@ class Unit extends Model
      * @var array
      */
     protected $fillable = [
-        'name',
+        'sales_order_id',
+        'product_id',
+        'quantity',
+        'unit_price',
+        'amount',
+        'sales_date',
+        
     ];
 
-    /**
+     /**
      * The attributes that should be cast to native types.
      *
      * @var array
      */
     protected $casts = [
         'id' => 'integer',
+        'sales_order_id' => 'integer',
+     
     ];
 
-    public function unit(){
-    $unit = Unit::find(1);
-    $unit->delete(); 
- // Includes soft deleted records
-
-}
-    
+     public function salesOrder(): BelongsTo
+    {
+        return $this->belongsTo(SalesOrder::class);
+    }
 }

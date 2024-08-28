@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -23,6 +24,9 @@ class Customer extends Model
         'middlename',
         'phone_number',
         'fullname',
+        'email',
+        'address',
+        'credit_limit'
     ];
 
     /**
@@ -34,6 +38,7 @@ class Customer extends Model
         'id' => 'integer',
         'customer_type_id' => 'integer',
         'title_id' => 'integer',
+        'credit_limit'=>'integer'
     ];
 
     public function customerType(): BelongsTo
@@ -44,5 +49,10 @@ class Customer extends Model
     public function title(): BelongsTo
     {
         return $this->belongsTo(Title::class);
+    }
+
+      public function creditlimit(): BelongsTo
+    {
+        return $this->belongsTo(CreditLimit::class);
     }
 }

@@ -5,10 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
 
 class CreateItem extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
 
       public function getRouteKeyName()
@@ -143,4 +145,32 @@ private static function generateBatchNumber()
     {
         return $this->belongsTo(User::class);
     }
+    public function item($id)
+{
+    // Find the item by ID
+    $createItem = CreateItem::find($id);
+
+    if ($createItem) {
+        // Perform soft delete
+        $createItem->delete();
+    } else {
+        // Handle the case where the item was not found
+        return response()->json(['message' => 'Item not found'], 404);
+    }
+
+    // Retrieve all items, including those that are soft-deleted
+    $allItems = CreateItem::withTrashed()->get();
+
+    // Retrieve only soft-deleted items
+    $trashedItems = CreateItem::onlyTrashed()->get();
+
+    // Return the result (You can structure the response as needed)
+    return response()->json([
+        'all_items' => $allItems,
+        'trashed_items' => $trashedItems,
+    ]);
+}
+
+   
+
 }

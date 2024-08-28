@@ -14,9 +14,9 @@ class CustomerController extends Controller
 {
     public function index(Request $request): CustomerCollection
     {
-        $customers = Customer::all();
+        $customer = Customer::all();
 
-        return new CustomerCollection($customers);
+        return new CustomerCollection($customer);
     }
 
     public function store(CustomerStoreRequest $request): CustomerResource
@@ -37,7 +37,8 @@ class CustomerController extends Controller
 
         return new CustomerResource($customer);
     }
- public function destroy($id): Response
+
+   public function destroy($id): Response
     {
        Customer::destroy($id);
 
