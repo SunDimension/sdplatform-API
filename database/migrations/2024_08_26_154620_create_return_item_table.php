@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('return_item', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('release_id')->constrained()->onDelete('cascade');
+            $table->foreignId('release_id')->constrained('release')->onDelete('cascade');
             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
             $table->foreignId('store_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sales_receipt_id')->constrained()->onDelete('cascade');
+            $table->foreignId('sales_receipt_id')->constrained('sales_receipt')->onDelete('cascade');
             $table->date('return_date');
             $table->timestamps();
             

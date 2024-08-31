@@ -1,0 +1,86 @@
+models: 
+  ApprovalLimit:
+    id: uuid primary
+    amount: float
+    user_id: id foreign:users
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+
+  ApprovalProcessModule:
+    id: uuid primary
+    name: longtext
+    max_approval_count: int
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+
+  ApprovalProcessType:
+    id: uuid primary
+    name: string
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+
+  ApprovalStage:
+    id: uuid primary
+    name: string
+    process_type_id: uuid foreign:approval_process_types
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+
+  ApprovalType:
+    id: uuid primary
+    name: string
+    description: longtext
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+  
+  ApprovalInstance:
+    id: uuid primary
+    approval_stage_id: uuid foreign:approval_stages
+    approval_type_id: uuid foreign:approval_types
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+
+  ApprovalProcessFlow:
+    id: uuid primary
+    sequence_no: int
+    process_module_id: uuid foreign:approval_process_modules
+    approval_stage_id: uuid foreign:approval_stages
+    status_id: int
+    created_by: id foreign:users
+    modified_by: id foreign:users
+    deleted_by: id foreign:users
+    softDeletes
+
+
+controllers:
+  ApprovalInstance:
+    resource: api
+  ApprovalLimit:
+    resource: api
+  ApprovalProcessFlow:
+    resource: api
+  ApprovalProcessModule:
+    resource: api
+  ApprovalProcessType:
+    resource: api
+  ApprovalStage:
+    resource: api
+  ApprovalType:
+    resource: api
+  
+seeders: 
+  ApprovalProcessFlow,ApprovalInstance,ApprovalLimit,ApprovalProcessModule,ApprovalProcessType,ApprovalStage,ApprovalType
+
+  
