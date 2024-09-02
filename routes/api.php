@@ -231,3 +231,18 @@ Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterCo
 
 Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
 
+
+
+Route::apiResource('approval-instances', App\Http\Controllers\ApprovalInstanceController::class);
+
+Route::apiResource('approval-limits', App\Http\Controllers\ApprovalLimitController::class);
+
+Route::apiResource('approval-process-flows', App\Http\Controllers\ApprovalProcessFlowController::class);
+
+Route::apiResource('approval-process-modules', App\Http\Controllers\ApprovalProcessModuleController::class);
+
+Route::apiResource('approval-process-types', App\Http\Controllers\ApprovalProcessTypeController::class);
+
+Route::apiResource('approval-stages', App\Http\Controllers\ApprovalStageController::class);
+
+Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
