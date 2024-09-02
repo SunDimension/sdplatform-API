@@ -37,7 +37,7 @@ class CreateItemStoreRequest extends FormRequest
             'warehouse' => ['required','integer','exists:warehouses,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'image_url' => ['string'],
-            'barcode' => ['string','nullable','unique:barcode'],
+            'barcode' => ['string','nullable'],
             'store_id' => ['required','integer', 'exists:stores,id'],
             'user_id' => ['required', 'integer','exists:users,id']
         ];
