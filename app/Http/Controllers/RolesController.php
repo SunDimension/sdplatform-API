@@ -96,4 +96,6 @@ class RolesController extends Controller
 
         return response()->json(['message' => 'Permission detached successfully.'], Response::HTTP_OK);
     }
+
+    
 }

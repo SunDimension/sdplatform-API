@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -20,11 +22,11 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
-        'role_id',
         'name',
         'email',
         'password',
         'status_id',
+        'store_id',
         'branch_id',
         'warehouse_id',
     ];
@@ -45,13 +47,13 @@ class User extends Authenticatable
      */
     protected $casts = [
         'id' => 'integer',
-        'role_id' => 'integer',
         'status_id' => 'integer',
         'branch_id' => 'integer',
         'warehouse_id' => 'integer',
+        'store_id' => 'integer'
     ];
 
-     public function roles()
+     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user');
     }
@@ -69,5 +71,10 @@ class User extends Authenticatable
     public function warehouse(): BelongsTo
     {
         return $this->belongsTo(Warehouse::class);
+    }
+
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
     }
 }

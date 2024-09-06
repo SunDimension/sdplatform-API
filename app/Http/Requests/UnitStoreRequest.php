@@ -21,7 +21,7 @@ class UnitStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'deleted_at'=>['times']
+            'deleted_at'=>['timestamp']
         ];
     }
 }

@@ -19,10 +19,42 @@ class UserSeeder extends Seeder
                 'name' => 'App',
                 'email' => 'admin@app.com',
                 'password' => bcrypt('password'),
-                'role_id' => 1,
+                'store_id' =>2,
                 'status_id' => 1,
-                'branch_id' => 1,
-                'warehouse_id' => 1,
+                'branch_id' => 2,
+                'warehouse_id' => 6,
+                'created_at' => now()
+            ],
+
+              [
+                'name' => 'Umar Farok',
+                'email' => 'farouk@hamirglobal.com',
+                'password' => bcrypt('password'),
+                'store_id' =>2,
+                'status_id' => 1,
+                'branch_id' => 2,
+                'warehouse_id' => 6,
+                'created_at' => now()
+            ],
+                 [
+                'name' => 'Yusuf',
+                'email' => 'yusuf@hamirglobal.com',
+                'password' => bcrypt('password'),
+                'store_id' =>2,
+                'status_id' => 1,
+                'branch_id' => 2,
+                'warehouse_id' => 6,
+                'created_at' => now()
+            ],
+
+                 [
+                'name' => 'Admin',
+                'email' => 'admin@hamirglobal.com',
+                'password' => bcrypt('password'),
+                'store_id' =>2,
+                'status_id' => 1,
+                'branch_id' => 2,
+                'warehouse_id' => 6,
                 'created_at' => now()
             ]
         ]);
