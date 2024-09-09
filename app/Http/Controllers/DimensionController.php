@@ -38,7 +38,7 @@ class DimensionController extends Controller
         return new DimensionResource($dimension);
     }
 
- public function destroy($id): Response
+ public function destroy($id)
     {   
        
         Dimension::destroy($id);

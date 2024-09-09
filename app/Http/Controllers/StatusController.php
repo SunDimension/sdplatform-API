@@ -38,7 +38,7 @@ class StatusController extends Controller
         return new StatusResource($status);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         Status::destroy($id);

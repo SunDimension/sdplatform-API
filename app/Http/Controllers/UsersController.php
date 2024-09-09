@@ -40,7 +40,7 @@ class UsersController extends Controller
         return new UserResource($user);
     }
 
-  public function destroy($id): Response
+  public function destroy($id)
     {   
        
         User::destroy($id);

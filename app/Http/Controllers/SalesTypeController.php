@@ -37,7 +37,7 @@ class SalesTypeController extends Controller
         return new SalesTypeResource($salestype);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         SalesType::destroy($id);

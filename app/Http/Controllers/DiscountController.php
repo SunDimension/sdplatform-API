@@ -38,7 +38,7 @@ class DiscountController extends Controller
         return new DiscountResource($discount);
     }
 
-  public function destroy($id): Response
+  public function destroy($id)
     {   
        
         Discount::destroy($id);

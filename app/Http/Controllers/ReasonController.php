@@ -37,7 +37,7 @@ class ReasonController extends Controller
         return new ReasonResource($reason);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         Reason::destroy($id);

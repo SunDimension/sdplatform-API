@@ -38,7 +38,7 @@ class BranchController extends Controller
         return new BranchResource($branch);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
         // $branch->delete();
         Branch::destroy($id);

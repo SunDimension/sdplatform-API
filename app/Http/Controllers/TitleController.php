@@ -38,7 +38,7 @@ class TitleController extends Controller
         return new TitleResource($title);
     }
 
-public function destroy($id): Response
+public function destroy($id)
     {   
        
         Title::destroy($id);

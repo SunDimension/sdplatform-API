@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class FinancialQuarterController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $financialQuarters = FinancialQuarter::all();
 
         return new FinancialQuarterCollection($financialQuarters);
     }
 
-    public function store(FinancialQuarterStoreRequest $request): Response
+    public function store(FinancialQuarterStoreRequest $request)
     {
         $financialQuarter = FinancialQuarter::create($request->validated());
 
         return new FinancialQuarterResource($financialQuarter);
     }
 
-    public function show(Request $request, FinancialQuarter $financialQuarter): Response
+    public function show(Request $request, FinancialQuarter $financialQuarter)
     {
         return new FinancialQuarterResource($financialQuarter);
     }
 
-    public function update(FinancialQuarterUpdateRequest $request, FinancialQuarter $financialQuarter): Response
+    public function update(FinancialQuarterUpdateRequest $request, FinancialQuarter $financialQuarter)
     {
         $financialQuarter->update($request->validated());
 
         return new FinancialQuarterResource($financialQuarter);
     }
 
-    public function destroy(Request $request, FinancialQuarter $financialQuarter): Response
+    public function destroy(Request $request, FinancialQuarter $financialQuarter)
     {
         $financialQuarter->delete();
 

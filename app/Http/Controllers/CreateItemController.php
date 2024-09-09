@@ -49,7 +49,7 @@ class CreateItemController extends Controller
         return new CreateItemResource($createItem);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
         CreateItem::destroy($id);
 

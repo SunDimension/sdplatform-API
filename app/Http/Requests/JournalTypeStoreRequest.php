@@ -21,7 +21,7 @@ class JournalTypeStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'sign' => ['required', 'string'],
+            'sign' => ['required', 'integer'],
         ];
     }
 }

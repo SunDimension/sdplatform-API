@@ -38,7 +38,7 @@ class SalesReceiptController extends Controller
         return new SalesReceiptResource($salesreceipt);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         SalesReceipt::destroy($id);

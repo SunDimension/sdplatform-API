@@ -38,7 +38,7 @@ class SalesInvoiceController extends Controller
         return new SalesInvoiceResource($salesinvoice);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         SalesInvoice::destroy($id);

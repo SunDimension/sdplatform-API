@@ -38,7 +38,7 @@ class ReleaseDetailsController extends Controller
         return new ReleaseDetailsResource($releaseDetails);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         ReleaseDetails::destroy($id);

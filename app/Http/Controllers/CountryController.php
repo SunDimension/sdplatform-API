@@ -38,7 +38,7 @@ class CountryController extends Controller
         return new CountryResource($country);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
         Country::destroy($id);
 

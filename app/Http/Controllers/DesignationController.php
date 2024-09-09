@@ -38,7 +38,7 @@ class DesignationController extends Controller
         return new DesignationResource($designation);
     }
 
-     public function destroy($id): Response
+     public function destroy($id)
     {
        Designation::destroy($id);
 

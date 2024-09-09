@@ -23,7 +23,7 @@ class JournalEntryStoreRequest extends FormRequest
             'description' => ['required', 'string'],
             'payment_date' => ['required'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'vendor_id' => ['required', 'string'],
+            'vendor_id' => ['nullable', 'string'],
             'created_by' => ['nullable'],
             'modified_by' => ['nullable'],
             'deleted_by' => ['nullable'],

@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class ChartCardController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $chartCards = ChartCard::all();
 
         return new ChartCardCollection($chartCards);
     }
 
-    public function store(ChartCardStoreRequest $request): Response
+    public function store(ChartCardStoreRequest $request)
     {
         $chartCard = ChartCard::create($request->validated());
 
         return new ChartCardResource($chartCard);
     }
 
-    public function show(Request $request, ChartCard $chartCard): Response
+    public function show(Request $request, ChartCard $chartCard)
     {
         return new ChartCardResource($chartCard);
     }
 
-    public function update(ChartCardUpdateRequest $request, ChartCard $chartCard): Response
+    public function update(ChartCardUpdateRequest $request, ChartCard $chartCard)
     {
         $chartCard->update($request->validated());
 
         return new ChartCardResource($chartCard);
     }
 
-    public function destroy(Request $request, ChartCard $chartCard): Response
+    public function destroy(Request $request, ChartCard $chartCard)
     {
         $chartCard->delete();
 

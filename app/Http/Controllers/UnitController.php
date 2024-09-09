@@ -38,7 +38,7 @@ class UnitController extends Controller
         return new UnitResource($unit);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         Unit::destroy($id);

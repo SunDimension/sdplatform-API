@@ -38,7 +38,7 @@ class CreditLimitController extends Controller
         return new CreditLimitResource($creditLimit);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
        CreditLimit::destroy($id);
 

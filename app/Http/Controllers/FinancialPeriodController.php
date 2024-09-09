@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class FinancialPeriodController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $financialPeriods = FinancialPeriod::all();
 
         return new FinancialPeriodCollection($financialPeriods);
     }
 
-    public function store(FinancialPeriodStoreRequest $request): Response
+    public function store(FinancialPeriodStoreRequest $request)
     {
         $financialPeriod = FinancialPeriod::create($request->validated());
 
         return new FinancialPeriodResource($financialPeriod);
     }
 
-    public function show(Request $request, FinancialPeriod $financialPeriod): Response
+    public function show(Request $request, FinancialPeriod $financialPeriod)
     {
         return new FinancialPeriodResource($financialPeriod);
     }
 
-    public function update(FinancialPeriodUpdateRequest $request, FinancialPeriod $financialPeriod): Response
+    public function update(FinancialPeriodUpdateRequest $request, FinancialPeriod $financialPeriod)
     {
         $financialPeriod->update($request->validated());
 
         return new FinancialPeriodResource($financialPeriod);
     }
 
-    public function destroy(Request $request, FinancialPeriod $financialPeriod): Response
+    public function destroy(Request $request, FinancialPeriod $financialPeriod)
     {
         $financialPeriod->delete();
 

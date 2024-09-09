@@ -37,7 +37,7 @@ class RefundTypeController extends Controller
         return new RefundTypeResource($refundtype);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         RefundType::destroy($id);

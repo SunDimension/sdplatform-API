@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class ChartCategoryController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $chartCategories = ChartCategory::all();
 
         return new ChartCategoryCollection($chartCategories);
     }
 
-    public function store(ChartCategoryStoreRequest $request): Response
+    public function store(ChartCategoryStoreRequest $request)
     {
         $chartCategory = ChartCategory::create($request->validated());
 
         return new ChartCategoryResource($chartCategory);
     }
 
-    public function show(Request $request, ChartCategory $chartCategory): Response
+    public function show(Request $request, ChartCategory $chartCategory)
     {
         return new ChartCategoryResource($chartCategory);
     }
 
-    public function update(ChartCategoryUpdateRequest $request, ChartCategory $chartCategory): Response
+    public function update(ChartCategoryUpdateRequest $request, ChartCategory $chartCategory)
     {
         $chartCategory->update($request->validated());
 
         return new ChartCategoryResource($chartCategory);
     }
 
-    public function destroy(Request $request, ChartCategory $chartCategory): Response
+    public function destroy(Request $request, ChartCategory $chartCategory)
     {
         $chartCategory->delete();
 

@@ -38,7 +38,7 @@ class ItemTypeController extends Controller
         return new ItemTypeResource($itemType);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {   
        
         ItemType::destroy($id);

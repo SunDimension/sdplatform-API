@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class JournalEntryDetailController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $journalEntryDetails = JournalEntryDetail::all();
 
         return new JournalEntryDetailCollection($journalEntryDetails);
     }
 
-    public function store(JournalEntryDetailStoreRequest $request): Response
+    public function store(JournalEntryDetailStoreRequest $request)
     {
         $journalEntryDetail = JournalEntryDetail::create($request->validated());
 
         return new JournalEntryDetailResource($journalEntryDetail);
     }
 
-    public function show(Request $request, JournalEntryDetail $journalEntryDetail): Response
+    public function show(Request $request, JournalEntryDetail $journalEntryDetail)
     {
         return new JournalEntryDetailResource($journalEntryDetail);
     }
 
-    public function update(JournalEntryDetailUpdateRequest $request, JournalEntryDetail $journalEntryDetail): Response
+    public function update(JournalEntryDetailUpdateRequest $request, JournalEntryDetail $journalEntryDetail)
     {
         $journalEntryDetail->update($request->validated());
 
         return new JournalEntryDetailResource($journalEntryDetail);
     }
 
-    public function destroy(Request $request, JournalEntryDetail $journalEntryDetail): Response
+    public function destroy(Request $request, JournalEntryDetail $journalEntryDetail)
     {
         $journalEntryDetail->delete();
 

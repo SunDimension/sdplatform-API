@@ -38,7 +38,7 @@ class AdjustmentTypeController extends Controller
         return new AdjustmentTypeResource($adjustmentType);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
         AdjustmentType::destroy($id);
 

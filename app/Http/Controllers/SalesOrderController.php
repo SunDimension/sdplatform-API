@@ -39,7 +39,7 @@ class SalesOrderController extends Controller
         return new SalesOrderResource($salesorder);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         SalesOrder::destroy($id);

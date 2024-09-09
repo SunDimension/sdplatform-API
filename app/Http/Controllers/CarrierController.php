@@ -38,7 +38,7 @@ class CarrierController extends Controller
         return new CarrierResource($carrier);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
        Carrier::destroy($id);
 

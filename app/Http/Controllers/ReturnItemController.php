@@ -38,7 +38,7 @@ class ReturnItemController extends Controller
         return new ReturnItemResource($returnItem);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         ReturnItem::destroy($id);

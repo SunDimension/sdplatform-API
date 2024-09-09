@@ -38,7 +38,7 @@ class PaymentReceivedController extends Controller
         return new PaymentReceivedResource($paymentReceived);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {   
        
         PaymentReceived::destroy($id);

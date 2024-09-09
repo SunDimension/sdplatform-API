@@ -38,7 +38,7 @@ class ReturnDetailsController extends Controller
         return new ReturnDetailsResource($returnDetails);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         ReturnDetails::destroy($id);

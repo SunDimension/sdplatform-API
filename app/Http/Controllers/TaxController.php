@@ -38,7 +38,7 @@ class TaxController extends Controller
         return new TaxResource($tax);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {   
        
         Tax::destroy($id);

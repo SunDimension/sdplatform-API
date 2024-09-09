@@ -26,19 +26,19 @@ class DashboardSettingController extends Controller
         return new DashboardSettingResource($dashboardSetting);
     }
 
-    public function show(Request $request, DashboardSetting $dashboardSetting): Response
+    public function show(Request $request, DashboardSetting $dashboardSetting)
     {
         return new DashboardSettingResource($dashboardSetting);
     }
 
-    public function update(DashboardSettingUpdateRequest $request, DashboardSetting $dashboardSetting): Response
+    public function update(DashboardSettingUpdateRequest $request, DashboardSetting $dashboardSetting)
     {
         $dashboardSetting->update($request->validated());
 
         return new DashboardSettingResource($dashboardSetting);
     }
 
-    public function destroy(Request $request, DashboardSetting $dashboardSetting): Response
+    public function destroy(Request $request, DashboardSetting $dashboardSetting)
     {
         $dashboardSetting->delete();
 

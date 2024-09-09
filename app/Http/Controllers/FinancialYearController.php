@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class FinancialYearController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $financialYears = FinancialYear::all();
 
         return new FinancialYearCollection($financialYears);
     }
 
-    public function store(FinancialYearStoreRequest $request): Response
+    public function store(FinancialYearStoreRequest $request)
     {
         $financialYear = FinancialYear::create($request->validated());
 
         return new FinancialYearResource($financialYear);
     }
 
-    public function show(Request $request, FinancialYear $financialYear): Response
+    public function show(Request $request, FinancialYear $financialYear)
     {
         return new FinancialYearResource($financialYear);
     }
 
-    public function update(FinancialYearUpdateRequest $request, FinancialYear $financialYear): Response
+    public function update(FinancialYearUpdateRequest $request, FinancialYear $financialYear)
     {
         $financialYear->update($request->validated());
 
         return new FinancialYearResource($financialYear);
     }
 
-    public function destroy(Request $request, FinancialYear $financialYear): Response
+    public function destroy(Request $request, FinancialYear $financialYear)
     {
         $financialYear->delete();
 

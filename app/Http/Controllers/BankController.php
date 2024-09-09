@@ -38,7 +38,7 @@ class BankController extends Controller
         return new BankResource($bank);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {   
        
         Bank::destroy($id);

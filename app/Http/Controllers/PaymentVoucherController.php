@@ -38,7 +38,7 @@ class PaymentVoucherController extends Controller
         return new PaymentVoucherResource($paymentVoucher);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         PaymentVoucher::destroy($id);

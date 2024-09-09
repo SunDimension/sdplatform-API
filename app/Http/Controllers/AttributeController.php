@@ -38,7 +38,7 @@ class AttributeController extends Controller
         return new AttributeResource($attribute);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
         Attribute::destroy($id);
 

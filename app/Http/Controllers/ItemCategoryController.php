@@ -38,7 +38,7 @@ class ItemCategoryController extends Controller
         return new ItemCategoryResource($itemCategory);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {   
        
         ItemCategory::destroy($id);

@@ -38,7 +38,7 @@ class WeightController extends Controller
         return new WeightResource($weight);
     }
 
-  public function destroy($id): Response
+  public function destroy($id)
     {   
        
         Weight::destroy($id);

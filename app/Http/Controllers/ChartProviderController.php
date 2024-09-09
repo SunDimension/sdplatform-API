@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class ChartProviderController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $chartProviders = ChartProvider::all();
 
         return new ChartProviderCollection($chartProviders);
     }
 
-    public function store(ChartProviderStoreRequest $request): Response
+    public function store(ChartProviderStoreRequest $request)
     {
         $chartProvider = ChartProvider::create($request->validated());
 
         return new ChartProviderResource($chartProvider);
     }
 
-    public function show(Request $request, ChartProvider $chartProvider): Response
+    public function show(Request $request, ChartProvider $chartProvider)
     {
         return new ChartProviderResource($chartProvider);
     }
 
-    public function update(ChartProviderUpdateRequest $request, ChartProvider $chartProvider): Response
+    public function update(ChartProviderUpdateRequest $request, ChartProvider $chartProvider)
     {
         $chartProvider->update($request->validated());
 
         return new ChartProviderResource($chartProvider);
     }
 
-    public function destroy(Request $request, ChartProvider $chartProvider): Response
+    public function destroy(Request $request, ChartProvider $chartProvider)
     {
         $chartProvider->delete();
 

@@ -26,19 +26,19 @@ class ChartController extends Controller
         return new ChartResource($chart);
     }
 
-    public function show(Request $request, Chart $chart): Response
+    public function show(Request $request, Chart $chart)
     {
         return new ChartResource($chart);
     }
 
-    public function update(ChartUpdateRequest $request, Chart $chart): Response
+    public function update(ChartUpdateRequest $request, Chart $chart)
     {
         $chart->update($request->validated());
 
         return new ChartResource($chart);
     }
 
-    public function destroy(Request $request, Chart $chart): Response
+    public function destroy(Request $request, Chart $chart)
     {
         $chart->delete();
 

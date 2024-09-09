@@ -38,7 +38,7 @@ class StateController extends Controller
         return new StateResource($state);
     }
 
-  public function destroy($id): Response
+  public function destroy($id)
     {   
        
         State::destroy($id);

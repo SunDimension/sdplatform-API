@@ -12,33 +12,33 @@ use Illuminate\Http\Response;
 
 class PeriodAccountController extends Controller
 {
-    public function index(Request $request): Response
+    public function index(Request $request)
     {
         $periodAccounts = PeriodAccount::all();
 
         return new PeriodAccountCollection($periodAccounts);
     }
 
-    public function store(PeriodAccountStoreRequest $request): Response
+    public function store(PeriodAccountStoreRequest $request)
     {
         $periodAccount = PeriodAccount::create($request->validated());
 
         return new PeriodAccountResource($periodAccount);
     }
 
-    public function show(Request $request, PeriodAccount $periodAccount): Response
+    public function show(Request $request, PeriodAccount $periodAccount)
     {
         return new PeriodAccountResource($periodAccount);
     }
 
-    public function update(PeriodAccountUpdateRequest $request, PeriodAccount $periodAccount): Response
+    public function update(PeriodAccountUpdateRequest $request, PeriodAccount $periodAccount)
     {
         $periodAccount->update($request->validated());
 
         return new PeriodAccountResource($periodAccount);
     }
 
-    public function destroy(Request $request, PeriodAccount $periodAccount): Response
+    public function destroy(Request $request, PeriodAccount $periodAccount)
     {
         $periodAccount->delete();
 

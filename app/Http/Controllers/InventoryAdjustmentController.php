@@ -38,7 +38,7 @@ class InventoryAdjustmentController extends Controller
         return new InventoryAdjustmentResource($inventoryAdjustment);
     }
     
-    public function destroy($id): Response
+    public function destroy($id)
     {   
        
         InventoryAdjustment::destroy($id);

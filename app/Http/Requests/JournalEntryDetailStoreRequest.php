@@ -25,7 +25,7 @@ class JournalEntryDetailStoreRequest extends FormRequest
             'amount' => ['required', 'numeric'],
             'description' => ['required', 'string'],
             'account_id' => ['required'],
-            'account_no' => ['required', 'string'],
+            'account_no' => ['nullable', 'string'],
             'created_by' => ['nullable'],
             'modified_by' => ['nullable'],
             'deleted_by' => ['nullable'],

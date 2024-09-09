@@ -38,7 +38,7 @@ class BrandController extends Controller
         return new BrandResource($brand);
     }
 
-    public function destroy($id): Response
+    public function destroy($id)
     {
         Brand::destroy($id);
         return response(null, Response::HTTP_NO_CONTENT);

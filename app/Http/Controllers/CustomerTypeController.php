@@ -38,7 +38,7 @@ class CustomerTypeController extends Controller
         return new CustomerTypeResource($customerType);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {
        CustomerType::destroy($id);
 

@@ -37,7 +37,7 @@ class StoreController extends Controller
         return new StoreResource($store);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         Store::destroy($id);

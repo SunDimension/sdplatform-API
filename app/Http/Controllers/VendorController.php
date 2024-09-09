@@ -38,7 +38,7 @@ class VendorController extends Controller
         return new VendorResource($vendor);
     }
 
-   public function destroy($id): Response
+   public function destroy($id)
     {   
        
         Vendor::destroy($id);
