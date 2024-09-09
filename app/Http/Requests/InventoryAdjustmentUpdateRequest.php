@@ -25,7 +25,7 @@ class InventoryAdjustmentUpdateRequest extends FormRequest
             'date' => ['required'],
             'reason_id' => ['required', 'integer', 'exists:reasons,id'],
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
+            'store_id' => ['required', 'integer', 'exists:stores,id'],
             'description' => ['required', 'string'],
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
             'cost_price' => ['required', 'numeric'],

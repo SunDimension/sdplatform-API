@@ -71,4 +71,15 @@ class UsersController extends Controller
         return response()->json(['message' => 'Role removed successfully.'], Response::HTTP_OK);
     }  
 
+     public function syncRoles(Request $request, User $user): JsonResponse
+    {
+        // Retrieve role_ids from the request (this will replace all current roles)
+        $roleIds = $request->input('role_ids');
+
+        // Sync roles, removing old ones and assigning the new set
+        $user->roles()->sync($roleIds);
+
+        return response()->json(['message' => 'Roles synced successfully.'], Response::HTTP_OK);
+    }
+
 }

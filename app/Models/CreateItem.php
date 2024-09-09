@@ -5,18 +5,18 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
+// use Illuminate\Database\Eloquent\SoftDeletes;
 
 
 class CreateItem extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
 
-      public function getRouteKeyName()
-    {
-        return 'name';
-    }
+    //   public function getRouteKeyName()
+    // {
+    //     return 'name';
+    // }
 
     /**
      * The attributes that are mass assignable.
@@ -145,31 +145,31 @@ private static function generateBatchNumber()
     {
         return $this->belongsTo(User::class);
     }
-    public function item($id)
-{
-    // Find the item by ID
-    $createItem = CreateItem::find($id);
+    // public function item($id)
+// {
+//     // Find the item by ID
+//     $createItem = CreateItem::find($id);
 
-    if ($createItem) {
-        // Perform soft delete
-        $createItem->delete();
-    } else {
-        // Handle the case where the item was not found
-        return response()->json(['message' => 'Item not found'], 404);
-    }
+//     if ($createItem) {
+//         // Perform soft delete
+//         $createItem->delete();
+//     } else {
+//         // Handle the case where the item was not found
+//         return response()->json(['message' => 'Item not found'], 404);
+//     }
 
-    // Retrieve all items, including those that are soft-deleted
-    $allItems = CreateItem::withTrashed()->get();
+//     // Retrieve all items, including those that are soft-deleted
+//     $allItems = CreateItem::withTrashed()->get();
 
-    // Retrieve only soft-deleted items
-    $trashedItems = CreateItem::onlyTrashed()->get();
+//     // Retrieve only soft-deleted items
+//     $trashedItems = CreateItem::onlyTrashed()->get();
 
-    // Return the result (You can structure the response as needed)
-    return response()->json([
-        'all_items' => $allItems,
-        'trashed_items' => $trashedItems,
-    ]);
-}
+//     // Return the result (You can structure the response as needed)
+//     return response()->json([
+//         'all_items' => $allItems,
+//         'trashed_items' => $trashedItems,
+//     ]);
+// }
 
    
 

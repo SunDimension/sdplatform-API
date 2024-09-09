@@ -23,6 +23,7 @@ class InventoryAdjustmentResource extends JsonResource
             'description' => $this->description,
             'item_category_id' => $this->item_category_id,
             'cost_price' => $this->cost_price,
+            'store_id'=>$this->store,
             'selling_price' => $this->selling_price,
             'quantity' => $this->quantity,
         ];

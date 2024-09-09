@@ -20,10 +20,9 @@ class UserStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role_id' => ['required', 'integer', 'exists:roles,id'],
-            'user_name' => ['required', 'string'],
-            'user_email' => ['required', 'string'],
-            'password' => ['required', 'password'],
+            'name' => ['required', 'string', 'max:255'],
+             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+             'password' => ['required', 'string', 'min:8', 'confirmed'],
             'status_id' => ['required', 'integer', 'exists:statuses,id'],
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],

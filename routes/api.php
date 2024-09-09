@@ -29,11 +29,32 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 
 
-
 Route::prefix('users')->group(function () {
+    // Get all users
+    Route::get('/', [UsersController::class, 'index'])->name('users.index');
+
+    // Create a new user
+    Route::post('/', [UsersController::class, 'store'])->name('users.store');
+
+    // Get a specific user
+    Route::get('/{user}', [UsersController::class, 'show'])->name('users.show');
+
+    // Update a specific user
+    Route::put('/{user}', [UsersController::class, 'update'])->name('users.update');
+
+    // Delete a specific user
+    Route::delete('/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
+
+    // Assign roles to a user
     Route::post('/{user}/roles/assign', [UsersController::class, 'assignRole'])->name('users.assignRole');
+
+    // Remove roles from a user
     Route::post('/{user}/roles/remove', [UsersController::class, 'removeRole'])->name('users.removeRole');
+
+    // Sync roles for a user (replace existing roles with new ones)
+    Route::post('/{user}/roles/sync', [UsersController::class, 'syncRoles'])->name('users.syncRoles');
 });
+
 
 Route::prefix('roles')->group(function () {
     // Get all roles

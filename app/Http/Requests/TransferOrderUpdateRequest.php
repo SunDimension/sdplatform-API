@@ -21,9 +21,9 @@ class TransferOrderUpdateRequest extends FormRequest
     {
         
         return [
-            'transfer_order_number' => ['string', 'unique:transfer_order_number'], // Nullable if not provided
+            // 'transfer_order_number' => ['required', 'string', 'unique:transfer_orders,transfer_order_number,' . $this->route('transfer-orders')], // Nullable if not provided
             'transfer_date' => ['required', 'date'], // Date format validation
-            'transfer_reason' => ['required', 'integer'], // Use 'in' rule if specific values are needed
+            'transfer_reason' => ['required', 'integer','exists:reasons,id'], // Use 'in' rule if specific values are needed
             'source_id' => ['required', 'integer', 'exists:stores,id'],
             'destination_id' => ['required', 'integer', 'exists:stores,id'],
             'image_url' => ['nullable', 'string'], // Nullable if not provided
