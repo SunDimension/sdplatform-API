@@ -35,14 +35,14 @@ class PaymentVoucher extends Model
      */
     protected $casts = [
         'id' => 'integer',
-        'product_id' => 'integer',
+        // 'product_id' => 'integer',
         'expense_date' => 'timestamp',
         'branch_id' => 'integer',
         'warehouse_id' => 'integer',
         'tax_id' => 'integer',
         'vendor_id' => 'integer',
         'payment_mode_id' => 'integer',
-        'expense_account_id' => 'integer',
+        // 'expense_account_id' => 'integer',
     ];
 
     public function product(): BelongsTo
@@ -77,6 +77,6 @@ class PaymentVoucher extends Model
 
     public function expenseAccount(): BelongsTo
     {
-        return $this->belongsTo(ExpenseAccountId::class);
+        return $this->belongsTo(Account::class,'expense_account_id');
     }
 }

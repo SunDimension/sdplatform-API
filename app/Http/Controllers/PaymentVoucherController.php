@@ -7,6 +7,7 @@ use App\Http\Requests\PaymentVoucherUpdateRequest;
 use App\Http\Resources\PaymentVoucherCollection;
 use App\Http\Resources\PaymentVoucherResource;
 use App\Models\PaymentVoucher;
+use App\Models\PaymentVoucherDetail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -21,7 +22,24 @@ class PaymentVoucherController extends Controller
 
     public function store(PaymentVoucherStoreRequest $request): PaymentVoucherResource
     {
-        $paymentVoucher = PaymentVoucher::create($request->validated());
+        //$paymentVoucher = PaymentVoucher::create($request->validated());
+        $data = $request->validated();
+        $paymentVoucher = PaymentVoucher::create($data);
+        //Log::debug($data);
+        foreach ($data['voucher_entries'] as $clauseEntry) {
+            PaymentVoucherDetail::create([
+                'payment_voucher_id'=>$paymentVoucher->id,
+                'item_id' => $clauseEntry['item_id'],
+                'amount' => $clauseEntry['amount'],
+                // 'expense_account_id' => $clauseEntry['expense_account_id'],
+                'quantity' => $clauseEntry['quantity'],
+                'description' => $clauseEntry['description'],
+
+                 //'amount' => $journalEntry->id,
+            ]);
+
+            
+        }
 
         return new PaymentVoucherResource($paymentVoucher);
     }

@@ -20,7 +20,8 @@ class PaymentVoucherDetailStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'Expense_account_id' => ['required', 'string'],
+            'expense_account_id' => ['required', 'string'],
+            'description' => ['required', 'string'],
             'amount' => ['required', 'string'],
             'quantity' => ['required', 'string'],
             'item_id' => ['required', 'integer', 'exists:items,id'],

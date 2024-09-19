@@ -16,10 +16,11 @@ class PaymentVoucherDetail extends Model
      * @var array
      */
     protected $fillable = [
-        'Expense_account_id',
+        'expense_account_id',
         'amount',
         'quantity',
         'item_id',
+        'description',
     ];
 
     /**

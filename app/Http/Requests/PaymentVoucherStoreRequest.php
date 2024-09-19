@@ -20,16 +20,17 @@ class PaymentVoucherStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'product_id' => ['required', 'integer', 'exists:products,id'],
+            'product_id' => ['nullable', 'integer', 'exists:products,id'],
             'expense_date' => ['required'],
-            'amount' => ['required', 'string'],
+            'amount' => ['nullable', 'string'],
             'description' => ['required', 'string'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['nullable', 'integer', 'exists:branches,id'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'tax_id' => ['required', 'integer', 'exists:taxes,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'payment_mode_id' => ['required', 'integer', 'exists:payment_modes,id'],
-            'expense_account_id' => ['required', 'integer', 'exists:expense_accounts,id'],
+            'expense_account_id' => ['required', 'string', 'exists:accounts,id'],
+            'voucher_entries.*' => ['required'],
         ];
     }
 }
