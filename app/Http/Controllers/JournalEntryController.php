@@ -7,8 +7,10 @@ use App\Http\Requests\JournalEntryUpdateRequest;
 use App\Http\Resources\JournalEntryCollection;
 use App\Http\Resources\JournalEntryResource;
 use App\Models\JournalEntry;
+use App\Models\JournalEntryDetail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class JournalEntryController extends Controller
 {
@@ -21,7 +23,22 @@ class JournalEntryController extends Controller
 
     public function store(JournalEntryStoreRequest $request)
     {
-        $journalEntry = JournalEntry::create($request->validated());
+        $data = $request->validated();
+        $journalEntry = JournalEntry::create($data);
+        Log::debug($data);
+
+        foreach ($data['journal_entries'] as $clauseEntry) {
+
+            JournalEntryDetail::create([
+                'journal_entry_id'=>$journalEntry->id,
+                'journal_type_id' => $clauseEntry['journal_type_id'],
+                'amount' => $clauseEntry['amount'],
+                'account_id' => $clauseEntry['account_id'],
+                'account_no' => $clauseEntry['account_no'],
+                'description' => $clauseEntry['description'],
+                 //'amount' => $journalEntry->id,
+            ]);
+        }
 
         return new JournalEntryResource($journalEntry);
     }
