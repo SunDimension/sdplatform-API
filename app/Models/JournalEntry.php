@@ -26,6 +26,8 @@ class JournalEntry extends Model
         'created_by',
         'modified_by',
         'deleted_by',
+        'approval_stage_id',
+        'approval_officer_id'
     ];
 
     /**
@@ -39,6 +41,8 @@ class JournalEntry extends Model
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
+        'approval_stage_id' => 'integer',
+        'approval_officer_id' => 'integer'
     ];
 
     public function journalEntryDetails(): HasMany
@@ -53,16 +57,16 @@ class JournalEntry extends Model
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'created_by');
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'modified_by');
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'deleted_by');
     }
 }

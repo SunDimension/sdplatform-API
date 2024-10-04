@@ -21,6 +21,12 @@ class JournalEntryController extends Controller
         return new JournalEntryCollection($journalEntries);
     }
 
+    public function pending(Request $request)
+    {
+        $journalEntries = JournalEntry::where('approval_stage_id',1)->get();
+        return new JournalEntryCollection($journalEntries);
+    }
+
     public function store(JournalEntryStoreRequest $request)
     {
         $data = $request->validated();

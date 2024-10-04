@@ -53,21 +53,21 @@ class JournalEntryDetail extends Model
 
     public function account(): BelongsTo
     {
-        return $this->belongsTo(Foreign::class);
+        return $this->belongsTo(Account::class );
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'created_by');
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'modified_by');
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'deleted_by');
     }
 }

@@ -233,6 +233,7 @@ Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingCo
 Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
 
 Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
+Route::get('journal-entry/pending', [App\Http\Controllers\JournalEntryController::class,'pending']);
 
 Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
 
