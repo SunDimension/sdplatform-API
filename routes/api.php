@@ -100,6 +100,14 @@ Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::cl
 Route::apiResource('return-details', App\Http\Controllers\ReturnDetailsController::class);
 
 Route::apiResource('release-details', App\Http\Controllers\ReleaseDetailsController::class);
+
+Route::apiResource('release', App\Http\Controllers\ReleaseController::class);
+
+Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::class);
+
+Route::apiResource('return-details', App\Http\Controllers\ReturnDetailsController::class);
+
+Route::apiResource('release-details', App\Http\Controllers\ReleaseDetailsController::class);
 Route::apiResource('dimensions', App\Http\Controllers\DimensionController::class);
 
 Route::apiResource('roles', App\Http\Controllers\RolesController::class);

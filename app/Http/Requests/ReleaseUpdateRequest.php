@@ -11,7 +11,7 @@ class ReleaseUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -20,14 +20,15 @@ class ReleaseUpdateRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
     public function rules(): array
-    {
-         return [
-            
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
-            'branch_id' => ['required', 'integer','exists:branches,id'],
-            'customer_id' => ['required', 'integer','exists:customers,id'],
-            'sales_receipt_id' => ['required', 'integer','exists:sales_receipts,id'],
-            'release_date' => ['date'],
+     {
+        return [
+            'sales_receipt_id'    => 'required|exists:sales_receipts,id', // Ensure it exists
+            'branch_id'           => 'required|exists:branches,id',       // Ensure it exists
+            'store_id'            => 'required|exists:stores,id',         // Ensure it exists
+            'customer_id'         => 'required|exists:customers,id',      // Ensure it exists
+            'release_date'        => 'required|date',                      // Must be a valid date
+            'create_item_id'      => 'required|exists:create_items,id',   // Ensure it exists
+            'quantity_released'   => 'required|integer|min:1',            // Must be a positive integer
         ];
     }
 }

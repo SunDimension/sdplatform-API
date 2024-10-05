@@ -23,9 +23,9 @@ class SalesReceiptStoreRequest extends FormRequest
     {
         return [
             
-            'sales_order_id' => ['required', 'integer', 'exists:sales_order,id'],
+            'sales_order' => ['required', 'integer', 'exists:sales_order,id'],
             'branch_id' => ['required', 'integer','exists:branches,id'],
-            'sales_invoice_id' => ['required', 'integer','exists:sales_invoice,id'],
+            'sales_invoice' => ['required', 'integer','exists:sales_invoice,id'],
             'payment_mode_id' => ['required', 'integer','exists:payment_modes,id'],
             'customer_id' => ['required', 'integer','exists:customers,id'],
             'store_id' => ['required', 'integer','exists:stores,id'],

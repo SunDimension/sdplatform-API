@@ -50,4 +50,13 @@ class Release extends Model
     {
         return $this->belongsTo(SalesReceipt::class);   
 }
+     public function createItem()
+    {
+        return $this->belongsTo(CreateItem::class); // Each release belongs to a CreateItem
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+}
 }

@@ -23,7 +23,7 @@ class ItemSoldStoreRequest extends FormRequest
     {
         return [
             
-            'sales_order_id' => ['required', 'integer', 'exists:sales_order,id'],
+            'sales_order' => ['required', 'integer', 'exists:sales_order,id'],
             'product_id' => ['required', 'integer','exists:create_items,id'],
             'unit_price' => ['required', 'numeric'],
             'quantity' => ['required', 'string'],

@@ -8,8 +8,10 @@ use App\Http\Requests\ReleaseUpdateRequest;
 use App\Http\Resources\ReleaseCollection;
 use App\Http\Resources\ReleaseResource;
 use App\Models\Release;
+use App\Models\CreateItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 
 class ReleaseController extends Controller
 {
@@ -20,9 +22,33 @@ class ReleaseController extends Controller
 
         return new ReleaseCollection($release);
     }
-    public function store(ReleaseStoreRequest $request): ReleaseResource
+ public function store(ReleaseStoreRequest $request): ReleaseResource
     {
-        $release = Release::create($request->validated());
+        // Validate input (make sure you get both the create_item_id and quantity to be released)
+        $validated = $request->validated();
+        $createItem = CreateItem::findOrFail($validated['create_item_id']);
+
+        // Check if there is enough stock
+        if ($createItem->quantity < $validated['quantity_released']) {
+            return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Reduce stock from CreateItem (inventory)
+        $createItem->quantity -= $validated['quantity_released'];
+        $createItem->save();
+
+        // Record the release in the Release table
+       $release = Release::create([
+    'sales_receipt_id'   => $validated['sales_receipt_id'],
+    'branch_id'          => $validated['branch_id'],
+    'store_id'           => $validated['store_id'],
+    'customer_id'        => $validated['customer_id'],
+    'create_item_id'     => $createItem->id, // From inventory
+    'quantity_released'  => $validated['quantity_released'],
+    'release_date'       => now(),
+    'user_id'            => Auth::id(), // The user who authorized the release
+]);
+
 
         return new ReleaseResource($release);
     }
