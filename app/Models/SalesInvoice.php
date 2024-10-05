@@ -19,40 +19,26 @@ class SalesInvoice extends Model
      * @var array
      */
     protected $fillable = [
-        'sales_order_number',
-        'customer_id',
-        'branch_id',
-        'store_id',
-        'credit_limit_id',
-        'credit_amount',
-        'total_amount',
-        'sales_date',
-        'credit_balance',
+        'sales_order_id',
+        'sales_invoice_number',
+        'amount',
+        'unit_price',
+        'invoice_date',
+        'product_id'
+
     ];
 
-      protected static function boot()
-{
-    parent::boot();
+   protected static function boot()
+    {
+        parent::boot();
 
-    static::creating(function($salesinvoice) {
-        // if (empty($createItem->batch_number)) {
-        // dd($createItem);
-            $salesinvoice->sales_invoice_number = static::generateSalesInvoiceNumber();
-        // }
-    });
-}
+        // Automatically generate sales_invoice_number when a new SalesInvoice is created
+        static::creating(function ($salesInvoice) {
+            $salesInvoice->sales_invoice_number = 'HGV-INV-' . strtoupper(uniqid());
+        });
+    }
 
-private static function generateSalesInvoiceNumber()
-{
-        // dd('check');
-    $prefix = 'HGV-SI';
-    $timestamp = now()->format('YmdHis'); // Corrected method name
-    $randomNumber = rand();
-
-    return "{$prefix}-{$timestamp}-{$randomNumber}";
-}
-
-    public function salesorder()
+    public function salesorder() : BelongsTo
     {
         return $this->belongsTo(SalesOrder::class);
     }

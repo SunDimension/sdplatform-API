@@ -19,12 +19,9 @@ class SalesReceipt extends Model
     protected $fillable = [
         'customer_id',
         'branch_id',
-        'sales_order_id',
-        'sales_invoice_id',
         'store_id',
         'sales_receipt_number',
-        'payment_mode_id',
-        'quantity',
+        'payment_type',
         'total_amount',
         'amount_paid',
         'receipt_date',
@@ -41,33 +38,22 @@ class SalesReceipt extends Model
         'customer_id' => 'integer',
         'store_id'=>'integer',
         'branch_id' => 'integer',
-        'sales_invoice_id' => 'integer',
-        'sales_order_id' => 'integer',
-        'payment_mode_id' => 'integer',
+        'item_sold_id' => 'integer',
+        
+     
+        
         
     ];
 
-      protected static function boot()
-{
-    parent::boot();
+     protected static function boot()
+        {
+        parent::boot();
 
-    static::creating(function($salesreceipt) {
-        // if (empty($createItem->batch_number)) {
-        // dd($createItem);
-            $salesreceipt->sales_receipt_number = static::generateSalesReceiptNumber();
-        // }
-    });
-}
-
-private static function generateSalesReceiptNumber()
-{
-        // dd('check');
-    $prefix = 'HGV-SR';
-    $timestamp = now()->format('YmdHis'); // Corrected method name
-    $randomNumber = rand();
-
-    return "{$prefix}-{$timestamp}-{$randomNumber}";
-}
+        // Automatically generate sales_receipt_number when a new SalesReceipt is created
+        static::creating(function ($salesReceipt) {
+            $salesReceipt->sales_receipt_number = 'HGV-SR-' . strtoupper(uniqid());
+        });
+        }
 
     public function customer(): BelongsTo
     {
@@ -99,5 +85,11 @@ private static function generateSalesReceiptNumber()
     {
         return $this->belongsTo(Store::class);
     }
+
+    public function itemSold()
+    {
+        return $this->hasMany(ItemSold::class);
+    }
+
 
 }

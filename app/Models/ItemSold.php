@@ -11,6 +11,8 @@ class ItemSold extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public $table ="item_solds";
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +24,7 @@ class ItemSold extends Model
         'quantity',
         'unit_price',
         'amount',
+        'store_id',
         'sales_date',
         
     ];
@@ -34,11 +37,21 @@ class ItemSold extends Model
     protected $casts = [
         'id' => 'integer',
         'sales_order_id' => 'integer',
+        'store_id'=>'integer,'
      
     ];
 
      public function salesOrder(): BelongsTo
     {
         return $this->belongsTo(SalesOrder::class);
+    }
+
+      public function salesReceipt()
+    {
+        return $this->belongsTo(SalesReceipt::class);
+    }
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 }

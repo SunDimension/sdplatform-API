@@ -12,6 +12,8 @@ class SalesOrder extends Model
 {
     use HasFactory,SoftDeletes;
 
+
+    public $table = "sales_orders";
     /**
      * The attributes that are mass assignable.
      *
@@ -22,7 +24,7 @@ class SalesOrder extends Model
         'customer_id',
         'branch_id',
         'store_id',
-        'credit_limit_id',
+        'credit_limit',
         'credit_amount',
         'total_amount',
         'sales_date',
@@ -30,53 +32,30 @@ class SalesOrder extends Model
     ];
 
 
-      protected static function boot()
-{
-    parent::boot();
+  protected static function boot()
+    {
+        parent::boot();
 
-    static::creating(function($salesorder) {
-        // if (empty($createItem->batch_number)) {
-        // dd($createItem);
-            $salesorder->sales_order_number = static::generateSalesOrderNumber();
-        // }
-    });
-}
-
-private static function generateSalesOrderNumber()
-{
-        // dd('check');
-    $prefix = 'HGV-SO';
-    $timestamp = now()->format('YmdHis'); // Corrected method name
-    $randomNumber = rand();
-
-    return "{$prefix}-{$timestamp}-{$randomNumber}";
-}
-
+        // Automatically generate sales_order_number when a new SalesOrder is created
+        static::creating(function ($salesOrder) {
+            $salesOrder->sales_order_number = 'HGV-SO-' . strtoupper(uniqid());
+        });
+    }
+    
 
     public function itemsold() :hasMany
 
     {
-        return $this->hasMany(ItemSold::class);
+        return $this->hasMany(ItemSold::class, 'sales_order');
     }
 
-    public function branch() : BelongsTo
+  public function salesInvoices()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->hasMany(SalesInvoice::class);
     }
 
-     public function store() : BelongsTo
+    public function salesReceipts()
     {
-        return $this->belongsTo(Store::class);
-    }
-
-     public function creditLimit() : BelongsTo
-    {
-        return $this->belongsTo(CreditLimit::class);
-    }
-
-    
-     public function customer() : BelongsTo
-    {
-        return $this->belongsTo(Customer::class);
+        return $this->hasMany(SalesReceipt::class);
     }
 }
