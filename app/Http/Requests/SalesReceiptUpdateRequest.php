@@ -21,18 +21,19 @@ class SalesReceiptUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-       return [
+        return [
             
-            'sales_order_id' => ['required', 'integer', 'exists:sales_order,id'],
+            'sales_order' => ['required', 'integer', 'exists:sales_order,id'],
             'branch_id' => ['required', 'integer','exists:branches,id'],
-            'sales_invoice_id' => ['required', 'integer','exists:sales_invoice,id'],
+            'sales_invoice' => ['required', 'integer','exists:sales_invoice,id'],
             'payment_mode_id' => ['required', 'integer','exists:payment_modes,id'],
             'customer_id' => ['required', 'integer','exists:customers,id'],
             'store_id' => ['required', 'integer','exists:stores,id'],
-            'total_amount' => ['required', 'string',],
             'sales_receipt_number' => ['string', 'unique:sales_receipt_number'],
+            'total_amount' => ['required', 'string',],
             'amount_paid' => ['required', 'string'],
             'receipt_date' => ['string'],
-       ];
+            
+        ];
     }
 }
