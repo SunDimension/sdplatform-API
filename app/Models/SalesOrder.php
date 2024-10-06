@@ -46,7 +46,7 @@ class SalesOrder extends Model
     public function itemsold() :hasMany
 
     {
-        return $this->hasMany(ItemSold::class, 'sales_order');
+        return $this->hasMany(ItemSold::class, 'sales_order_id');
     }
 
   public function salesInvoices()
@@ -57,5 +57,19 @@ class SalesOrder extends Model
     public function salesReceipts()
     {
         return $this->hasMany(SalesReceipt::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
     }
 }

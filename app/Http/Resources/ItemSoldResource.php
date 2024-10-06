@@ -17,6 +17,7 @@ class ItemSoldResource extends JsonResource
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
+            'product_name' => $this->product->name,
             'sales_order' => $this->sales_order,
             'unit_price' => $this->unit_price,
             'amount' => $this->amount,

@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
+
+use App\Http\Resources\SalesOrderResource;
 use Illuminate\Http\Request;
 use App\Models\SalesOrder;
 use App\Models\ItemSold;
 use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Log;
 
 class SalesOrderController extends Controller
 {
@@ -15,11 +17,20 @@ class SalesOrderController extends Controller
      public function index(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::with('itemsSold', 'salesInvoices', 'salesReceipts')
+        $salesOrders = SalesOrder::with('itemsold', 'salesInvoices', 'salesReceipts')
             ->paginate(10); // Paginate results, you can change the number as needed
 
         return response()->json($salesOrders);
     }
+
+    public function getbynumber($orderno)
+    {
+        $salesOrders = SalesOrder::with('itemsold')->where('sales_order_number', $orderno)->first();
+        return response()->json(['data'=>new SalesOrderResource($salesOrders)]);
+    }
+
+
+
    // Method to create a new Sales Order
     public function store(Request $request)
     {
@@ -52,6 +63,7 @@ class SalesOrderController extends Controller
             'total_amount' =>$validated['total_amount'] ?? null,
         ]);
 
+        Log::alert($validated);
         // Update Items Sold
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
@@ -67,7 +79,7 @@ class SalesOrderController extends Controller
             ]);
             $itemSoldIds[] = $itemSold->id;
         }
-
+/*
         // Handle Sales Invoice if payment is deferred
         if (!empty($validated['invoice'])) {
             SalesInvoice::create([
@@ -114,8 +126,8 @@ class SalesOrderController extends Controller
 
         // Handle exceptions and return a detailed error message
         return response()->json(['error' => $e->getMessage()], 500);
-    }
-        return response()->json(['message' => 'Sales Order Created Successfully', 'sales_order' => $salesOrder], 201);
+    }*/
+        return response()->json(['message' => 'Sales Order Created Successfully', 'sales_order' => $salesOrder], 200);
     }
 
     // Method to fetch the Sales Order for editing

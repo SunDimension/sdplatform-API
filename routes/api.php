@@ -86,6 +86,7 @@ Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryControlle
 Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
 
 Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
+Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class,'getbynumber']);
 
 Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController::class);
 

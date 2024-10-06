@@ -37,7 +37,7 @@ class ItemSold extends Model
     protected $casts = [
         'id' => 'integer',
         'sales_order_id' => 'integer',
-        'store_id'=>'integer,'
+        'store_id'=>'integer'
      
     ];
 
@@ -53,5 +53,10 @@ class ItemSold extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(CreateItem::class,"product_id");
     }
 }
