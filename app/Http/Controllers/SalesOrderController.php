@@ -127,7 +127,7 @@ class SalesOrderController extends Controller
         // Handle exceptions and return a detailed error message
         return response()->json(['error' => $e->getMessage()], 500);
     }*/
-        return response()->json(['message' => 'Sales Order Created Successfully', 'sales_order' => $salesOrder], 200);
+        return response()->json(['message' => 'Sales Order Created Successfully', 'data' => $salesOrder], 200);
     }
 
     // Method to fetch the Sales Order for editing
