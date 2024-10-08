@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CustomerController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\CreateItemController;
+use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RolesController;
@@ -83,6 +84,12 @@ Route::prefix('roles')->group(function () {
 
 Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryController::class);
 
+Route::apiResource('years', App\Http\Controllers\YearController::class);
+
+Route::apiResource('service-types', App\Http\Controllers\ServiceTypeController::class);
+
+Route::apiResource('vendor-targets', App\Http\Controllers\VendorTargetController::class);
+
 Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
 
 Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
@@ -122,6 +129,16 @@ Route::apiResource('weights', App\Http\Controllers\WeightController::class);
 Route::apiResource('item-types', App\Http\Controllers\ItemTypeController::class);
 
 Route::apiResource('statuses', App\Http\Controllers\StatusController::class);
+
+Route::apiResource('inflow-statuses', App\Http\Controllers\inflowStatusController::class);
+
+Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
+
+Route::apiResource('post-outflows', App\Http\Controllers\PostOutflowController::class);
+
+Route::apiResource('settle-credits', App\Http\Controllers\SettleCreditController::class);
+
+Route::apiResource('post-inflows', App\Http\Controllers\PostInflowController::class);
 
 Route::apiResource('branches', App\Http\Controllers\BranchController::class);
 

@@ -82,4 +82,23 @@ class UsersController extends Controller
         return response()->json(['message' => 'Roles synced successfully.'], Response::HTTP_OK);
     }
 
+
+       public function getUserDetails(Request $request) {
+    // Assuming you're using Auth for user authentication
+    //  $userId = Auth::id();
+   $user = User::with(['branch', 'store'])->find(Auth::id()); // Eager load branch and store
+
+    if ($user) {
+            return response()->json([
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'branch' => $user->branch, // Include branch details
+                'store' => $user->store,   // Include store details
+            ]);
+        } else {
+            return response()->json(['error' => 'User not found'], 404);
+        }
+}
+
 }

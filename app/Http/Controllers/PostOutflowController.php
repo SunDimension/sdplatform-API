@@ -8,17 +8,57 @@ use App\Http\Resources\PostOutflowCollection;
 use App\Http\Resources\PostOutflowResource;
 use App\Models\PostOutflow;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Log;
 
 class PostOutflowController extends Controller
 {
-    public function index(Request $request): PostOutflowCollection
-    {
-        $postoutflow = PostOutflow::all();
+  
+  public function index(Request $request): PostOutflowCollection
+{
+    // Get query parameters from the request
+    $beneBank = $request->query('bene_bank');
+    $fromDate = $request->query('from_date');
+    $toDate = $request->query('to_date');
 
-        return new PostOutflowCollection($postoutflow);
+    // Start building the query
+    $query = PostOutflow::query();
+
+    // Filter by beneficiary bank if provided
+    if ($beneBank) {
+        $query->where('bene_bank', $beneBank);
     }
-    public function store(PostOutflowStoreRequest $request): PostOutflowResource
+
+    // Filter by date range (fromDate to toDate) if both dates are provided
+    if ($fromDate && $toDate) {
+        $query->whereBetween('outflow_date', [Carbon::parse($fromDate), Carbon::parse($toDate)]);
+    } elseif ($fromDate) {
+        // If only fromDate is provided, filter for outflows from that date onwards
+        $query->where('outflow_date', '>=', Carbon::parse($fromDate));
+    } elseif ($toDate) {
+        // If only toDate is provided, filter for outflows up to that date
+        $query->where('outflow_date', '<=', Carbon::parse($toDate));
+    }
+    
+    // Get the filtered outflows
+    $postoutflows = $query->get();
+
+    // Return as a resource collection
+    return new PostOutflowCollection($postoutflows);
+}
+
+//  public function index(Request $request): PostOutflowCollection
+//     {
+//         $postoutflow = PostOutflow::all();
+
+//         return new PostOutflowCollection($postoutflow);
+//     }
+
+
+
+      public function store(PostOutflowStoreRequest $request): PostOutflowResource
     {
         $postoutflow = PostOutflow::create($request->validated());
 

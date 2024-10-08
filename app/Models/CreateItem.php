@@ -145,6 +145,11 @@ private static function generateBatchNumber()
     {
         return $this->belongsTo(User::class);
     }
+
+      public function releases()
+    {
+        return $this->hasMany(Release::class); // A CreateItem can have many releases
+    }
     // public function item($id)
 // {
 //     // Find the item by ID
