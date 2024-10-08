@@ -10,6 +10,7 @@ use App\Models\PostOutflow;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Log;
 
@@ -19,9 +20,18 @@ class PostOutflowController extends Controller
   public function index(Request $request): PostOutflowCollection
 {
     // Get query parameters from the request
-    $beneBank = $request->query('bene_bank');
-    $fromDate = $request->query('from_date');
-    $toDate = $request->query('to_date');
+    
+    $validated = $request->validate([
+        'bene_bank' => 'nullable',
+        'from_date' => 'nullable|date',
+        'to_date' => 'nullable|date',
+    ]);
+
+    FacadesLog::debug($validated);
+
+    $beneBank = $validated['bene_bank'];
+    $fromDate = $validated['from_date'];
+    $toDate = $validated['to_date'];
 
     // Start building the query
     $query = PostOutflow::query();

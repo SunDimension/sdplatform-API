@@ -135,6 +135,7 @@ Route::apiResource('inflow-statuses', App\Http\Controllers\inflowStatusControlle
 Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
 
 Route::apiResource('post-outflows', App\Http\Controllers\PostOutflowController::class);
+Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class,'index']);
 
 Route::apiResource('settle-credits', App\Http\Controllers\SettleCreditController::class);
 
