@@ -29,6 +29,8 @@ class SalesOrder extends Model
         'total_amount',
         'sales_date',
         'credit_balance',
+        'payment_type',
+        'status'
     ];
 
 

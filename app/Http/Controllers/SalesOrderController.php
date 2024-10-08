@@ -23,13 +23,26 @@ class SalesOrderController extends Controller
         return response()->json($salesOrders);
     }
 
+    public function pendingReceipts(Request $request)
+    {
+        // Optionally, you can add filtering and sorting capabilities here
+        $salesOrders = SalesOrder::where('status','Pending')->whereNot('payment_type','Credit')->get(); 
+        Log::debug($salesOrders);
+        return response()->json(['data'=> SalesOrderResource::collection($salesOrders)]);
+    }
+
+    public function pendingCredit(Request $request)
+    {
+        // Optionally, you can add filtering and sorting capabilities here
+        $salesOrders = SalesOrder::where('status','Pending')->where('payment_type','Credit')->get();
+        return response()->json(['data'=> SalesOrderResource::collection($salesOrders)]);
+    }
+
     public function getbynumber($orderno)
     {
         $salesOrders = SalesOrder::with('itemsold')->where('sales_order_number', $orderno)->first();
         return response()->json(['data'=>new SalesOrderResource($salesOrders)]);
     }
-
-
 
    // Method to create a new Sales Order
     public function store(Request $request)
@@ -49,7 +62,7 @@ class SalesOrderController extends Controller
             'payment' => 'nullable|array',
             'payment.total_amount' => 'required|numeric',
             'payment.amount_paid' => 'required|numeric',
-            'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater', // Payment type now explicitly validated
+            'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit', // Payment type now explicitly validated
             // 'payment.item_sold_id' => 'required|integer|exists:item_solds,id',  // item_sold_id is foreign key in sales_receipt
         ]);
         $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
@@ -61,6 +74,7 @@ class SalesOrderController extends Controller
             'store_id' => $validated['store_id'],
             'credit_limit' => $validated['credit_limit'] ?? null,
             'total_amount' =>$validated['total_amount'] ?? null,
+            'payment_type'=> $validated['payment']['payment_type'] 
         ]);
 
         Log::alert($validated);
