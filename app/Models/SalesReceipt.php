@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesReceipt extends Model
 {
-    use HasFactory,SoftDeletes ;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -25,7 +25,8 @@ class SalesReceipt extends Model
         'total_amount',
         'amount_paid',
         'receipt_date',
-        
+        'sales_order_id',
+
     ];
 
     /**
@@ -36,24 +37,25 @@ class SalesReceipt extends Model
     protected $casts = [
         'id' => 'integer',
         'customer_id' => 'integer',
-        'store_id'=>'integer',
+        'store_id' => 'integer',
         'branch_id' => 'integer',
         'item_sold_id' => 'integer',
-        
-     
-        
-        
+        'sales_order_id' => 'integer',
+
+
+
+
     ];
 
-     protected static function boot()
-        {
+    protected static function boot()
+    {
         parent::boot();
 
         // Automatically generate sales_receipt_number when a new SalesReceipt is created
         static::creating(function ($salesReceipt) {
             $salesReceipt->sales_receipt_number = 'HGV-SR-' . strtoupper(uniqid());
         });
-        }
+    }
 
     public function customer(): BelongsTo
     {
@@ -90,6 +92,4 @@ class SalesReceipt extends Model
     {
         return $this->hasMany(ItemSold::class);
     }
-
-
 }

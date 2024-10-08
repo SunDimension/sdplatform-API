@@ -7,21 +7,26 @@ use App\Http\Requests\SalesReceiptStoreRequest;
 use App\Http\Requests\SalesReceiptUpdateRequest;
 use App\Http\Resources\SalesReceiptCollection;
 use App\Http\Resources\SalesReceiptResource;
+use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
 class SalesReceiptController extends Controller
 {
-    public function index(Request $request): SalesReceiptCollection
+    public function index(Request $request)
     {
         $salesreceipt = SalesReceipt::all();
 
         return new SalesReceiptCollection($salesreceipt);
     }
-    public function store(SalesReceiptStoreRequest $request): SalesReceiptResource
+    public function store(SalesReceiptStoreRequest $request)
     {
-        $salesreceipt = SalesReceipt::create($request->validated());
+        $data = $request->validated();
+        $salesreceipt = SalesReceipt::create($data);
+        $order = SalesOrder::where('id', $salesreceipt->sales_order_id)->first();
+        $order->status = 'Paid';
+        $order->save();
 
         return new SalesReceiptResource($salesreceipt);
     }

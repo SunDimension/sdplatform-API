@@ -40,7 +40,7 @@ class SalesOrderController extends Controller
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesOrder::with('itemsold')->where('sales_order_number', $orderno)->first();
+        $salesOrders = SalesOrder::where('sales_order_number', $orderno)->first();
         return response()->json(['data'=>new SalesOrderResource($salesOrders)]);
     }
 

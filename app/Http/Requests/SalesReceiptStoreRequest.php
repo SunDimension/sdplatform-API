@@ -23,13 +23,13 @@ class SalesReceiptStoreRequest extends FormRequest
     {
         return [
             
-            'sales_order' => ['required', 'integer', 'exists:sales_order,id'],
+            'sales_order_id' => ['required'],
             'branch_id' => ['required', 'integer','exists:branches,id'],
-            'sales_invoice' => ['required', 'integer','exists:sales_invoice,id'],
-            'payment_mode_id' => ['required', 'integer','exists:payment_modes,id'],
+            'sales_invoice' => ['nullable', 'integer','exists:sales_invoice,id'],
+            'payment_type' => ['required'],
             'customer_id' => ['required', 'integer','exists:customers,id'],
             'store_id' => ['required', 'integer','exists:stores,id'],
-            'sales_receipt_number' => ['string', 'unique:sales_receipt_number'],
+            'sales_receipt_number' => ['string', 'unique:sales_receipts'],
             'total_amount' => ['required', 'string',],
             'amount_paid' => ['required', 'string'],
             'receipt_date' => ['string'],

@@ -27,8 +27,9 @@ class SalesOrderResource extends JsonResource
             'credit_limit' => $this->credit_limit,
             'credit_balance' => $this->credit_balance,
             'total_amount' => $this->total_amount,
+            'payment_type' => $this->payment_type,
             'items'=> ItemSoldResource::collection($this->itemsold),
-            
+
         ];
     }
 }
