@@ -58,7 +58,7 @@ class SalesOrder extends Model
 
     public function salesReceipts()
     {
-        return $this->hasMany(SalesReceipt::class);
+        return $this->hasMany(SalesReceipt::class, "sales_order_id","id");
     }
 
     public function store()

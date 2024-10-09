@@ -96,9 +96,9 @@ Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::cla
 Route::get('/sales-orders/pending-credit', [App\Http\Controllers\SalesOrderController::class,'pendingCredit']);
 Route::get('/sales-orders/pending-receipt', [App\Http\Controllers\SalesOrderController::class,'pendingReceipts']);
 Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class,'getbynumber']);
+Route::get('/sales-receipt-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class,'getbynumber']);
 
 Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController::class);
-
 Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
 
 Route::apiResource('item-sold', App\Http\Controllers\ItemSoldController::class);

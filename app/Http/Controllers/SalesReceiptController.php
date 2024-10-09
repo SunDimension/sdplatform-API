@@ -11,15 +11,23 @@ use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class SalesReceiptController extends Controller
 {
     public function index(Request $request)
     {
         $salesreceipt = SalesReceipt::all();
-
         return new SalesReceiptCollection($salesreceipt);
     }
+
+    public function getbynumber($orderno)
+    {
+        $salesOrders = SalesReceipt::with('salesorder')->where('sales_receipt_number', $orderno)->first();
+        Log::debug($salesOrders);
+        return response()->json(['data'=>new SalesReceiptResource($salesOrders)]);
+    }
+
     public function store(SalesReceiptStoreRequest $request)
     {
         $data = $request->validated();

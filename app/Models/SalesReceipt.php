@@ -26,14 +26,14 @@ class SalesReceipt extends Model
         'amount_paid',
         'receipt_date',
         'sales_order_id',
-
     ];
 
     /**
      * The attributes that should be cast to native types.
      *
      * @var array
-     */
+    **/
+
     protected $casts = [
         'id' => 'integer',
         'customer_id' => 'integer',
@@ -41,16 +41,11 @@ class SalesReceipt extends Model
         'branch_id' => 'integer',
         'item_sold_id' => 'integer',
         'sales_order_id' => 'integer',
-
-
-
-
     ];
 
     protected static function boot()
     {
         parent::boot();
-
         // Automatically generate sales_receipt_number when a new SalesReceipt is created
         static::creating(function ($salesReceipt) {
             $salesReceipt->sales_receipt_number = 'HGV-SR-' . strtoupper(uniqid());
@@ -67,16 +62,15 @@ class SalesReceipt extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function salesorder(): BelongsTo
+    public function salesorder()
     {
-        return $this->belongsTo(SalesOrder::class);
+        return $this->belongsTo(SalesOrder::class, "sales_order_id");
     }
 
     public function salesinvoice(): BelongsTo
     {
         return $this->belongsTo(SalesInvoice::class);
     }
-
 
     public function paymentMode(): BelongsTo
     {
@@ -88,8 +82,8 @@ class SalesReceipt extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function itemSold()
-    {
-        return $this->hasMany(ItemSold::class);
-    }
+    // public function itemSold()
+    // {
+    //     return $this->hasMany(ItemSold::class);
+    // }
 }
