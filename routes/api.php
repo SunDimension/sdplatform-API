@@ -28,7 +28,10 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
+// routes/api.php
 
+
+// Route::middleware('auth:sanctum')->get('/users', [UsersController::class, 'index']);
 
 Route::prefix('users')->group(function () {
     // Get all users
@@ -92,6 +95,19 @@ Route::apiResource('vendor-targets', App\Http\Controllers\VendorTargetController
 
 Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
 
+
+///////////// Sales Routes /////////////////
+// Route::post('sales-orders', [SalesOrderController::class,'store']);
+// Route::get('/sales-orders/{id}/edit', [SalesOrderController::class, 'edit']);
+// Route::put('/sales-orders/{id}', [SalesOrderController::class, 'update']);
+///////////////
+
+Route::apiResource('sales-orders', App\Http\Controllers\SalesOrderController::class);
+
+Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class,'index']);
+
+Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class,'index']);
+
 Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
 Route::get('/sales-orders/pending-credit', [App\Http\Controllers\SalesOrderController::class,'pendingCredit']);
 Route::get('/sales-orders/pending-receipt', [App\Http\Controllers\SalesOrderController::class,'pendingReceipts']);
@@ -99,6 +115,7 @@ Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderContro
 Route::get('/sales-receipt-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class,'getbynumber']);
 
 Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController::class);
+
 Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
 
 Route::apiResource('item-sold', App\Http\Controllers\ItemSoldController::class);
@@ -135,7 +152,6 @@ Route::apiResource('inflow-statuses', App\Http\Controllers\inflowStatusControlle
 Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
 
 Route::apiResource('post-outflows', App\Http\Controllers\PostOutflowController::class);
-Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class,'index']);
 
 Route::apiResource('settle-credits', App\Http\Controllers\SettleCreditController::class);
 

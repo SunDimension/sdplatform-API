@@ -143,7 +143,10 @@ class SalesOrderController extends Controller
     }*/
         return response()->json(['message' => 'Sales Order Created Successfully', 'data' => $salesOrder], 200);
     }
-
+      public function show(Request $request, SalesOrder $salesOrder): SalesOrderResource
+    {
+        return new SalesOrderResource($salesOrder);
+    }
     // Method to fetch the Sales Order for editing
     public function edit($id)
     {
