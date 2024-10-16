@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Vendor extends Model
 {
     use HasFactory;
-
+    public $table = "vendors";
     /**
      * The attributes that are mass assignable.
      *
@@ -17,20 +17,20 @@ class Vendor extends Model
      */
     protected $fillable = [
         'name',
-        'address',
-        'contact_title',
-        'contact_designation',
+        'title',
+        'designation',
         'contact_surname',
         'contact_firstname',
         'contact_middlename',
-        'contact_fullname',
-        'vendor_type_id',
-        'phone_number',
-        'email',
+        'vendor_type',
+        'service_type',
+        'contact_phone_number',
+        'contact_email',
         'image_url',
         'tin',
-        'bank_id',
+        'bank',
         'account_number',
+        'account_number'
     ];
 
     /**
@@ -52,5 +52,10 @@ class Vendor extends Model
     public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
+    }
+    
+    public function serviceType(): BelongsTo
+    {
+        return $this->belongsTo(ServiceType::class);
     }
 }

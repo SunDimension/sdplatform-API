@@ -23,7 +23,7 @@ class Customer extends Model
         'firstname',
         'middlename',
         'phone_number',
-        'fullname',
+            'name',
         'email',
         'address',
         'credit_limit'

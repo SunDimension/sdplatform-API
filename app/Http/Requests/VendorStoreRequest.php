@@ -21,20 +21,20 @@ class VendorStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            'address' => ['required', 'string'],
-            'contact_title' => ['required', 'string'],
-            'contact_designation' => ['required', 'string'],
+            'title' => ['required', 'integer', 'exists:titles,id'],
+            'designation' => ['required', 'integer', 'exists:designations,id'],
             'contact_surname' => ['required', 'string'],
             'contact_firstname' => ['required', 'string'],
             'contact_middlename' => ['required', 'string'],
-            'contact_fullname' => ['required', 'string'],
-            'vendor_type_id' => ['required', 'integer', 'exists:vendor_types,id'],
-            'phone_number' => ['required', 'string'],
-            'email' => ['required', 'email'],
+            'vendor_type' => ['required', 'integer', 'exists:vendor_types,id'],
+             'service_type' => ['required', 'integer', 'exists:service_types,id'],
+            'contact_phone_number' => ['required', 'string'],
+            'contact_email' => ['nullable', 'email'],
             'image_url' => ['required', 'string'],
             'tin' => ['required', 'string'],
-            'bank_id' => ['required', 'integer', 'exists:banks,id'],
-            'account_number' => ['required', 'string'],
+            'bank' => ['required', 'integer', 'exists:banks,id'],
+            'account_number' => ['nullable', 'string'],
+            'account_name' => ['nullable', 'string'],
         ];
     }
 }

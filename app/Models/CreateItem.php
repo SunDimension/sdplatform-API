@@ -35,6 +35,7 @@ class CreateItem extends Model
         'cost_price',
         'selling_price',
         'reorder_level',
+        'discount',
         'dimension_id',
         'weight_id',
         'branch_id',
@@ -66,7 +67,7 @@ class CreateItem extends Model
         'warehouse' => 'integer',
         'vendor_id' => 'integer',
         'store_id' => 'integer',
-        'user_id' => 'integer'
+        'user_id' => 'integer',
     ];
 
    protected static function boot()
@@ -105,6 +106,11 @@ private static function generateBatchNumber()
     public function unit(): BelongsTo
     {
         return $this->belongsTo(Unit::class);
+    }
+
+       public function discount(): BelongsTo
+    {
+        return $this->belongsTo(Discount::class);
     }
 
     public function brand(): BelongsTo

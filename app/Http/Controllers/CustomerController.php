@@ -14,14 +14,20 @@ class CustomerController extends Controller
 {
     public function index(Request $request): CustomerCollection
     {
-        $customer = Customer::all();
-
-        return new CustomerCollection($customer);
+        $customers = Customer::all();
+        return new CustomerCollection($customers);
     }
 
     public function store(CustomerStoreRequest $request): CustomerResource
     {
-        $customer = Customer::create($request->validated());
+        // Get validated data
+        $data = $request->validated();
+
+        // Concatenate surname and middlename to create name
+        $data['name'] = trim($data['surname'] . ' ' . ($data['middlename'] ?? ''));
+
+        // Create the new customer with the modified data
+        $customer = Customer::create($data);
 
         return new CustomerResource($customer);
     }
@@ -33,15 +39,21 @@ class CustomerController extends Controller
 
     public function update(CustomerUpdateRequest $request, Customer $customer): CustomerResource
     {
-        $customer->update($request->validated());
+        // Get validated data
+        $data = $request->validated();
+
+        // Concatenate surname and middlename to create name
+        $data['name'] = trim($data['surname'] . ' ' . ($data['middlename'] ?? ''));
+
+        // Update the customer with the modified data
+        $customer->update($data);
 
         return new CustomerResource($customer);
     }
 
-   public function destroy($id)
+    public function destroy($id)
     {
-       Customer::destroy($id);
-
+        Customer::destroy($id);
         return response(null, Response::HTTP_NO_CONTENT);
     }
 }
