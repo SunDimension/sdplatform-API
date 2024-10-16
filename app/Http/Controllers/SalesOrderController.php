@@ -57,6 +57,8 @@ class SalesOrderController extends Controller
             'items.*.product_id' => 'required|exists:create_items,id',
             'items.*.quantity' => 'required|integer',
             'items.*.unit_price' => 'required|numeric',
+            'items.*.store_id' => 'required|integer',
+            'items.*.discount' => 'required|numeric',
             'total_amount' => 'required|numeric',
             'invoice' => 'nullable|array',
             'payment' => 'nullable|array',
@@ -86,8 +88,9 @@ class SalesOrderController extends Controller
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
-                'amount' => $item['quantity'] * $item['unit_price'],
-                'store_id' => $validated['store_id'],
+                'amount' => $item['quantity'] * ($item['unit_price']-$item['discount']),
+                'store_id' => $item['store_id'],
+                'discount' => $item['discount'],
                 'sales_date' => now(),
                  
             ]);
