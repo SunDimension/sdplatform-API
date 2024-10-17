@@ -22,7 +22,10 @@ class ItemSoldResource extends JsonResource
             'unit_price' => $this->unit_price,
             'amount' => $this->amount,
             'sales_date' => $this->sales_date,
+            'store_id' => $this->store_id,
+            'store_name' => $this->store->name,
             'quantity' => $this->quantity,
+            'discount' => $this->discount ?? 0,
         ];
     }
 }
