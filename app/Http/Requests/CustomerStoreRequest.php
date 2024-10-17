@@ -25,9 +25,8 @@ class CustomerStoreRequest extends FormRequest
             'customer_type_id' => ['required', 'integer', 'exists:customer_types,id'],
             'title_id' => ['required', 'integer','exists:titles,id'],
             'surname' => ['required', 'string',],
-            'middlename' => ['string',],
-            'firstname' => ['string',],
-            'fullname' => ['string',],
+            'middlename' => ['nullable', 'string'],  // Changed to nullable
+            'firstname' => ['nullable', 'string'],
             'email' => ['string','email'],
             'address' => ['string'],
             'phone_number' => ['string'],

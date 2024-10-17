@@ -19,7 +19,7 @@ class CustomerResource extends JsonResource
             'surname' => $this->surname,
             'firstname' => $this->firstname,
             'middlename' => $this->middlename,
-             'name' => trim($this->firstname . ' ' . $this->surname), 
+            'name' => trim($this->surname . ' ' . $this->firstname), 
             'address' => $this->address,
             'phone_number' => $this->phone_number,
             'customer_type_id' => $this->customer_type_id,

@@ -32,8 +32,7 @@ class CreateItemResource extends JsonResource
             'user_id'=> $this->user_id,
             'warehouse' => $this->warehouse,
             'vendor_id' => $this->vendor_id,
-            'image_url' => $this->image_url,
-            'barcode' => $this->barcode,
+         
         ];
     }
 }

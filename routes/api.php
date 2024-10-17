@@ -108,13 +108,18 @@ Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController:
 
 Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class,'index']);
 
-Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
 Route::get('/sales-orders/pending-credit', [App\Http\Controllers\SalesOrderController::class,'pendingCredit']);
-Route::get('/sales-orders/pending-receipt', [App\Http\Controllers\SalesOrderController::class,'pendingReceipts']);
+Route::get('/sales-orders-pending-receipt', [App\Http\Controllers\SalesOrderController::class,'pendingReceipts']);
 Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class,'getbynumber']);
 Route::get('/sales-receipt-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class,'getbynumber']);
+Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
 
 Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController::class);
+
+/////////// StoreItem////////////////////////////////////////
+
+
+Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
 
 Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
 
