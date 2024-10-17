@@ -29,6 +29,8 @@ class SalesOrderResource extends JsonResource
             'total_amount' => $this->total_amount,
             'payment_type' => $this->payment_type,
             'status'=>$this->status,
+            'created_at'=>$this->created_at,
+            'updated_at'=>$this->updated_a,
             'items'=> ItemSoldResource::collection($this->itemsold),
 
         ];

@@ -16,25 +16,14 @@ class CreateItemController extends Controller
 {
     public function index(Request $request): CreateItemCollection
     {   
-
-            $createItem = CreateItem::all();
-      
-           
-
-      
-        
-
+        $createItem = CreateItem::all();
         return new CreateItemCollection($createItem);
     }
-
 
     public function store(CreateItemStoreRequest $request): CreateItemResource
     {
         $createItem = CreateItem::create($request->validated());
-
         return new CreateItemResource($createItem);
-     
-       
     }
 
     public function show(Request $request, CreateItem $createItem): CreateItemResource
@@ -45,31 +34,53 @@ class CreateItemController extends Controller
     public function update(CreateItemUpdateRequest $request, CreateItem $createItem): CreateItemResource
     {
         $createItem->update($request->validated());
-
         return new CreateItemResource($createItem);
     }
 
     public function destroy($id)
     {
         CreateItem::destroy($id);
-
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-   public function search(Request $request): CreateItemCollection
-{
-    $sname = $request->input('name', '');
+    public function search(Request $request): CreateItemCollection
+    {
+        $sname = $request->input('name', '');
 
-    if (!empty($sname)) {
-        // Assuming `name` is a column in `create_items`
-        $createItems = CreateItem::where('name', 'like', "%$sname%")
-            ->where('user_id', Auth::id())
-            ->get();
-    } else {
-        // Return all items for the authenticated user if no name is provided
-        $createItems = CreateItem::where('user_id', Auth::id())->get();
+        if (!empty($sname)) {
+            $createItems = CreateItem::where('name', 'like', "%$sname%")
+                ->where('user_id', Auth::id())
+                ->get();
+        } else {
+            $createItems = CreateItem::where('user_id', Auth::id())->get();
+        }
+
+        return new CreateItemCollection($createItems);
     }
 
-    return new CreateItemCollection($createItems);
-}
+    /**
+     * Reduce stock quantity of the item.
+     */
+    public function reduceStock(Request $request, CreateItem $createItem, $id)
+    {
+        // Validate request
+        $validated = $request->validate([
+            'quantity_sold' => 'required|integer|min:1',
+        ]);
+
+           $createItem = CreateItem::findOrFail($id);
+
+        // Ensure there's enough quantity available
+        if ($createItem->quantity < $validated['quantity_sold']) {
+            return response()->json([
+                'message' => 'Not enough stock available'
+            ], Response::HTTP_BAD_REQUEST);
+        }
+
+        // Deduct the sold quantity from available stock
+        $createItem->quantity -= $validated['quantity_sold'];
+        $createItem->save();
+
+        return new CreateItemResource($createItem);
+    }
 }

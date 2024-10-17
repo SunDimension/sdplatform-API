@@ -93,7 +93,11 @@ Route::apiResource('service-types', App\Http\Controllers\ServiceTypeController::
 
 Route::apiResource('vendor-targets', App\Http\Controllers\VendorTargetController::class);
 
+Route::patch('create-items/{id}/reduce-stock', [App\Http\Controllers\CreateItemController::class, 'reduceStock']);
+
+
 Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
+
 
 
 ///////////// Sales Routes /////////////////
