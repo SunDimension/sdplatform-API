@@ -17,7 +17,7 @@ class SalesOrderController extends Controller
      public function index(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::with('itemsold', 'salesInvoices', 'salesReceipts')
+        $salesOrders = SalesOrder::with('itemsold', 'salesReceipts')
             ->paginate(10); // Paginate results, you can change the number as needed
 
         return response()->json($salesOrders);
