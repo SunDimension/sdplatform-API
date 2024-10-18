@@ -76,7 +76,8 @@ class SalesOrderController extends Controller
             'store_id' => $validated['store_id'],
             'credit_limit' => $validated['credit_limit'] ?? null,
             'total_amount' =>$validated['total_amount'] ?? null,
-            'payment_type'=> $validated['payment']['payment_type'] 
+            'payment_type'=> $validated['payment']['payment_type'],
+    
         ]);
 
         Log::alert($validated);
@@ -182,6 +183,7 @@ class SalesOrderController extends Controller
             'branch_id' => $validated['branch_id'],
             'store_id' => $validated['store_id'],
             'credit_limit' => $validated['credit_limit'] ?? null,
+            
         ]);
 
         // Update Items Sold
