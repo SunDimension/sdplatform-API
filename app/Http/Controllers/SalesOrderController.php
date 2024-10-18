@@ -90,8 +90,8 @@ class SalesOrderController extends Controller
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
                 'amount' => $item['quantity'] * ($item['unit_price']-$item['discount']),
-                'store_id' => $item['store_id'],
-                'discount' => $item['discount'],
+                // 'store_id' => $item['store_id'],
+                // 'discount' => $item['discount'],
                 'sales_date' => now(),
                  
             ]);
