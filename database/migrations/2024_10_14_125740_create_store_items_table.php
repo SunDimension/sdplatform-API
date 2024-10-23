@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('create_item_id')->constrained('create_items');
             $table->foreignId('unit_id')->constrained('units');
             $table->float('quantity');
+            $table->float('quantity_holding')->default(0);
             $table->float('cost_price');
             $table->float('selling_price');
             $table->string('reorder_level');

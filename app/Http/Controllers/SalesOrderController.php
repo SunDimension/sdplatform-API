@@ -8,8 +8,10 @@ use App\Models\SalesOrder;
 use App\Models\ItemSold;
 use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
+use App\Models\StoreItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Http\Response;
 
 class SalesOrderController extends Controller
 {
@@ -17,7 +19,7 @@ class SalesOrderController extends Controller
      public function index(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::with('itemsold', 'salesReceipts')
+        $salesOrders = SalesOrder::with('itemSold', 'salesReceipts')
             ->paginate(10); // Paginate results, you can change the number as needed
 
         return response()->json($salesOrders);
@@ -40,7 +42,7 @@ class SalesOrderController extends Controller
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesOrder::where('sales_order_number', $orderno)->first();
+        $salesOrders = SalesOrder::with('itemSold')->where('sales_order_number', $orderno)->first();
         return response()->json(['data'=>new SalesOrderResource($salesOrders)]);
     }
 
@@ -67,6 +69,22 @@ class SalesOrderController extends Controller
             'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit', // Payment type now explicitly validated
             // 'payment.item_sold_id' => 'required|integer|exists:item_solds,id',  // item_sold_id is foreign key in sales_receipt
         ]);
+
+        $errors = [];
+        foreach ($validated['items'] as $item) {
+            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $item['store_id']);
+            // Check if there is enough stock
+            if($createItem->quantity-$createItem->quantity_holding < $validated['quantity']) {
+                $createItem->load('createItem');
+                $errors[] = $createItem->createItem->name;
+                // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Check if there is enough stock
+        if (count($errors)>0) {
+            return response()->json(['error' => 'Insufficient stock for '. implode(",", $errors)], Response::HTTP_BAD_REQUEST);
+        }
+
         $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
         // Create a new Sales Order
         $salesOrder = SalesOrder::create([
@@ -80,7 +98,7 @@ class SalesOrderController extends Controller
     
         ]);
 
-        Log::alert($validated);
+        //Log::alert($validated);
         // Update Items Sold
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
@@ -96,6 +114,11 @@ class SalesOrderController extends Controller
                  
             ]);
             $itemSoldIds[] = $itemSold->id;
+
+            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $item['store_id']);
+            // $createItem->quantity -= $validated['quantity_released'];
+            $createItem->quantity_holding += $validated['quantity'];
+            $createItem->save();
         }
 /*
         // Handle Sales Invoice if payment is deferred
@@ -154,7 +177,7 @@ class SalesOrderController extends Controller
     // Method to fetch the Sales Order for editing
     public function edit($id)
     {
-        $salesOrder = SalesOrder::with('itemsSold', 'salesInvoices', 'salesReceipts')->findOrFail($id);
+        $salesOrder = SalesOrder::with('itemSold', 'salesInvoices', 'salesReceipts')->findOrFail($id);
 
         return response()->json($salesOrder);
     }

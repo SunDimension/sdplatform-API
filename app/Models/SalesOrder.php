@@ -44,7 +44,7 @@ protected static function boot()
 }
     
 
-    public function itemsold() :hasMany
+    public function itemSold() :hasMany
 
     {
         return $this->hasMany(ItemSold::class, 'sales_order_id');

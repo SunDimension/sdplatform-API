@@ -18,45 +18,47 @@ class Release extends Model
         'store_id',
         'customer_id',
         'release_date',
-];
+        'user_id'
+    ];
 
     protected $cast = [
 
-        'id' =>'integer',
-        'branch_id'=>'integer',
-        'sales_receipt_id'=>'integer',
-        'store_id'=>'integer',
-        'customer_id'=>'integer',
-        'release_date'=>'integer'
+        'id' => 'integer',
+        'branch_id' => 'integer',
+        'sales_receipt_id' => 'integer',
+        'store_id' => 'integer',
+        'customer_id' => 'integer',
+        'release_date' => 'date',
+        'user_id' => 'integer'
 
-        ];
+
+    ];
 
 
- public function customer(): BelongsTo
-        {
+    public function customer(): BelongsTo
+    {
         return $this->belongsTo(Customer::class);
-             }
- public function branch(): BelongsTo
-        {
+    }
+    public function branch(): BelongsTo
+    {
         return $this->belongsTo(Branch::class);
-         }
- public function stores(): BelongsTo
+    }
+    public function stores(): BelongsTo
     {
         return $this->belongsTo(Store::class);
-
     }
 
-  public function salesreceipt(): BelongsTo
+    public function salesreceipt(): BelongsTo
     {
-        return $this->belongsTo(SalesReceipt::class);   
-}
-     public function createItem()
-    {
-        return $this->belongsTo(CreateItem::class); // Each release belongs to a CreateItem
+        return $this->belongsTo(SalesReceipt::class);
     }
+    //  public function createItem()
+    // {
+    //     return $this->belongsTo(CreateItem::class); // Each release belongs to a CreateItem
+    // }
 
     public function user()
     {
         return $this->belongsTo(User::class);
-}
+    }
 }
