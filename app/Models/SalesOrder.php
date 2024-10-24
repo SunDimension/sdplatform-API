@@ -24,6 +24,7 @@ class SalesOrder extends Model
         'customer_id',
         'branch_id',
         'store_id',
+        'user_id',
         'credit_limit',
         'credit_amount',
         'total_amount',
@@ -42,13 +43,13 @@ protected static function boot()
         $salesOrder->sales_order_number = 'HGV-SO-' . $randomNumber;
     });
 }
-    
-
-    public function itemsold() :hasMany
+      public function itemsold() :hasMany
 
     {
         return $this->hasMany(ItemSold::class, 'sales_order_id');
     }
+
+   
 
   public function salesInvoices()
     {
@@ -62,11 +63,16 @@ protected static function boot()
 
     public function store()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class, 'store_id');
     }
     public function branch()
     {
-        return $this->belongsTo(Branch::class);
+        return $this->belongsTo(Branch::class,'branch_id');
+    }
+
+      public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function customer()

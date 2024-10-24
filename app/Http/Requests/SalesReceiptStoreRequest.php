@@ -29,6 +29,8 @@ class SalesReceiptStoreRequest extends FormRequest
             'payment_type' => ['required'],
             'customer_id' => ['required', 'integer','exists:customers,id'],
             'store_id' => ['required', 'integer','exists:stores,id'],
+            'user_id' => ['required', 'integer','exists:users,id'],
+            'cashier_id' => ['required', 'integer','exists:users,id'],
             'sales_receipt_number' => ['string', 'unique:sales_receipts'],
             'total_amount' => ['required', 'string',],
             'amount_paid' => ['required', 'string'],

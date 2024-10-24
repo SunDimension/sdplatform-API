@@ -44,7 +44,7 @@ class ItemSold extends Model
 
      public function salesOrder(): BelongsTo
     {
-        return $this->belongsTo(SalesOrder::class);
+        return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 
       public function salesReceipt()

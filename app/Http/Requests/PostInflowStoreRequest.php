@@ -24,10 +24,10 @@ class PostInflowStoreRequest extends FormRequest
     {
         return [
             'bank_id'    => 'required|exists:banks,id', // Ensure it exists
-            'amount'            => 'nullable|numeric',         // Ensure it exists
+            'amount'     => 'nullable|numeric',         // Ensure it exists
             'narration'   => 'nullable|string', 
             'inflow_date'   => 'nullable|date',     
-            'inflow_status'   => 'required|exists:inflow_status,id',                // Must be a positive integer
+           
         ];
     }
 }

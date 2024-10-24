@@ -20,6 +20,8 @@ class SalesReceipt extends Model
         'customer_id',
         'branch_id',
         'store_id',
+        'cashier_id',
+        'user_id',
         'sales_receipt_number',
         'payment_type',
         'total_amount',
@@ -68,7 +70,10 @@ class SalesReceipt extends Model
     {
         return $this->belongsTo(SalesOrder::class, "sales_order_id");
     }
-
+     public function cashier()
+    {
+        return $this->belongsTo(User::class, 'cashier_id');
+    }
     public function salesinvoice(): BelongsTo
     {
         return $this->belongsTo(SalesInvoice::class);

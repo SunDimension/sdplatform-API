@@ -16,7 +16,7 @@ class PostInflowResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'bank' => $this->bank,
+            'bank_id' => $this->bank_id,
             'amount' => $this->amount,
             'narration' => $this->narration,
             'inflow_date' => $this->inflow_date,
