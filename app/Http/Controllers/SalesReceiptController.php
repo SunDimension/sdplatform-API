@@ -13,16 +13,20 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class SalesReceiptController extends Controller
 {
+
+
+
     public function index(Request $request)
     {
         $salesreceipt = SalesReceipt::all();
         return new SalesReceiptCollection($salesreceipt);
     }
 
-    public function getbynumber($orderno)
+   public function getbynumber($orderno)
     {
         $salesOrders = SalesReceipt::with(['salesOrder', 'salesOrder.itemSold'])->where('sales_receipt_number', $orderno)->first();
         Log::debug($salesOrders);
@@ -62,7 +66,7 @@ class SalesReceiptController extends Controller
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
     }
 
-    public function store(SalesReceiptStoreRequest $request)
+   public function store(SalesReceiptStoreRequest $request)
     {
         $data = $request->validated();
         $salesreceipt = SalesReceipt::create($data);

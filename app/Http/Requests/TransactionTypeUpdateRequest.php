@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class PostInflowStoreRequest extends FormRequest
+class TransactionTypeUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -20,14 +20,9 @@ class PostInflowStoreRequest extends FormRequest
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
         public function rules(): array
-    
     {
-        return [
-            'bank_id'    => 'required|exists:banks,id', // Ensure it exists
-            'amount'     => 'nullable|numeric',         // Ensure it exists
-            'narration'   => 'nullable|string', 
-            'inflow_date'   => 'nullable|date',     
-           
+       return [
+            'name' => ['required', 'string'],
         ];
     }
 }
