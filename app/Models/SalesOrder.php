@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class SalesOrder extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
 
     public $table = "sales_orders";
@@ -33,32 +33,33 @@ class SalesOrder extends Model
         'payment_type',
         'status'
     ];
-protected static function boot()
-{
-    parent::boot();
+    protected static function boot()
+    {
+        parent::boot();
 
-    // Automatically generate sales_order_number when a new SalesOrder is created
-    static::creating(function ($salesOrder) {
-        $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT); // Generates a random 7-digit number
-        $salesOrder->sales_order_number = 'HGV-SO-' . $randomNumber;
-    });
-}
-      public function itemsold() :hasMany
+        // Automatically generate sales_order_number when a new SalesOrder is created
+        static::creating(function ($salesOrder) {
+            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT); // Generates a random 7-digit number
+            $salesOrder->sales_order_number = 'HGV-SO-' . $randomNumber;
+        });
+    }
+
+    public function itemsold(): hasMany
 
     {
         return $this->hasMany(ItemSold::class, 'sales_order_id');
     }
 
-   
 
-  public function salesInvoices()
+
+    public function salesInvoices()
     {
         return $this->hasMany(SalesInvoice::class);
     }
 
     public function salesReceipts()
     {
-        return $this->hasMany(SalesReceipt::class, "sales_order_id","id");
+        return $this->hasMany(SalesReceipt::class, "sales_order_id", "id");
     }
 
     public function store()
@@ -67,10 +68,10 @@ protected static function boot()
     }
     public function branch()
     {
-        return $this->belongsTo(Branch::class,'branch_id');
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
 
-      public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }

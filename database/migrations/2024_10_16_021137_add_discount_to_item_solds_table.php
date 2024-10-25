@@ -23,7 +23,6 @@ return new class extends Migration
     {
         Schema::table('item_solds', function (Blueprint $table) {
             $table->drop('discount');
-            
         });
     }
 };

@@ -29,7 +29,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 // routes/api.php
-
+Route::middleware('auth:api')->group(function () {
 
 // Route::middleware('auth:sanctum')->get('/users', [UsersController::class, 'index']);
 
@@ -230,6 +230,9 @@ Route::apiResource('credit-sales', App\Http\Controllers\CreditSaleController::cl
 
 Route::apiResource('customers', App\Http\Controllers\CustomerController::class);
 
+Route::get('pending-release', [App\Http\Controllers\SalesReceiptController::class,'pendingRelease']);
+Route::get('new-release-order-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class,'pendingReleaseOrder']);
+
 Route::apiResource('sales-receipts', App\Http\Controllers\SalesReceiptController::class);
 
 Route::apiResource('credit-limits', App\Http\Controllers\CreditLimitController::class);
@@ -325,3 +328,4 @@ Route::apiResource('approval-process-types', App\Http\Controllers\ApprovalProces
 Route::apiResource('approval-stages', App\Http\Controllers\ApprovalStageController::class);
 
 Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
+});

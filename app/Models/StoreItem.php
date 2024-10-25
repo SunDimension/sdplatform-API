@@ -32,4 +32,14 @@ class StoreItem extends Model
         'store_id'=>'integer',
         'user_id'=>'integer'
     ];
+
+    public function createItem()
+    {
+        return $this->belongsTo(CreateItem::class);
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

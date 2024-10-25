@@ -28,6 +28,7 @@ class SalesReceipt extends Model
         'amount_paid',
         'receipt_date',
         'sales_order_id',
+        'payment_detail'
     ];
 
     /**
@@ -43,6 +44,7 @@ class SalesReceipt extends Model
         'branch_id' => 'integer',
         'item_sold_id' => 'integer',
         'sales_order_id' => 'integer',
+        'payment_detail' => 'array',
     ];
 
    protected static function boot()

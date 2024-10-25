@@ -9,59 +9,62 @@ use App\Models\SalesOrder;
 use App\Models\ItemSold;
 use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
+use App\Models\StoreItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Carbon\Carbon;
+use GuzzleHttp\Psr7\Response;
+use Illuminate\Http\Response as HttpResponse;
 
 class SalesOrderController extends Controller
 {
 
-public function index(Request $request): SalesOrderCollection
-{
-    // Get query parameters from the request and validate
-    $validated = $request->validate([
-        'store_id' => 'nullable|integer|exists:stores,id',
-        'from_date' => 'nullable|date',
-        'to_date' => 'nullable|date',
-    ]);
-
-    // Log the validated input (if necessary for debugging)
-    FacadesLog::debug($validated);
-
-    $storeId = $validated['store_id'] ?? null;
-    $fromDate = $validated['from_date'] ?? null;
-    $toDate = $validated['to_date'] ?? null;
-
-    // Start building the query
-    $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
-
-    // Apply filters based on the validated parameters
-    if ($storeId) {
-        $query->where('store_id', $storeId);
-    }
-
-    // Handle date filtering with proper range logic
-    if ($fromDate && $toDate) {
-        // Ensure fromDate is not after toDate
-        $query->whereBetween('created_at', [
-            Carbon::parse($fromDate)->startOfDay(),
-            Carbon::parse($toDate)->endOfDay()
+    public function index(Request $request): SalesOrderCollection
+    {
+        // Get query parameters from the request and validate
+        $validated = $request->validate([
+            'store_id' => 'nullable|integer|exists:stores,id',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
         ]);
-    } elseif ($fromDate) {
-        // Filter for records starting from fromDate
-        $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
-    } elseif ($toDate) {
-        // Filter for records up to toDate
-        $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+
+        // Log the validated input (if necessary for debugging)
+        FacadesLog::debug($validated);
+
+        $storeId = $validated['store_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+
+        // Start building the query
+        $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
+
+        // Apply filters based on the validated parameters
+        if ($storeId) {
+            $query->where('store_id', $storeId);
+        }
+
+        // Handle date filtering with proper range logic
+        if ($fromDate && $toDate) {
+            // Ensure fromDate is not after toDate
+            $query->whereBetween('created_at', [
+                Carbon::parse($fromDate)->startOfDay(),
+                Carbon::parse($toDate)->endOfDay()
+            ]);
+        } elseif ($fromDate) {
+            // Filter for records starting from fromDate
+            $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+        } elseif ($toDate) {
+            // Filter for records up to toDate
+            $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+        }
+
+        // Execute the query and get the filtered results
+        $salesOrders = $query->get();
+
+        // Return as a resource collection
+        return new SalesOrderCollection($salesOrders);
     }
-
-    // Execute the query and get the filtered results
-    $salesOrders = $query->get();
-
-    // Return as a resource collection
-    return new SalesOrderCollection($salesOrders);
-}
 
 
 
@@ -70,39 +73,39 @@ public function index(Request $request): SalesOrderCollection
     public function pendingReceipts(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::where('status','Pending')->whereNot('payment_type','Credit')->get(); 
+        $salesOrders = SalesOrder::where('status', 'Pending')->whereNot('payment_type', 'Credit')->get();
         Log::debug($salesOrders);
-        return response()->json(['data'=> SalesOrderResource::collection($salesOrders)]);
+        return response()->json(['data' => SalesOrderResource::collection($salesOrders)]);
     }
 
     public function pendingCredit(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::where('status','Pending')->where('payment_type','Credit')->get();
-        return response()->json(['data'=> SalesOrderResource::collection($salesOrders)]);
+        $salesOrders = SalesOrder::where('status', 'Pending')->where('payment_type', 'Credit')->get();
+        return response()->json(['data' => SalesOrderResource::collection($salesOrders)]);
     }
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesOrder::where('sales_order_number', $orderno)->first();
-        return response()->json(['data'=>new SalesOrderResource($salesOrders)]);
+        $salesOrders = SalesOrder::with('itemSold')->where('sales_order_number', $orderno)->first();
+        return response()->json(['data' => new SalesOrderResource($salesOrders)]);
     }
 
     public function show($id)
-{
-    // Retrieve the sales order by its ID along with related data
-    $salesOrder = SalesOrder::with('customer', 'branch', 'store', 'itemsold')->findOrFail($id);
+    {
+        // Retrieve the sales order by its ID along with related data
+        $salesOrder = SalesOrder::with('customer', 'branch', 'store', 'itemsold')->findOrFail($id);
 
-    // Return the sales order as a JSON response
-    return response()->json(['data' => new SalesOrderResource($salesOrder)]);
-}
+        // Return the sales order as a JSON response
+        return response()->json(['data' => new SalesOrderResource($salesOrder)]);
+    }
 
 
-   // Method to create a new Sales Order
+    // Method to create a new Sales Order
     public function store(Request $request)
     {
         // Validate incoming request data
-       $validated = $request->validate([
+        $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'branch_id' => 'required|exists:branches,id',
             'store_id' => 'required|exists:stores,id',
@@ -122,6 +125,23 @@ public function index(Request $request): SalesOrderCollection
             'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit', // Payment type now explicitly validated
             // 'payment.item_sold_id' => 'required|integer|exists:item_solds,id',  // item_sold_id is foreign key in sales_receipt
         ]);
+
+        $errors = [];
+        foreach ($validated['items'] as $item) {
+            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id'])->first();
+            // Check if there is enough 
+            Log::debug($createItem);
+            if ($createItem->quantity - $createItem->quantity_holding < $item['quantity']) {
+                $createItem->load('createItem');
+                $errors[] = $createItem->createItem->name;
+                // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
+            }
+        }
+        // Check if there is enough stock
+        if (count($errors) > 0) {
+            return response()->json(['error' => 'Insufficient stock for ' . implode(",", $errors)], HttpResponse::HTTP_BAD_REQUEST);
+        }
+
         $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
         // Create a new Sales Order
         $salesOrder = SalesOrder::create([
@@ -131,76 +151,34 @@ public function index(Request $request): SalesOrderCollection
             'store_id' => $validated['store_id'],
             'user_id' => $validated['user_id'],
             'credit_limit' => $validated['credit_limit'] ?? null,
-            'total_amount' =>$validated['total_amount'] ?? null,
-            'payment_type'=> $validated['payment']['payment_type'],
-    
+            'total_amount' => $validated['total_amount'] ?? null,
+            'payment_type' => $validated['payment']['payment_type'],
+
         ]);
 
-        Log::alert($validated);
+        //Log::alert($validated);
         // Update Items Sold
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
-             $itemSold = ItemSold::create([
+            $itemSold = ItemSold::create([
                 'sales_order_id' => $salesOrder->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
-                'amount' => $item['quantity'] * ($item['unit_price']-$item['discount']),
+                'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
                 'store_id' => $item['store_id'],
                 'discount' => $item['discount'],
                 'sales_date' => now(),
-                 
+
             ]);
             $itemSoldIds[] = $itemSold->id;
-        }
-/*
-        // Handle Sales Invoice if payment is deferred
-        if (!empty($validated['invoice'])) {
-            SalesInvoice::create([
-                'sales_order_id' => $salesOrder->id,
-                'product_id' => $validated['invoice']['product_id'],
-                'unit_price' => $validated['invoice']['unit_price'],
-                'amount' => $validated['invoice']['amount'],
-                'sales_invoice_number' => 'HGV-INV-' . strtoupper(uniqid()), // Unique auto-generated invoice number
-                'invoice_date' => now(),
-            ]);
+
+            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id']);
+            // $createItem->quantity -= $validated['quantity_released'];
+            $createItem->quantity_holding += $validated['quantity'];
+            $createItem->save();
         }
 
-        // Handle Sales Receipt if payment is made
-         DB::beginTransaction();
-    try {
-        // Create the SalesReceipt
-        $salesReceiptData = [
-           'sales_order_id' => $salesOrder->id,
-            'customer_id' => $request->customer_id,
-            'branch_id' => $request->branch_id,
-            'store_id' => $request->store_id,
-             // Get item_sold_id from the payment details
-            'amount_paid' => $request->payment['amount_paid'],
-            'total_amount' => $request->payment['total_amount'],
-            'payment_type' => $request->payment['payment_type'],
-            // Add any other necessary fields here
-        ];
-
-        // Create the SalesReceipt
-        $salesReceipt = SalesReceipt::create($salesReceiptData);
-
-        // If needed, link the receipt with items sold
-        // This part will depend on your business logic
-        // Example: Associate receipt with specific items
-        // ItemSold::whereIn('id', $itemIds)->update(['sales_receipt_id' => $salesReceipt->id]);
-
-        // Commit the transaction
-        DB::commit();
-
-        return response()->json($salesReceipt, 201);
-    } catch (\Exception $e) {
-        // Rollback the transaction on error
-        DB::rollBack();
-
-        // Handle exceptions and return a detailed error message
-        return response()->json(['error' => $e->getMessage()], 500);
-    }*/
         return response()->json(['message' => 'Sales Order Created Successfully', 'data' => $salesOrder], 200);
     }
     //   public function show(Request $request, SalesOrder $salesOrder): SalesOrderResource
@@ -210,7 +188,7 @@ public function index(Request $request): SalesOrderCollection
     // Method to fetch the Sales Order for editing
     public function edit($id)
     {
-        $salesOrder = SalesOrder::with('itemsSold', 'salesInvoices', 'salesReceipts')->findOrFail($id);
+        $salesOrder = SalesOrder::with('itemSold', 'salesInvoices', 'salesReceipts')->findOrFail($id);
 
         return response()->json($salesOrder);
     }
@@ -239,7 +217,7 @@ public function index(Request $request): SalesOrderCollection
             'branch_id' => $validated['branch_id'],
             'store_id' => $validated['store_id'],
             'credit_limit' => $validated['credit_limit'] ?? null,
-            
+
         ]);
 
         // Update Items Sold
