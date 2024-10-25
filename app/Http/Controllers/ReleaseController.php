@@ -14,6 +14,7 @@ use App\Models\StoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class ReleaseController extends Controller
 {
@@ -24,16 +25,17 @@ class ReleaseController extends Controller
 
         return new ReleaseCollection($release);
     }
-    public function store(ReleaseStoreRequest $request): ReleaseResource
+    public function store(ReleaseStoreRequest $request)
     {
         // Validate input (make sure you get both the create_item_id and quantity to be released)
         $validated = $request->validated();
         
         $errors = [];
         foreach ($validated['items'] as $item) {
-            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id']);
+            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
             // Check if there is enough stock
-            if($createItem->quantity < $validated['quantity_released']) {
+            Log::debug($createItem);
+            if($createItem->quantity < $item['quantity']) {
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
                 // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
@@ -62,19 +64,19 @@ class ReleaseController extends Controller
             ReleaseDetails::create([
                 'release_id' => $release->id,
                 'product_id' => $item['product_id'],
-                'release_quantity' => $item['release_quantity'],
+                'release_quantity' => $item['quantity'],
                 'amount' => $item['amount'],
             ]);
 
             // Reduce stock from CreateItem (inventory)
-            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id']);
-            $createItem->quantity -= $validated['quantity_released'];
-            $createItem->quantity_holding -= $validated['quantity_released'];
+            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
+            $createItem->quantity -= $item['quantity'];
+            $createItem->quantity_holding -= $item['quantity'];
             $createItem->save();
         }
-
-
-        return new ReleaseResource($release);
+        //return new ReleaseResource($release);
+        
+        return response()->json(['message' => 'Release Created Successfully', 'data' => $release], 200);
     }
 
     public function show(Request $request, Release $release): ReleaseResource

@@ -30,7 +30,7 @@ class ReleaseStoreRequest extends FormRequest
             'release_date'        => 'nullable|date',                      // Must be a valid date
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:create_items,id',
-            'items.*.release_quantity' => 'required|integer',
+            'items.*.quantity' => 'required|integer',
             'items.*.amount' => 'required|numeric',
 
         ];
