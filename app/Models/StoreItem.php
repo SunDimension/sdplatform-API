@@ -20,9 +20,9 @@ class StoreItem extends Model
         'store_id',
         'user_id',
         'discount',
+        'quantity_holding'
 
     ];
-
 
     protected $cast = [
         'id'=>'integer',

@@ -15,13 +15,12 @@ class ReleaseDetailsResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [           
-        'id' => $this->id,
-        'release_id' => $this->release_id,
-        'quantity' => $this->release_quantity,
-        'product_id' => $this->product_id,
-        'product_name' => $this->product->name,
-        'amount' => $this->amount,
-        
-];
+            'id' => $this->id,
+            'release_id' => $this->release_id,
+            'quantity' => $this->release_quantity,
+            'product_id' => $this->product_id,
+            'product_name' => $this->product->name,
+            'amount' => $this->amount,
+        ];
     }
 }

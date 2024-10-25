@@ -30,7 +30,7 @@ class SalesOrderController extends Controller
         ]);
 
         // Log the validated input (if necessary for debugging)
-        FacadesLog::debug($validated);
+        // FacadesLog::debug($validated);
 
         $storeId = $validated['store_id'] ?? null;
         $fromDate = $validated['from_date'] ?? null;
@@ -130,8 +130,8 @@ class SalesOrderController extends Controller
         foreach ($validated['items'] as $item) {
             $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id'])->first();
             // Check if there is enough 
-            Log::debug($createItem);
-            if ($createItem->quantity - $createItem->quantity_holding < $item['quantity']) {
+            // Log::debug($createItem);
+            if (($createItem->quantity - $createItem->quantity_holding) < $item['quantity']) {
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
                 // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
@@ -173,10 +173,10 @@ class SalesOrderController extends Controller
             ]);
             $itemSoldIds[] = $itemSold->id;
 
-            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id']);
+            $createItem2 = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id'])->first();
             // $createItem->quantity -= $validated['quantity_released'];
-            $createItem->quantity_holding += $validated['quantity'];
-            $createItem->save();
+            $createItem2->quantity_holding += $item['quantity'];
+            $createItem2->save();
         }
 
         return response()->json(['message' => 'Sales Order Created Successfully', 'data' => $salesOrder], 200);
