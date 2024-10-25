@@ -24,7 +24,7 @@ class SalesReceiptController extends Controller
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesReceipt::with('salesorder')->where('sales_receipt_number', $orderno)->first();
+        $salesOrders = SalesReceipt::with(['salesOrder', 'salesOrder.itemSold'])->where('sales_receipt_number', $orderno)->first();
         Log::debug($salesOrders);
         return response()->json(['data' => new SalesReceiptResource($salesOrders)]);
     }
@@ -70,7 +70,8 @@ class SalesReceiptController extends Controller
         $order->status = 'Paid';
         $order->save();
 
-        return new SalesReceiptResource($salesreceipt);
+        //return new SalesReceiptResource($salesreceipt);
+        return response()->json(['message' => 'Sales Receipt Created Successfully', 'data' => $salesreceipt], 200);
     }
 
     public function show(Request $request, SalesReceipt $salesreceipt): SalesReceiptResource

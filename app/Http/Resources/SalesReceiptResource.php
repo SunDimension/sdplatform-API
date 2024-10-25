@@ -29,6 +29,7 @@ class SalesReceiptResource extends JsonResource
             'amount_paid' => $this->amount_paid,
             'receipt_date' => $this->receipt_date,
             'total_amount' => $this->total_amount,
+            'payment_detail' => $this->payment_detail,
         ];
     }
 }

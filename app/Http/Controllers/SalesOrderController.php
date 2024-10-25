@@ -72,9 +72,10 @@ class SalesOrderController extends Controller
 
         $errors = [];
         foreach ($validated['items'] as $item) {
-            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $item['store_id']);
-            // Check if there is enough stock
-            if($createItem->quantity-$createItem->quantity_holding < $validated['quantity']) {
+            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $item['store_id'])->first();
+            // Check if there is enough 
+            Log::debug($createItem);
+            if($createItem->quantity - $createItem->quantity_holding < $item['quantity']) {
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
                 // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);

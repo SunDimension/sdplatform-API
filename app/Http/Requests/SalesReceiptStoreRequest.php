@@ -30,10 +30,12 @@ class SalesReceiptStoreRequest extends FormRequest
             'customer_id' => ['required', 'integer','exists:customers,id'],
             'store_id' => ['required', 'integer','exists:stores,id'],
             'sales_receipt_number' => ['string', 'unique:sales_receipts'],
-            'total_amount' => ['required', 'string',],
-            'amount_paid' => ['required', 'string'],
+            'total_amount' => ['required'],
+            'amount_paid' => ['required'],
             'receipt_date' => ['string'],
-            
+            'payment_detail'=>['array'],
+            'payment_detail.*.amount'=>['required'],
+            'payment_detail.*.payment_type'=>['required','string']
         ];
     }
 }
