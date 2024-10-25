@@ -127,6 +127,9 @@ Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController:
 
 
 Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
+Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
+
+
 
 Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
 
@@ -260,38 +263,24 @@ Route::apiResource('purchase-order-details', App\Http\Controllers\PurchaseOrderD
 
 Route::apiResource('refund-types', App\Http\Controllers\RefundTypeController::class);
 
-
 Route::apiResource('sales-type', App\Http\Controllers\SalesTypeController::class);
-
-
 Route::apiResource('store-types', App\Http\Controllers\StoreTypeController::class);
 
-
 Route::apiResource('stores', App\Http\Controllers\StoreController::class);
-
+Route::get('my-stores', [App\Http\Controllers\StoreController::class,'mystore']);
 
 Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
-
 Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
 
 Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
-
 Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
-
 Route::apiResource('charts', App\Http\Controllers\ChartController::class);
-
 Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
-
 Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
-
 Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
-
 Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
-
 Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
-
 Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
-
 Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
 Route::get('journal-entry/pending', [App\Http\Controllers\JournalEntryController::class,'pending']);
 

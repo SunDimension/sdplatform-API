@@ -9,7 +9,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReleaseDetails extends Model
 {
-    use HasFactory,SoftDeletes ;
+    use HasFactory,SoftDeletes;
+
+    protected $table ="release_details";
 
     protected $fillable = [
 
@@ -29,11 +31,11 @@ class ReleaseDetails extends Model
 
      public function product():BelongsTo
     {
-        return $this->belongTo(CreateItem::class);
+        return $this->belongsTo(CreateItem::class, "product_id");
     }
 
-     public function release():BelongsTo
+     public function release()
     {
-        return $this->belongTo(Release::class);
+        return $this->belongsTo(Release::class);
     }
 }
