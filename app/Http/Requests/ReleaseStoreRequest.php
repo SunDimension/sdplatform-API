@@ -27,9 +27,12 @@ class ReleaseStoreRequest extends FormRequest
             'branch_id'           => 'required|exists:branches,id',       // Ensure it exists
             'store_id'            => 'required|exists:stores,id',         // Ensure it exists
             'customer_id'         => 'required|exists:customers,id',      // Ensure it exists
-            'release_date'        => 'required|date',                      // Must be a valid date
-            'create_item_id'      => 'required|exists:create_items,id',   // Ensure it exists
-            'quantity_released'   => 'required|integer|min:1',            // Must be a positive integer
+            'release_date'        => 'nullable|date',                      // Must be a valid date
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:create_items,id',
+            'items.*.quantity' => 'required|integer',
+            'items.*.amount' => 'required|numeric',
+
         ];
     }
 }
