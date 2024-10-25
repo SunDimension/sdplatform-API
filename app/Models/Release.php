@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Release extends Model
@@ -43,7 +44,7 @@ class Release extends Model
     {
         return $this->belongsTo(Branch::class);
     }
-    public function stores(): BelongsTo
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
@@ -51,6 +52,11 @@ class Release extends Model
     public function salesreceipt(): BelongsTo
     {
         return $this->belongsTo(SalesReceipt::class);
+    }
+
+    public function releasedetail(): HasMany
+    {
+        return $this->hasMany(ReleaseDetails::class);
     }
     //  public function createItem()
     // {

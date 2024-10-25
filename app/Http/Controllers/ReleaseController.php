@@ -81,7 +81,8 @@ class ReleaseController extends Controller
 
     public function show(Request $request, Release $release): ReleaseResource
     {
-        return new ReleaseResource($release);
+        //Log::debug($release->load('releasedetail'));
+        return new ReleaseResource($release->load('releasedetail'));
     }
 
     public function update(ReleaseUpdateRequest $request, Release $release): ReleaseResource
