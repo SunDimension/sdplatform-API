@@ -22,10 +22,10 @@ class StoreItemResource extends JsonResource
             'cost_price'=>$this->cost_price, 
             'selling_price'=>$this->selling_price, 
             'reorder_level'=>$this->reorder_level, 
-            'Quantity'=>$this->Quantity, 
+            'quantity'=>$this->quantity, 
             'store_id'=>$this->store_id,  
-            'user_id'=>$this->branch_id,
-            'discount'=>$this->branch_id,
+            // 'user_id'=>$this->branch_id,
+            'discount'=>$this->discount,
             'store_type_id'=>$this->store_type_id
         ];
     }

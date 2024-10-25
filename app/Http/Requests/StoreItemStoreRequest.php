@@ -21,15 +21,15 @@ class StoreItemStoreRequest extends FormRequest
     {
         return [
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
-            'quantity'=>['string'],
+            'quantity'=>['numeric'],
             'unit_id' => ['required', 'integer', 'exists:units,id'],
             'cost_price' => ['numeric'],
             'selling_price' => ['numeric'],
             'reorder_level' => ['string'],
-            'discount' => ['required','integer','exists:discounts,id'],
+            'discount' => ['numeric'],
             'create_item_id' => ['required','integer','exists:create_items,id'],
             'store_id' => ['required','integer', 'exists:stores,id'],
-            'user_id' => ['required', 'integer','exists:users,id']
+            // 'user_id' => ['required', 'integer','exists:users,id']
         ];
     }
 }

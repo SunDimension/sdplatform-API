@@ -11,6 +11,7 @@ use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Auth;
 
 class UsersController extends Controller
 {
