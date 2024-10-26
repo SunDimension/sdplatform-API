@@ -14,8 +14,8 @@ class CustomerStoreRequest extends FormRequest
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
+    /** 
+     * Get the validation rules that apply to the request.unauthenticated
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */

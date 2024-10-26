@@ -26,10 +26,10 @@ class StoreItemStoreRequest extends FormRequest
             'cost_price' => ['numeric'],
             'selling_price' => ['numeric'],
             'reorder_level' => ['string'],
-            'discount' => ['numeric'],
+            'discount' => ['required', 'integer','exists:discount,id'],
             'create_item_id' => ['required','integer','exists:create_items,id'],
             'store_id' => ['required','integer', 'exists:stores,id'],
-            // 'user_id' => ['required', 'integer','exists:users,id']
+            'user_id' => ['required', 'integer','exists:users,id']
         ];
     }
 }

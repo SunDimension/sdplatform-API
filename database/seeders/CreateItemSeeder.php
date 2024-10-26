@@ -17,7 +17,7 @@ class CreateItemSeeder extends Seeder
 
             ['name'=>'Viva Plus 180G','item_category_id'=>5,'item_type_id'=>2,'description'=>'Detergent','batch_number'=>'5545554','unit_id'=>5,'brand_id'=>2,'cost_price'=>'5000','selling_price'=>'','reorder_level'=>'','dimension_id'=>2,'weight_id'=>3,'branch_id'=>3,'warehouse'=>3,'vendor_id'=>1,'store_id'=>1,'user_id'=>6],
 
-           ['name'=>'Delfin White Soap x 24','item_category_id'=>5,'item_type_id'=>2,'description'=>'Detergent','batch_number'=>'5545554','unit_id'=>5,'brand_id'=>2,'cost_price'=>'5000','selling_price'=>'','reorder_level'=>'','dimension_id'=>2,'weight_id'=>3,'branch_id'=>3,'warehouse'=>4,'vendor_id'=>1,'store_id'=>1,'user_id'=>6],
+           ['name'=>'Delfin White Soap x 24','item_category_id'=>5,'item_type_id'=>2,'description'=>'Detergent','batch_number'=>'','unit_id'=>5,'brand_id'=>2,'cost_price'=>'4500','selling_price'=>'5600','reorder_level'=>'','dimension_id'=>2,'weight_id'=>3,'branch_id'=>3,'warehouse'=>4,'vendor_id'=>1,'store_id'=>1,'user_id'=>6],
 
            ['name'=>'Chic Soap','item_category_id'=>5,'item_type_id'=>2,'description'=>'Detergent','batch_number'=>'5545554','unit_id'=>5,'brand_id'=>2,'cost_price'=>'5000','selling_price'=>'','reorder_level'=>'','dimension_id'=>2,'weight_id'=>3,'branch_id'=>3,'warehouse'=>4,'vendor_id'=>1,'store_id'=>2,'user_id'=>6],
 
