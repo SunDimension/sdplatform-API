@@ -1,12 +1,7 @@
 <?php
 
-use App\Http\Controllers\Api\CategoryController;
-use App\Http\Controllers\TitleController;
-use App\Http\Controllers\Api\CustomerController;
-use App\Http\Controllers\Api\DashboardController;
-use App\Http\Controllers\Api\OrderController;
+
 use App\Http\Controllers\CreateItemController;
-use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RolesController;
@@ -29,7 +24,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 // routes/api.php
-Route::middleware('auth:api')->group(function () {
+// Route::middleware('auth:api')->group(function () {
 
 // Route::middleware('auth:sanctum')->get('/users', [UsersController::class, 'index']);
 
@@ -128,6 +123,7 @@ Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController:
 
 Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
 Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
+Route::get('get-inventory-by-branch-store/{itemId}/{branchId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStoreBranch"]);
 
 
 
@@ -267,6 +263,7 @@ Route::apiResource('sales-type', App\Http\Controllers\SalesTypeController::class
 Route::apiResource('store-types', App\Http\Controllers\StoreTypeController::class);
 
 Route::apiResource('stores', App\Http\Controllers\StoreController::class);
+Route::get('my-stores/{branchid}', [App\Http\Controllers\StoreController::class,'mystore2']);
 Route::get('my-stores', [App\Http\Controllers\StoreController::class,'mystore']);
 
 Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
@@ -317,4 +314,4 @@ Route::apiResource('approval-process-types', App\Http\Controllers\ApprovalProces
 Route::apiResource('approval-stages', App\Http\Controllers\ApprovalStageController::class);
 
 Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
-});
+// });

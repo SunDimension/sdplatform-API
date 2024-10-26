@@ -33,6 +33,18 @@ class StoreItemController extends Controller
             
         return  StoreItemResource::collection($storeItems);
     }
+
+    public function GetInventoryByStoreBranch($itemId, $branchId)
+    {
+        //$storeitem = StoreItem::where("item_id", $item_id)->where;
+        $item_ids = Store::where('branch_id', $branchId)->pluck('id');
+
+        $storeItems = StoreItem::where('create_item_id', $itemId)
+            ->whereIn('store_id', $item_ids)
+            ->get();
+            
+        return  StoreItemResource::collection($storeItems);
+    }
     public function store(StoreItemStoreRequest $request): StoreItemResource
     {
         $storeitem = StoreItem::create($request->validated());
