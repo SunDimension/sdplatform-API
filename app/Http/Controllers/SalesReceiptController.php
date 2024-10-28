@@ -46,6 +46,20 @@ class SalesReceiptController extends Controller
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
     }
 
+    public function pendingReleaseStore($storeId)
+    {
+        //$salesOrders = SalesReceipt::with('salesorder');
+        $user = Auth::user();
+        // Log::debug($user);
+
+        $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
+            // Add your specific criteria for ItemSold here
+            $query->where('store_id', $storeId); // Example condition
+        })->get();
+        //Log::debug($salesOrders);
+        return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
+    }
+
     public function pendingReleaseOrder($orderno)
     {
         //$salesOrders = SalesReceipt::with('salesorder');
@@ -58,6 +72,25 @@ class SalesReceiptController extends Controller
         })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($user){
             // Only retrieve specific fields from ItemSold
             $query->where('store_id', $user->store_id);
+        }])
+            // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
+            ->first();
+        //Log::debug($salesReceipts);
+        return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
+    }
+
+    public function pendingReleaseOrder2($orderno,$storeId)
+    {
+        //$salesOrders = SalesReceipt::with('salesorder');
+        $user = Auth::user();
+        //Log::debug($user);
+
+        $salesReceipts = SalesReceipt::where("sales_receipt_number", $orderno)->whereHas('salesOrder.itemSold', function ($query) use ($storeId) {
+            // Add your specific criteria for ItemSold here
+            $query->where('store_id', $storeId); // Example condition
+        })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($storeId){
+            // Only retrieve specific fields from ItemSold
+            $query->where('store_id', $storeId);
         }])
             // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
             ->first();

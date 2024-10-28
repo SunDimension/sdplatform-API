@@ -56,7 +56,7 @@ class ReleaseController extends Controller
             // 'create_item_id'     => $createItem->id, // From inventory
             // 'quantity_released'  => $validated['quantity_released'],
             'release_date'       => now(),
-            'user_id'            => Auth::id()
+            'user_id'            =>  $validated['user_id'],//Auth::id()
         ]); // The user who authorized the release
 
 

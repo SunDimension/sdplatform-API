@@ -229,7 +229,9 @@ Route::apiResource('credit-sales', App\Http\Controllers\CreditSaleController::cl
 
 Route::apiResource('customers', App\Http\Controllers\CustomerController::class);
 
+Route::get('pending-release/{storeId}', [App\Http\Controllers\SalesReceiptController::class,'pendingReleaseStore']);
 Route::get('pending-release', [App\Http\Controllers\SalesReceiptController::class,'pendingRelease']);
+Route::get('new-release-order-info/{orderno}/{storeId}', [App\Http\Controllers\SalesReceiptController::class,'pendingReleaseOrder2']);
 Route::get('new-release-order-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class,'pendingReleaseOrder']);
 
 Route::apiResource('sales-receipts', App\Http\Controllers\SalesReceiptController::class);
