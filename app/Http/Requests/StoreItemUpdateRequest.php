@@ -11,7 +11,7 @@ class StoreItemUpdateRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -19,16 +19,15 @@ class StoreItemUpdateRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-       public function rules(): array
+     public function rules(): array
     {
         return [
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
-            'quantity'=>['string'],
-            'unit_id' => ['required', 'integer', 'exists:units,id'],
+            'quantity'=>['numeric'],
             'cost_price' => ['numeric'],
             'selling_price' => ['numeric'],
             'reorder_level' => ['string'],
-            'discount' => ['required','integer','exists:discounts,id'],
+            'discount' => ['numeric'],
             'create_item_id' => ['required','integer','exists:create_items,id'],
             'store_id' => ['required','integer', 'exists:stores,id'],
             'user_id' => ['required', 'integer','exists:users,id']

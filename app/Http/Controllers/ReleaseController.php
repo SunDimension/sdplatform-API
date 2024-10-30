@@ -10,10 +10,12 @@ use App\Http\Resources\ReleaseResource;
 use App\Models\Release;
 use App\Models\CreateItem;
 use App\Models\ReleaseDetails;
+use App\Models\SalesReceipt;
 use App\Models\StoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ReleaseController extends Controller
@@ -29,7 +31,7 @@ class ReleaseController extends Controller
     {
         // Validate input (make sure you get both the create_item_id and quantity to be released)
         $validated = $request->validated();
-        
+        Log::debug($validated);
         $errors = [];
         foreach ($validated['items'] as $item) {
             $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
@@ -59,7 +61,7 @@ class ReleaseController extends Controller
             'user_id'            =>  $validated['user_id'],//Auth::id()
         ]); // The user who authorized the release
 
-
+        $items = [];
         foreach ($validated['items'] as $item) {
             ReleaseDetails::create([
                 'release_id' => $release->id,
@@ -67,13 +69,18 @@ class ReleaseController extends Controller
                 'release_quantity' => $item['quantity'],
                 'amount' => $item['amount'],
             ]);
-
+            $items[] = $item['product_id'];
             // Reduce stock from CreateItem (inventory)
             $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
             $createItem->quantity -= $item['quantity'];
             $createItem->quantity_holding -= $item['quantity'];
             $createItem->save();
         }
+
+        $order= SalesReceipt::where('id', $validated['sales_receipt_id'])->first();
+
+        $sql = "update item_solds set status ='released' where sales_order_id=".$order->sales_order_id. " and store_id = ".$validated['store_id']. " and product_id in (". implode(",", $items).")";
+        DB::update($sql);
         //return new ReleaseResource($release);
         
         return response()->json(['message' => 'Release Created Successfully', 'data' => $release], 200);

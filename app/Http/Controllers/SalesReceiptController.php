@@ -40,7 +40,7 @@ class SalesReceiptController extends Controller
 
         $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($user) {
             // Add your specific criteria for ItemSold here
-            $query->where('store_id', $user->store_id); // Example condition
+            $query->where('store_id', $user->store_id)->where('status','pending'); // Example condition
         })->get();
         //Log::debug($salesOrders);
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
@@ -54,7 +54,7 @@ class SalesReceiptController extends Controller
 
         $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
             // Add your specific criteria for ItemSold here
-            $query->where('store_id', $storeId); // Example condition
+            $query->where('store_id', $storeId)->where('status','pending');// Example condition
         })->get();
         //Log::debug($salesOrders);
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
@@ -71,7 +71,7 @@ class SalesReceiptController extends Controller
             $query->where('store_id', $user->store_id); // Example condition
         })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($user){
             // Only retrieve specific fields from ItemSold
-            $query->where('store_id', $user->store_id);
+            $query->where('store_id', $user->store_id)->where('status','pending');
         }])
             // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
             ->first();
@@ -90,7 +90,7 @@ class SalesReceiptController extends Controller
             $query->where('store_id', $storeId); // Example condition
         })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($storeId){
             // Only retrieve specific fields from ItemSold
-            $query->where('store_id', $storeId);
+            $query->where('store_id', $storeId)->where('status','pending');
         }])
             // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
             ->first();
