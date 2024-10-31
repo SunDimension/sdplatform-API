@@ -26,6 +26,7 @@ class UserResource extends JsonResource
             'branch_id' => $this->branch_id,
             'store_id' => $this->store_id,
             'store' => $this->store->name,
+            "roles"=> RoleResource::collection($this->whenLoaded("roles"))
         ];
     }
 }

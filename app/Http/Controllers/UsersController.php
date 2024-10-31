@@ -17,7 +17,7 @@ class UsersController extends Controller
 {
     public function index(Request $request): UserCollection
     {
-        $users = User::all();
+        $users = User::with('roles')->get();
 
         return new UserCollection($users);
     }
@@ -41,27 +41,37 @@ class UsersController extends Controller
         return new UserResource($user);
     }
 
-  public function destroy($id)
-    {   
-       
+    public function destroy($id)
+    {
+
         User::destroy($id);
 
-        
+
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
- public function assignRole(Request $request, User $user): JsonResponse
+    //  public function assignRole(Request $request, User $user): JsonResponse
+    //     {
+    //         $role = Role::findOrFail($request->input('role_id'));
+
+    //         if (!$user->roles->contains($role)) {
+    //             $user->roles()->attach($role);
+    //         }
+
+    //         return response()->json(['message' => 'Role assigned successfully.'], Response::HTTP_OK);
+    //     }
+
+    public function assignRole(Request $request, User $user): JsonResponse
     {
-        $role = Role::findOrFail($request->input('role_id'));
+        $roleIds = $request->input('roles'); // expecting an array of role IDs
 
-        if (!$user->roles->contains($role)) {
-            $user->roles()->attach($role);
-        }
+        // Sync roles, which will attach the roles that are not already attached
+        $user->roles()->syncWithoutDetaching($roleIds);
 
-        return response()->json(['message' => 'Role assigned successfully.'], Response::HTTP_OK);
+        return response()->json(['message' => 'Roles assigned successfully.'], Response::HTTP_OK);
     }
 
-  public function removeRole(Request $request, User $user): JsonResponse
+    public function removeRole(Request $request, User $user): JsonResponse
     {
         $role = Role::findOrFail($request->input('role_id'));
 
@@ -70,9 +80,9 @@ class UsersController extends Controller
         }
 
         return response()->json(['message' => 'Role removed successfully.'], Response::HTTP_OK);
-    }  
+    }
 
-     public function syncRoles(Request $request, User $user): JsonResponse
+    public function syncRoles(Request $request, User $user): JsonResponse
     {
         // Retrieve role_ids from the request (this will replace all current roles)
         $roleIds = $request->input('role_ids');
@@ -84,12 +94,13 @@ class UsersController extends Controller
     }
 
 
-       public function getUserDetails(Request $request) {
-    // Assuming you're using Auth for user authentication
-    //  $userId = Auth::id();
-   $user = User::with(['branch', 'store'])->find(Auth::id()); // Eager load branch and store
+    public function getUserDetails(Request $request)
+    {
+        // Assuming you're using Auth for user authentication
+        //  $userId = Auth::id();
+        $user = User::with(['branch', 'store'])->find(Auth::id()); // Eager load branch and store
 
-    if ($user) {
+        if ($user) {
             return response()->json([
                 'id' => $user->id,
                 'name' => $user->name,
@@ -100,6 +111,5 @@ class UsersController extends Controller
         } else {
             return response()->json(['error' => 'User not found'], 404);
         }
-}
-
+    }
 }
