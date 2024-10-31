@@ -11,7 +11,10 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
+      public function index()
     {
+        // Fix: Return a collection of PermissionResources
+        return PermissionResource::collection(Permission::all());
     }
 
 

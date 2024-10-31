@@ -18,11 +18,10 @@ use Illuminate\Support\Facades\DB;
 
 class RolesController extends Controller
 {
-    public function index(Request $request): RoleCollection
-    {
-        $roles = Role::with(['permissions'])->get();
-        return new RoleCollection($roles);
-    }
+   public function index(Request $request)
+{   
+    return RoleResource::collection(Role::with('permissions')->get());
+}
 
     public function store(RoleStoreRequest $request): JsonResponse
     {

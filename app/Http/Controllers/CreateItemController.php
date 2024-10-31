@@ -14,10 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 class CreateItemController extends Controller
 {
-    public function index(Request $request): CreateItemCollection
     {   
-        $createItem = CreateItem::all();
-        return new CreateItemCollection($createItem);
     }
 
     public function store(CreateItemStoreRequest $request): CreateItemResource

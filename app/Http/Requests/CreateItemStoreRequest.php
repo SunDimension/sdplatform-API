@@ -22,23 +22,23 @@ class CreateItemStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string'],
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
-            'item_type_id' => ['required', 'integer', 'exists:item_types,id'],
-            'description' => ['string'],
+            // 'item_type_id' => ['required', 'integer', 'exists:item_types,id'],
+            // 'description' => ['string'],
             'batch_number' => ['string', 'unique:batch_number'],
-            'quantity'=>['string'],
-            'unit_id' => ['required', 'integer', 'exists:units,id'],
+            // 'quantity'=>['string'],
+            // 'unit_id' => ['required', 'integer', 'exists:units,id'],
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
-            'cost_price' => ['numeric'],
-            'selling_price' => ['numeric'],
-            'reorder_level' => ['string'],
-            'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
-            'weight_id' => ['required', 'integer', 'exists:weights,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'warehouse' => ['required','integer','exists:warehouses,id'],
+            // 'cost_price' => ['numeric'],
+            // 'selling_price' => ['numeric'],
+            // // 'reorder_level' => ['string'],
+            // 'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
+            // 'weight_id' => ['required', 'integer', 'exists:weights,id'],
+            // 'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            // 'warehouse' => ['required','integer','exists:warehouses,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
            
-            'store_id' => ['required','integer', 'exists:stores,id'],
-            'user_id' => ['required', 'integer','exists:users,id']
+            // 'store_id' => ['required','integer', 'exists:stores,id'],
+            // 'user_id' => ['required', 'integer','exists:users,id']
         ];
     }
 }
