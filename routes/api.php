@@ -317,3 +317,12 @@ Route::apiResource('approval-stages', App\Http\Controllers\ApprovalStageControll
 
 Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
 // });
+
+
+Route::apiResource('receive-orders', App\Http\Controllers\ReceiveOrderController::class);
+
+Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
+
+Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
+
+Route::apiResource('store-transfer-items', App\Http\Controllers\StoreTransferItemController::class);

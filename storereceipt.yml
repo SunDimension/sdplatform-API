@@ -1,0 +1,70 @@
+models: 
+  ReceiveOrder:
+    id: uuid primary
+    purchase_order_number: string
+    receive_date: timestamp
+    store_id: id foreign:stores
+    vendor_id: int
+    status: enum('pending','approved', 'cancelled')
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
+    softDeletes
+    relationships:
+      hasMany: ReceiveItem
+
+  ReceiveItem:
+    id: uuid primary
+    receive_order_id: uuid foreign:receive_orders
+    quantity: int
+    unit_price: double
+    product_id: id foreign:create_items.id
+    description: text nullable
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
+    softDeletes
+  
+  StoreTransferOrder:
+    id: uuid primary
+    order_number: string
+    transfer_date: timestamp
+    source_branch_id: id foreign:branches.id
+    source_store_id: id foreign:stores
+    destination_branch_id: id foreign:branches.id
+    destination_store_id: id foreign:stores
+    approval_stage_id: id foreign:approval_stages.id
+    source_status: enum('pending','approved', 'cancelled')
+    source_date_approved: timestamp nullable
+    destination_status: enum('pending','approved', 'cancelled')
+    destination_date_approved: timestamp nullable
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
+    softDeletes
+    relationships:
+      hasMany: ReceiveItem
+
+  StoreTransferItem:
+    id: uuid primary
+    transfer_order_id: uuid foreign:store_transfer_orders.id
+    quantity: int
+    unit_price: double
+    product_id: id foreign:create_items.id
+    # description: text nullable
+    created_by: id nullable foreign:users.id 
+    modified_by: id nullable foreign:users.id 
+    deleted_by: id nullable foreign:users.id 
+    softDeletes
+
+
+controllers:
+  ReceiveOrder:
+    resource: api
+  ReceiveItem:
+    resource: api
+  StoreTransferOrder:
+    resource: api
+  StoreTransferItem:
+    resource: api
+  
