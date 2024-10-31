@@ -27,7 +27,7 @@ class ReleaseStoreRequest extends FormRequest
             'branch_id'           => 'required|exists:branches,id',       // Ensure it exists
             'store_id'            => 'required|exists:stores,id',         // Ensure it exists
             'customer_id'         => 'required|exists:customers,id',      // Ensure it exists
-            'customer_id'         => 'required|exists:customers,id',      // Ensure it exists
+            // 'customer_id'         => 'required|exists:customers,id',      // Ensure it exists
             'release_date'        => 'nullable|date',                      // Must be a valid date
             'user_id'        => 'nullable',                      // Must be a valid date
             'items' => 'required|array',
