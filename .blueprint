@@ -1,74 +1,40 @@
 created:
-    - app/Http/Controllers/ApprovalInstanceController.php
-    - app/Http/Controllers/ApprovalLimitController.php
-    - app/Http/Controllers/ApprovalProcessFlowController.php
-    - app/Http/Controllers/ApprovalProcessModuleController.php
-    - app/Http/Controllers/ApprovalProcessTypeController.php
-    - app/Http/Controllers/ApprovalStageController.php
-    - app/Http/Controllers/ApprovalTypeController.php
-    - database/factories/ApprovalLimitFactory.php
-    - database/factories/ApprovalProcessModuleFactory.php
-    - database/factories/ApprovalProcessTypeFactory.php
-    - database/factories/ApprovalStageFactory.php
-    - database/factories/ApprovalTypeFactory.php
-    - database/factories/ApprovalInstanceFactory.php
-    - database/factories/ApprovalProcessFlowFactory.php
-    - database/migrations/2024_08_31_164856_create_approval_limits_table.php
-    - database/migrations/2024_08_31_164857_create_approval_process_modules_table.php
-    - database/migrations/2024_08_31_164858_create_approval_process_types_table.php
-    - database/migrations/2024_08_31_164859_create_approval_stages_table.php
-    - database/migrations/2024_08_31_164900_create_approval_types_table.php
-    - database/migrations/2024_08_31_164901_create_approval_instances_table.php
-    - database/migrations/2024_08_31_164902_create_approval_process_flows_table.php
-    - app/Models/ApprovalLimit.php
-    - app/Models/ApprovalProcessModule.php
-    - app/Models/ApprovalProcessType.php
-    - app/Models/ApprovalStage.php
-    - app/Models/ApprovalType.php
-    - app/Models/ApprovalInstance.php
-    - app/Models/ApprovalProcessFlow.php
-    - database/seeders/ApprovalProcessFlowSeeder.php
-    - database/seeders/ApprovalInstanceSeeder.php
-    - database/seeders/ApprovalLimitSeeder.php
-    - database/seeders/ApprovalProcessModuleSeeder.php
-    - database/seeders/ApprovalProcessTypeSeeder.php
-    - database/seeders/ApprovalStageSeeder.php
-    - database/seeders/ApprovalTypeSeeder.php
-    - tests/Feature/Http/Controllers/ApprovalInstanceControllerTest.php
-    - tests/Feature/Http/Controllers/ApprovalLimitControllerTest.php
-    - tests/Feature/Http/Controllers/ApprovalProcessFlowControllerTest.php
-    - tests/Feature/Http/Controllers/ApprovalProcessModuleControllerTest.php
-    - tests/Feature/Http/Controllers/ApprovalProcessTypeControllerTest.php
-    - tests/Feature/Http/Controllers/ApprovalStageControllerTest.php
-    - tests/Feature/Http/Controllers/ApprovalTypeControllerTest.php
-    - app/Http/Requests/ApprovalInstanceStoreRequest.php
-    - app/Http/Requests/ApprovalInstanceUpdateRequest.php
-    - app/Http/Requests/ApprovalLimitStoreRequest.php
-    - app/Http/Requests/ApprovalLimitUpdateRequest.php
-    - app/Http/Requests/ApprovalProcessFlowStoreRequest.php
-    - app/Http/Requests/ApprovalProcessFlowUpdateRequest.php
-    - app/Http/Requests/ApprovalProcessModuleStoreRequest.php
-    - app/Http/Requests/ApprovalProcessModuleUpdateRequest.php
-    - app/Http/Requests/ApprovalProcessTypeStoreRequest.php
-    - app/Http/Requests/ApprovalProcessTypeUpdateRequest.php
-    - app/Http/Requests/ApprovalStageStoreRequest.php
-    - app/Http/Requests/ApprovalStageUpdateRequest.php
-    - app/Http/Requests/ApprovalTypeStoreRequest.php
-    - app/Http/Requests/ApprovalTypeUpdateRequest.php
-    - app/Http/Resources/ApprovalInstanceCollection.php
-    - app/Http/Resources/ApprovalInstanceResource.php
-    - app/Http/Resources/ApprovalLimitCollection.php
-    - app/Http/Resources/ApprovalLimitResource.php
-    - app/Http/Resources/ApprovalProcessFlowCollection.php
-    - app/Http/Resources/ApprovalProcessFlowResource.php
-    - app/Http/Resources/ApprovalProcessModuleCollection.php
-    - app/Http/Resources/ApprovalProcessModuleResource.php
-    - app/Http/Resources/ApprovalProcessTypeCollection.php
-    - app/Http/Resources/ApprovalProcessTypeResource.php
-    - app/Http/Resources/ApprovalStageCollection.php
-    - app/Http/Resources/ApprovalStageResource.php
-    - app/Http/Resources/ApprovalTypeCollection.php
-    - app/Http/Resources/ApprovalTypeResource.php
+    - app/Http/Controllers/ReceiveOrderController.php
+    - app/Http/Controllers/ReceiveItemController.php
+    - app/Http/Controllers/StoreTransferOrderController.php
+    - app/Http/Controllers/StoreTransferItemController.php
+    - database/factories/ReceiveOrderFactory.php
+    - database/factories/ReceiveItemFactory.php
+    - database/factories/StoreTransferOrderFactory.php
+    - database/factories/StoreTransferItemFactory.php
+    - database/migrations/2024_10_31_004258_create_receive_orders_table.php
+    - database/migrations/2024_10_31_004259_create_receive_items_table.php
+    - database/migrations/2024_10_31_004300_create_store_transfer_orders_table.php
+    - database/migrations/2024_10_31_004301_create_store_transfer_items_table.php
+    - app/Models/ReceiveOrder.php
+    - app/Models/ReceiveItem.php
+    - app/Models/StoreTransferOrder.php
+    - app/Models/StoreTransferItem.php
+    - tests/Feature/Http/Controllers/ReceiveOrderControllerTest.php
+    - tests/Feature/Http/Controllers/ReceiveItemControllerTest.php
+    - tests/Feature/Http/Controllers/StoreTransferOrderControllerTest.php
+    - tests/Feature/Http/Controllers/StoreTransferItemControllerTest.php
+    - app/Http/Requests/ReceiveOrderStoreRequest.php
+    - app/Http/Requests/ReceiveOrderUpdateRequest.php
+    - app/Http/Requests/ReceiveItemStoreRequest.php
+    - app/Http/Requests/ReceiveItemUpdateRequest.php
+    - app/Http/Requests/StoreTransferOrderStoreRequest.php
+    - app/Http/Requests/StoreTransferOrderUpdateRequest.php
+    - app/Http/Requests/StoreTransferItemStoreRequest.php
+    - app/Http/Requests/StoreTransferItemUpdateRequest.php
+    - app/Http/Resources/ReceiveOrderCollection.php
+    - app/Http/Resources/ReceiveOrderResource.php
+    - app/Http/Resources/ReceiveItemCollection.php
+    - app/Http/Resources/ReceiveItemResource.php
+    - app/Http/Resources/StoreTransferOrderCollection.php
+    - app/Http/Resources/StoreTransferOrderResource.php
+    - app/Http/Resources/StoreTransferItemCollection.php
+    - app/Http/Resources/StoreTransferItemResource.php
 updated:
     - routes/api.php
 models:
@@ -149,3 +115,7 @@ models:
     ApprovalType: { id: 'uuid primary', name: string, description: longtext, created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
     ApprovalInstance: { id: 'uuid primary', approval_stage_id: 'uuid foreign:approval_stages', approval_type_id: 'uuid foreign:approval_types', created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
     ApprovalProcessFlow: { id: 'uuid primary', sequence_no: int, process_module_id: 'uuid foreign:approval_process_modules', approval_stage_id: 'uuid foreign:approval_stages', status_id: int, created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
+    ReceiveOrder: { id: 'uuid primary', purchase_order_number: string, receive_date: timestamp, store_id: 'id foreign:stores', vendor_id: int, status: "enum('pending','approved', 'cancelled')", created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: ReceiveItem } }
+    ReceiveItem: { id: 'uuid primary', receive_order_id: 'uuid foreign:receive_orders', quantity: int, unit_price: double, product_id: 'id foreign:create_items.id', description: 'text nullable', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
+    StoreTransferOrder: { id: 'uuid primary', order_number: string, transfer_date: timestamp, source_branch_id: 'id foreign:branches.id', source_store_id: 'id foreign:stores', destination_branch_id: 'id foreign:branches.id', destination_store_id: 'id foreign:stores', approval_stage_id: 'id foreign:approval_stages.id', source_status: "enum('pending','approved', 'cancelled')", source_date_approved: 'timestamp nullable', destination_status: "enum('pending','approved', 'cancelled')", destination_date_approved: 'timestamp nullable', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: ReceiveItem } }
+    StoreTransferItem: { id: 'uuid primary', transfer_order_id: 'uuid foreign:store_transfer_orders.id', quantity: int, unit_price: double, product_id: 'id foreign:create_items.id', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
