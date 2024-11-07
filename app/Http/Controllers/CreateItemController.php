@@ -16,11 +16,9 @@ class CreateItemController extends Controller
 {
     public function index(Request $request)
     {   
-   return CreateItemResource::collection(CreateItem::all());
+        return CreateItemResource::collection(CreateItem::all());
     }
-
-   
-
+    
     public function store(CreateItemStoreRequest $request): CreateItemResource
     {
         $createItem = CreateItem::create($request->validated());
