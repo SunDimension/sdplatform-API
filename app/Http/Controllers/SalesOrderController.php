@@ -4,12 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\SalesOrderResource;
 use App\Http\Resources\SalesOrderCollection;
+use App\Http\Resources\StoreCollection;
 use Illuminate\Http\Request;
 use App\Models\SalesOrder;
 use App\Models\ItemSold;
 use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
 use App\Models\StoreItem;
+use App\Models\Store;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
@@ -20,51 +22,114 @@ use Illuminate\Http\Response as HttpResponse;
 class SalesOrderController extends Controller
 {
 
-    public function index(Request $request): SalesOrderCollection
-    {
-        // Get query parameters from the request and validate
-        $validated = $request->validate([
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'from_date' => 'nullable|date',
-            'to_date' => 'nullable|date',
+
+public function index(Request $request): SalesOrderCollection
+{
+    // Validate and retrieve query parameters from the request
+    $validated = $request->validate([
+        'store_id' => 'nullable|integer|exists:stores,id',
+        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+        'from_date' => 'nullable|date',
+        'to_date' => 'nullable|date',
+    ]);
+
+    $storeId = $validated['store_id'] ?? null;
+    $branchId = $validated['branch_id'] ?? null;
+    $fromDate = $validated['from_date'] ?? null;
+    $toDate = $validated['to_date'] ?? null;
+
+    // Start building the query
+    $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold'])
+        ->when($storeId, function ($query, $storeId) {
+            return $query->where('store_id', $storeId);
+        })
+        ->when($branchId, function ($query, $branchId) {
+            // Filter SalesOrder by matching branch_id in related Store
+            return $query->whereHas('store', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            });
+        });
+
+    // Handle date filtering with proper range logic
+    if ($fromDate && $toDate) {
+        // Ensure fromDate is not after toDate
+        $query->whereBetween('created_at', [
+            Carbon::parse($fromDate)->startOfDay(),
+            Carbon::parse($toDate)->endOfDay(),
         ]);
-
-        // Log the validated input (if necessary for debugging)
-        // FacadesLog::debug($validated);
-
-        $storeId = $validated['store_id'] ?? null;
-        $fromDate = $validated['from_date'] ?? null;
-        $toDate = $validated['to_date'] ?? null;
-
-        // Start building the query
-        $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
-
-        // Apply filters based on the validated parameters
-        if ($storeId) {
-            $query->where('store_id', $storeId);
-        }
-
-        // Handle date filtering with proper range logic
-        if ($fromDate && $toDate) {
-            // Ensure fromDate is not after toDate
-            $query->whereBetween('created_at', [
-                Carbon::parse($fromDate)->startOfDay(),
-                Carbon::parse($toDate)->endOfDay()
-            ]);
-        } elseif ($fromDate) {
-            // Filter for records starting from fromDate
-            $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
-        } elseif ($toDate) {
-            // Filter for records up to toDate
-            $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
-        }
-
-        // Execute the query and get the filtered results
-        $salesOrders = $query->get();
-
-        // Return as a resource collection
-        return new SalesOrderCollection($salesOrders);
+    } elseif ($fromDate) {
+        $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+    } elseif ($toDate) {
+        $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
     }
+
+    // Execute the query and get the filtered results
+    $salesOrders = $query->get();
+
+    // Return as a resource collection
+    return new SalesOrderCollection($salesOrders);
+}
+
+
+public function getStores(Request $request)
+{
+    $branchId = $request->query('branch_id'); // Retrieve branch_id from query parameter
+
+    // Only fetch stores with the matching branch_id if provided
+    $stores = Store::when($branchId, function ($query) use ($branchId) {
+        $query->where('branch_id', $branchId);
+    })->get();
+
+    return response()->json($stores);
+}
+
+
+
+    // public function index(Request $request): SalesOrderCollection
+    // {
+    //     // Get query parameters from the request and validate
+    //     $validated = $request->validate([
+    //         'store_id' => 'nullable|integer|exists:stores,id',
+    //         'from_date' => 'nullable|date',
+    //         'to_date' => 'nullable|date',
+    //     ]);
+
+    //     // Log the validated input (if necessary for debugging)
+    //     // FacadesLog::debug($validated);
+
+    //     $storeId = $validated['store_id'] ?? null;
+    //     $fromDate = $validated['from_date'] ?? null;
+    //     $toDate = $validated['to_date'] ?? null;
+
+    //     // Start building the query
+    //     $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
+
+    //     // Apply filters based on the validated parameters
+    //     if ($storeId) {
+    //         $query->where('store_id', $storeId);
+    //     }
+
+    //     // Handle date filtering with proper range logic
+    //     if ($fromDate && $toDate) {
+    //         // Ensure fromDate is not after toDate
+    //         $query->whereBetween('created_at', [
+    //             Carbon::parse($fromDate)->startOfDay(),
+    //             Carbon::parse($toDate)->endOfDay()
+    //         ]);
+    //     } elseif ($fromDate) {
+    //         // Filter for records starting from fromDate
+    //         $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+    //     } elseif ($toDate) {
+    //         // Filter for records up to toDate
+    //         $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+    //     }
+
+    //     // Execute the query and get the filtered results
+    //     $salesOrders = $query->get();
+
+    //     // Return as a resource collection
+    //     return new SalesOrderCollection($salesOrders);
+    // }
 
 
 

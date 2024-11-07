@@ -30,7 +30,7 @@ class VendorStoreRequest extends FormRequest
              'service_type' => ['required', 'integer', 'exists:service_types,id'],
             'contact_phone_number' => ['required', 'string'],
             'contact_email' => ['nullable', 'email'],
-            'image_url' => ['required', 'string'],
+            'image_url' => ['nullable', 'string'],
             'tin' => ['required', 'string'],
             'bank' => ['required', 'integer', 'exists:banks,id'],
             'account_number' => ['nullable', 'string'],

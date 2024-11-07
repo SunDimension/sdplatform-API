@@ -30,7 +30,7 @@ class Vendor extends Model
         'tin',
         'bank',
         'account_number',
-        'account_number'
+        'account_name'
     ];
 
     /**

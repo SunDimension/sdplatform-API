@@ -17,9 +17,11 @@ class SalesReceiptResource extends JsonResource
         return [
             'id' => $this->id,
             'customer_id' => $this->customer_id,
+            'customer_name' => $this->customer ? $this->customer->name : null,
             'product_id' => $this->product_id,
             'branch_id' => $this->branch_id,
             'store_id' => $this->store_id,
+            'store_name' => $this->store ? $this->store->name : null,
             'cashier_id'=>$this->cashier_id,
             'user_id' => $this->salesOrder->user->name ?? null, // Sales Rep
             'cashier_name' => $this->cashier->name ?? null,

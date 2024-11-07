@@ -76,6 +76,11 @@ class SalesReceipt extends Model
     {
         return $this->belongsTo(User::class, 'cashier_id');
     }
+
+      public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function salesinvoice(): BelongsTo
     {
         return $this->belongsTo(SalesInvoice::class);
@@ -86,9 +91,9 @@ class SalesReceipt extends Model
         return $this->belongsTo(PaymentMode::class);
     }
 
-    public function stores(): BelongsTo
+  public function store()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class, 'store_id');
     }
 
     // public function itemSold()
