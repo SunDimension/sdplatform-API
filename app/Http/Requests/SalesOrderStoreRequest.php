@@ -26,7 +26,7 @@ class SalesOrderStoreRequest extends FormRequest
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'branch_id' => ['required', 'integer','exists:branches,id'],
             'store_id' => ['required', 'integer','exists:stores,id'],
-            'total_amount' => ['required', 'integer',],
+            'total_amount' => ['required', 'numeric',],
             'credit_limit' => ['required', 'integer','exists:credit_limit,id'],
             'credit_amount' => ['string'],
             'credit_balance' => ['string'],

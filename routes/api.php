@@ -103,11 +103,17 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('sales-orders', App\Http\Controllers\SalesOrderController::class);
 
-    Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class, 'index']);
+    Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class,'index']);
 
-    Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class, 'index']);
+    Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class,'index']);
 
-    Route::post('search-sales-orders', [App\Http\Controllers\SalesOrderController::class, 'index']);
+    Route::post('search-sales-orders', [App\Http\Controllers\SalesOrderController::class,'index']);
+
+
+    Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class,'index']);
+
+    Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class,'index']);
+
 
 
     Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
@@ -305,8 +311,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
 
     Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
-
-
 
     Route::apiResource('approval-instances', App\Http\Controllers\ApprovalInstanceController::class);
 
