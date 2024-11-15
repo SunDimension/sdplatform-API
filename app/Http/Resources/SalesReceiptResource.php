@@ -14,6 +14,8 @@ class SalesReceiptResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $details = is_string($this->payment_detail) ? json_decode($this->payment_detail, true) : $this->payment_detail;
+
         return [
             'id' => $this->id,
             'customer_id' => $this->customer_id,
@@ -29,12 +31,13 @@ class SalesReceiptResource extends JsonResource
             'payment_type' => $this->payment_type,
             'sales_order_id' => $this->sales_order_id,
             'sales_order' =>  new SalesOrderResource($this->whenLoaded('salesOrder')),
-            // 'items_sold' => ItemSoldResource::collection($this->whenLoaded('itemsSold')),
-            // 'sales_invoice' => $this->sales_invoice,
+            //'items_sold' => ItemSoldResource::collection($this->whenLoaded('itemsSold')),
+            //'sales_invoice' => $this->sales_invoice,
             'amount_paid' => $this->amount_paid,
             'receipt_date' => $this->receipt_date,
             'total_amount' => $this->total_amount,
-            'payment_detail' => $this->payment_detail,
+            'payment_detail' => $details,
+            //'cash'
         ];
     }
 }

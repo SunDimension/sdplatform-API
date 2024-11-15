@@ -24,51 +24,89 @@ class SalesReceiptController extends Controller
     {
 
 
-    $validated = $request->validate([
-        'store_id' => 'nullable|integer|exists:stores,id',
-        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
-        'from_date' => 'nullable|date',
-        'to_date' => 'nullable|date',
-    ]);
-
-    $storeId = $validated['store_id'] ?? null;
-    $branchId = $validated['branch_id'] ?? null;
-    $fromDate = $validated['from_date'] ?? null;
-    $toDate = $validated['to_date'] ?? null;
-
-    // Start building the query
-    $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
-        ->when($storeId, function ($query, $storeId) {
-            return $query->where('store_id', $storeId);
-        })
-        ->when($branchId, function ($query, $branchId) {
-            // Filter SalesOrder by matching branch_id in related Store
-            return $query->whereHas('store', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
-            });
-        });
-
-    // Handle date filtering with proper range logic
-    if ($fromDate && $toDate) {
-        // Ensure fromDate is not after toDate
-        $query->whereBetween('created_at', [
-            Carbon::parse($fromDate)->startOfDay(),
-            Carbon::parse($toDate)->endOfDay(),
+        $validated = $request->validate([
+            'store_id' => 'nullable|integer|exists:stores,id',
+            'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
         ]);
-    } elseif ($fromDate) {
-        $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
-    } elseif ($toDate) {
-        $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+
+        $storeId = $validated['store_id'] ?? null;
+        $branchId = $validated['branch_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+
+        // Start building the query
+        $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
+            ->when($storeId, function ($query, $storeId) {
+                return $query->where('store_id', $storeId);
+            })
+            ->when($branchId, function ($query, $branchId) {
+                // Filter SalesOrder by matching branch_id in related Store
+                return $query->whereHas('store', function ($query) use ($branchId) {
+                    $query->where('branch_id', $branchId);
+                });
+            });
+
+        // Handle date filtering with proper range logic
+        if ($fromDate && $toDate) {
+            // Ensure fromDate is not after toDate
+            $query->whereBetween('created_at', [
+                Carbon::parse($fromDate)->startOfDay(),
+                Carbon::parse($toDate)->endOfDay(),
+            ]);
+        } elseif ($fromDate) {
+            $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+        } elseif ($toDate) {
+            $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+        }
+
+        // Execute the query and get the filtered results
+        $salesReceipts = $query->get();
+
+        // Return as a resource collection
+        return new SalesReceiptCollection($salesReceipts);
     }
 
-    // Execute the query and get the filtered results
-    $salesReceipts = $query->get();
+    public function myReceipts(Request $request)
+    {
 
-    // Return as a resource collection
-    return new SalesReceiptCollection($salesReceipts);
+        $validated = $request->validate([
+            // 'store_id' => 'nullable|integer|exists:stores,id',
+            // 'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+        ]);
+        $user = auth()->user();
+        // $storeId = $user->store_id;
+        // $branchId = $user->branch_id;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+
+        // Start building the query
+        $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])->where('user_id', $user->id);
+
+        // Handle date filtering with proper range logic
+        if ($fromDate && $toDate) {
+            // Ensure fromDate is not after toDate
+            $query->whereBetween('created_at', [
+                Carbon::parse($fromDate)->startOfDay(),
+                Carbon::parse($toDate)->endOfDay(),
+            ]);
+        } elseif ($fromDate) {
+            $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+        } elseif ($toDate) {
+            $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+        }
+
+        // Execute the query and get the filtered results
+        $salesReceipts = $query->get();
+
+        // Return as a resource collection
+        return new SalesReceiptCollection($salesReceipts);
     }
 
-   public function getbynumber($orderno)
+    public function getbynumber($orderno)
     {
         $salesOrders = SalesReceipt::with(['salesOrder', 'salesOrder.itemSold'])->where('sales_receipt_number', $orderno)->first();
         Log::debug($salesOrders);
@@ -83,7 +121,7 @@ class SalesReceiptController extends Controller
 
         $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($user) {
             // Add your specific criteria for ItemSold here
-            $query->where('store_id', $user->store_id)->where('status','pending'); // Example condition
+            $query->where('store_id', $user->store_id)->where('status', 'pending'); // Example condition
         })->get();
         //Log::debug($salesOrders);
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
@@ -97,7 +135,7 @@ class SalesReceiptController extends Controller
 
         $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
             // Add your specific criteria for ItemSold here
-            $query->where('store_id', $storeId)->where('status','pending');// Example condition
+            $query->where('store_id', $storeId)->where('status', 'pending'); // Example condition
         })->get();
         //Log::debug($salesOrders);
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
@@ -112,9 +150,9 @@ class SalesReceiptController extends Controller
         $salesReceipts = SalesReceipt::where("sales_receipt_number", $orderno)->whereHas('salesOrder.itemSold', function ($query) use ($user) {
             // Add your specific criteria for ItemSold here
             $query->where('store_id', $user->store_id); // Example condition
-        })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($user){
+        })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($user) {
             // Only retrieve specific fields from ItemSold
-            $query->where('store_id', $user->store_id)->where('status','pending');
+            $query->where('store_id', $user->store_id)->where('status', 'pending');
         }])
             // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
             ->first();
@@ -122,7 +160,7 @@ class SalesReceiptController extends Controller
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
     }
 
-    public function pendingReleaseOrder2($orderno,$storeId)
+    public function pendingReleaseOrder2($orderno, $storeId)
     {
         //$salesOrders = SalesReceipt::with('salesorder');
         $user = Auth::user();
@@ -131,9 +169,9 @@ class SalesReceiptController extends Controller
         $salesReceipts = SalesReceipt::where("sales_receipt_number", $orderno)->whereHas('salesOrder.itemSold', function ($query) use ($storeId) {
             // Add your specific criteria for ItemSold here
             $query->where('store_id', $storeId); // Example condition
-        })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($storeId){
+        })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($storeId) {
             // Only retrieve specific fields from ItemSold
-            $query->where('store_id', $storeId)->where('status','pending');
+            $query->where('store_id', $storeId)->where('status', 'pending');
         }])
             // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
             ->first();
@@ -141,7 +179,7 @@ class SalesReceiptController extends Controller
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
     }
 
-   public function store(SalesReceiptStoreRequest $request)
+    public function store(SalesReceiptStoreRequest $request)
     {
         $data = $request->validated();
         $salesreceipt = SalesReceipt::create($data);
