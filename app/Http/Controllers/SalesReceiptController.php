@@ -7,6 +7,7 @@ use App\Http\Requests\SalesReceiptStoreRequest;
 use App\Http\Requests\SalesReceiptUpdateRequest;
 use App\Http\Resources\SalesReceiptCollection;
 use App\Http\Resources\SalesReceiptResource;
+use App\Models\PostOutflow;
 use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
@@ -187,6 +188,20 @@ class SalesReceiptController extends Controller
         $order->status = 'Paid';
         $order->save();
 
+        $payments = $data['payment_detail'];
+
+        $filteredPayments = array_filter($payments, function ($payment) {
+            return $payment['payment_type']  == 'Deposit';
+        });
+
+        if(count($filteredPayments)==1)
+        {
+            $filteredPayments = array_values($filteredPayments);
+            Log::debug($filteredPayments);
+            $outflow = ["customer_id"=> $salesreceipt->customer_id, "sales_receipt_id"=>$salesreceipt->id , "amount"=>$filteredPayments[0]['amount'], 'outflow_mode'=> 7,'outflow_date'=>now()];
+            PostOutflow::create($outflow);
+        }
+        
         //return new SalesReceiptResource($salesreceipt);
         return response()->json(['message' => 'Sales Receipt Created Successfully', 'data' => $salesreceipt], 200);
     }

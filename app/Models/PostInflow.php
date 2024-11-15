@@ -19,13 +19,14 @@ class PostInflow extends Model
         "narration",
         "inflow_date",
         "inflow_status",
+        'customer_id'
     ];
 
     protected $casts =[
-
         "id"=>"integer",
         "bank_id"=>"integer",
-        "inflow_status"=>"integer"
+        "inflow_status"=>"integer",
+        "customer_id"=>"integer"
     ];
 
     public function bank(): BelongsTo

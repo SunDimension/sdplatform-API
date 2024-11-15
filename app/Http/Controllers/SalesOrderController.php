@@ -8,6 +8,8 @@ use App\Http\Resources\StoreCollection;
 use Illuminate\Http\Request;
 use App\Models\SalesOrder;
 use App\Models\ItemSold;
+use App\Models\PostInflow;
+use App\Models\PostOutflow;
 use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
 use App\Models\StoreItem;
@@ -162,7 +164,16 @@ public function getStores(Request $request)
     public function getbynumber($orderno)
     {
         $salesOrders = SalesOrder::with('itemSold')->where('sales_order_number', $orderno)->first();
-        return response()->json(['data' => new SalesOrderResource($salesOrders)]);
+        $customerId = $salesOrders->customer_id;
+        $inflows = PostInflow::where('customer_id', $customerId)->where('inflow_status',3)->sum('amount');;
+        $outflows = PostOutflow::where('customer_id', $customerId)->sum('amount');
+
+        Log::debug($inflows);
+        Log::debug($outflows);
+
+        $balance = $inflows-$outflows;
+
+        return response()->json(['data' => new SalesOrderResource($salesOrders, $balance) ]);
     }
 
     public function show($id)

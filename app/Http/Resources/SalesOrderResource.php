@@ -7,6 +7,12 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class SalesOrderResource extends JsonResource
 {
+    private $extraParam;
+
+    public function __construct($resource, $extraParam = null) {
+        parent::__construct($resource);
+        $this->extraParam = $extraParam;
+    }
     /**
      * Transform the resource into an array.
      *
@@ -34,7 +40,7 @@ class SalesOrderResource extends JsonResource
             'status'=>$this->status,
             'updated_at'=>$this->updated_at,
             'items'=> ItemSoldResource::collection($this->whenLoaded('itemSold')),
-
+            'deposit'=> $this->extraParam == null ? 0 : $this->extraParam,
         ];
     }
 }

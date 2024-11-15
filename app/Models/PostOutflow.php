@@ -20,17 +20,20 @@ class PostOutflow extends Model
         "bene_bank",
         "narration",
         "outflow_date",
-        "outflow_mode"
-    
+        "outflow_mode",
+        "customer_id",
+        "sales_receipt_id"    
     ];
 
     protected $cast =[
         "id"=>"integer",
         "org_bank"=>"integer",
-        "bene_bank"=>"integer"
+        "bene_bank"=>"integer",
+        "customer_id"=>"integer",
+        "sales_receipt_id"=>"integer"
     ];
 
-          public function bank(): BelongsTo
+    public function bank(): BelongsTo
     {
         return $this->belongsTo(Bank::class);
     }
