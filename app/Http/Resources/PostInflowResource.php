@@ -21,6 +21,7 @@ class PostInflowResource extends JsonResource
             'narration' => $this->narration,
             'inflow_date' => $this->inflow_date,
             'inflow_status' => $this->inflow_status,
+            'customer_id' =>$this->customer_id,
         ];
     }
 }

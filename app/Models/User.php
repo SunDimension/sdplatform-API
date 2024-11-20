@@ -79,4 +79,16 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Store::class);
     }
-}
+
+    public function hasPermissionTo($name)
+    {
+        foreach ($this->roles as $role) {
+            if ($role->permissions->contains('name', $name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    }
+  
+

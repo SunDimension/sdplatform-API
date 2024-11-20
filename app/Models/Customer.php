@@ -19,6 +19,7 @@ class Customer extends Model
     protected $fillable = [
         'customer_type_id',
         'title_id',
+        'branch_id',
         'surname',
         'firstname',
         'middlename',
@@ -49,6 +50,10 @@ class Customer extends Model
     public function title(): BelongsTo
     {
         return $this->belongsTo(Title::class);
+    }
+      public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
     }
 
       public function creditlimit(): BelongsTo

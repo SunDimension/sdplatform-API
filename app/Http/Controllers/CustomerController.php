@@ -9,13 +9,27 @@ use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
     public function index(Request $request): CustomerCollection
     {
-        $customers = Customer::all();
-        return new CustomerCollection($customers);
+    // Check if the user can view customers
+        $user = auth()->user();
+        if (Gate::allows('Can view All Customers')) {
+            $customers = Customer::all();
+            Log::alert('ED');
+            return new CustomerCollection($customers);
+        }
+        elseif (Gate::allows('Can see branch customers')) {
+            Log::alert('ED3');
+            $customers = Customer::where('branch_id', $user->branch_id)->get();
+            return new CustomerCollection($customers);
+        }
+        
+        return new CustomerCollection([]);
     }
 
     public function store(CustomerStoreRequest $request): CustomerResource
@@ -34,6 +48,7 @@ class CustomerController extends Controller
 
     public function show(Request $request, Customer $customer): CustomerResource
     {
+        $this->authorize('view-customer');
         return new CustomerResource($customer);
     }
 

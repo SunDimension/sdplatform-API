@@ -37,5 +37,11 @@ class PostInflow extends Model
        public function inflowStatus(): BelongsTo
     {
         return $this->belongsTo(InflowStatus::class);
+
+    }
+
+       public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
 }
