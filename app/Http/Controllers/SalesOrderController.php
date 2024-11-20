@@ -179,7 +179,7 @@ public function getStores(Request $request)
     public function show($id)
     {
         // Retrieve the sales order by its ID along with related data
-        $salesOrder = SalesOrder::with('customer', 'branch', 'store', 'itemsold')->findOrFail($id);
+        $salesOrder = SalesOrder::with('customer', 'branch', 'store', 'itemSold')->findOrFail($id);
 
         // Return the sales order as a JSON response
         return response()->json(['data' => new SalesOrderResource($salesOrder)]);
