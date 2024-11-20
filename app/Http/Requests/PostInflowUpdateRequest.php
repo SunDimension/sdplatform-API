@@ -21,12 +21,14 @@ class PostInflowUpdateRequest extends FormRequest
      */
     public function rules(): array
     {
-          return [
-            'bank_id'    => 'nullable', // Ensure it exists
-            'customer_id' => 'required|exists:customers,id',
+        return [
+            'bank_id'    => 'required|exists:banks,id', // Ensure it exists
             'amount'     => 'nullable|numeric',         // Ensure it exists
             'narration'   => 'nullable|string', 
             'inflow_date'   => 'nullable|date',     
+            'inflow_status'   => 'nullable',     
+            'id'   => 'required',     
+            'customer_id'   => 'nullable',     
            
         ];
     }
