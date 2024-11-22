@@ -169,7 +169,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('statuses', App\Http\Controllers\StatusController::class);
 
-    Route::apiResource('inflow-statuses', App\Http\Controllers\inflowStatusController::class);
 
     Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
 
