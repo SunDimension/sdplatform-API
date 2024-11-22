@@ -338,24 +338,24 @@ public function getStores(Request $request)
         }
 
         // Update Sales Receipt if payment is made
-        if (!empty($validated['payment'])) {
-            SalesReceipt::updateOrCreate(
-                [
-                    'sales_order_id' => $salesOrder->id,
-                    'sales_receipt_number' => $validated['payment']['sales_receipt_number'], // Ensuring uniqueness
-                ],
-                [
-                    'sales_invoice_id' => $validated['payment']['sales_invoice_id'],
-                    'customer_id' => $validated['customer_id'],
-                    'branch_id' => $validated['branch_id'],
-                    'store_id' => $validated['store_id'],
-                    'total_amount' => $validated['payment']['total_amount'],
-                    'amount_paid' => $validated['payment']['amount_paid'],
-                    'payment_mode_id' => $validated['payment']['payment_mode_id'],
-                    'receipt_date' => now(),
-                ]
-            );
-        }
+        // if (!empty($validated['payment'])) {
+        //     SalesReceipt::updateOrCreate(
+        //         [
+        //             'sales_order_id' => $salesOrder->id,
+        //             'sales_receipt_number' => $validated['payment']['sales_receipt_number'], // Ensuring uniqueness
+        //         ],
+        //         [
+        //             'sales_invoice_id' => $validated['payment']['sales_invoice_id'],
+        //             'customer_id' => $validated['customer_id'],
+        //             'branch_id' => $validated['branch_id'],
+        //             'store_id' => $validated['store_id'],
+        //             'total_amount' => $validated['payment']['total_amount'],
+        //             'amount_paid' => $validated['payment']['amount_paid'],
+        //             'payment_mode_id' => $validated['payment']['payment_mode_id'],
+        //             'receipt_date' => now(),
+        //         ]
+        //     );
+        // }
 
         return response()->json(['message' => 'Sales Order Updated Successfully', 'sales_order' => $salesOrder], 200);
     }
