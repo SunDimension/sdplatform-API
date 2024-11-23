@@ -291,8 +291,13 @@ public function getStores(Request $request)
             'items.*.product_id' => 'required|exists:create_items,id',
             'items.*.quantity' => 'required|integer',
             'items.*.unit_price' => 'required|numeric',
-            'invoice' => 'nullable|array',
+            // 'invoice' => 'nullable|array',
+            'total_amount' => 'required|numeric',
+            // 'invoice' => 'nullable|array',
             'payment' => 'nullable|array',
+            // 'payment.total_amount' => 'required|numeric',
+            // 'payment.amount_paid' => 'required|numeric',
+            'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit', 
         ]);
 
         // Find and update the Sales Order
@@ -302,6 +307,8 @@ public function getStores(Request $request)
             'branch_id' => $validated['branch_id'],
             'store_id' => $validated['store_id'],
             'credit_limit' => $validated['credit_limit'] ?? null,
+            'total_amount' => $validated['total_amount'] ?? null,
+            'payment_type' => $validated['payment']['payment_type'],
 
         ]);
 
@@ -322,20 +329,20 @@ public function getStores(Request $request)
         }
 
         // Update Sales Invoice if payment is deferred
-        if (!empty($validated['invoice'])) {
-            SalesInvoice::updateOrCreate(
-                [
-                    'sales_order_id' => $salesOrder->id,
-                    'sales_invoice_number' => $validated['invoice']['sales_invoice_number'], // Ensuring uniqueness
-                ],
-                [
-                    'product_id' => $validated['invoice']['product_id'],
-                    'unit_price' => $validated['invoice']['unit_price'],
-                    'amount' => $validated['invoice']['amount'],
-                    'invoice_date' => now(),
-                ]
-            );
-        }
+        // if (!empty($validated['invoice'])) {
+        //     SalesInvoice::updateOrCreate(
+        //         [
+        //             'sales_order_id' => $salesOrder->id,
+        //             'sales_invoice_number' => $validated['invoice']['sales_invoice_number'], // Ensuring uniqueness
+        //         ],
+        //         [
+        //             'product_id' => $validated['invoice']['product_id'],
+        //             'unit_price' => $validated['invoice']['unit_price'],
+        //             'amount' => $validated['invoice']['amount'],
+        //             'invoice_date' => now(),
+        //         ]
+        //     );
+        // }
 
         // Update Sales Receipt if payment is made
         // if (!empty($validated['payment'])) {
