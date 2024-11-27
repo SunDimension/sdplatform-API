@@ -81,10 +81,6 @@ class PostInflowController extends Controller
 
     public function update(PostInflowUpdateRequest $request, $post_inflow): PostInflowResource
     {
-        // FacadesLog::debug('Route Parameters: ' . json_encode(request()->route()->parameters()));
-        // FacadesLog::debug('PostInflow Instance: ' . json_encode($postinflow));
-        // FacadesLog::debug('Validated Data: ' . json_encode($request->validated()));
-
         $postinflow = PostInflow::findOrFail($post_inflow);
 
         $data = $request->validated();
