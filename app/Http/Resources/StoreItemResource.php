@@ -26,7 +26,7 @@ class StoreItemResource extends JsonResource
             'quantity'=>$this->quantity - $this->quantity_holding, 
             'quantity_holding'=>$this->quantity_holding, 
             'store_id'=>$this->store_id,
-            'user_id'=>$this->user_id,
+            
             'discount'=>$this->discount,
           
            
