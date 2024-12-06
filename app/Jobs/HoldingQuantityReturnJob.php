@@ -28,6 +28,6 @@ class HoldingQuantityReturnJob implements ShouldQueue
      */
     public function handle(): void
     {
-        DB::exec("call `release_daily_holding_quantity`()");
+        DB::select("call `release_daily_holding_quantity`()");
     }
 }

@@ -136,8 +136,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
     Route::get('get-inventory-by-branch-store/{itemId}/{branchId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStoreBranch"]);
 
-
-
+    Route::apiResource('item_price', App\Http\Controllers\ItemPriceController::class);
     Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
 
     Route::apiResource('item-sold', App\Http\Controllers\ItemSoldController::class);
@@ -169,6 +168,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('statuses', App\Http\Controllers\StatusController::class);
 
+    Route::apiResource('inflow-statuses', App\Http\Controllers\InflowStatusController::class);
 
     Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
 

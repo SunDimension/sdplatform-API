@@ -11,6 +11,7 @@ use App\Models\Store;
 use App\Models\StoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 // use Illuminate\Support\Facades\Auth;
 
 class StoreItemController extends Controller
@@ -57,8 +58,12 @@ class StoreItemController extends Controller
         return new StoreItemResource($storeitem);
     }
 
-    public function update(StoreItemUpdateRequest $request, StoreItem $storeitem): StoreItemResource
-    {
+    public function update(StoreItemUpdateRequest $request,  $id): StoreItemResource
+    {   
+      Log::debug($request->validated());
+      $storeitem = StoreItem::findOrFail($id);
+        Log::debug($storeitem);
+        
         $storeitem->update($request->validated());
 
         return new StoreItemResource($storeitem);
