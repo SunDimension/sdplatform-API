@@ -23,8 +23,6 @@ return new class extends Migration
             $table->string('address')->nullable();
             $table->foreignId('customer_type_id')->constrained()->onDelete('cascade');
             $table->foreignId('credit_limit_id')->constrained()->onDelete('cascade');
-             
-           
             $table->string('amount_paid');
             $table->string('total_amount');
             $table->timestamps();

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
@@ -24,10 +25,11 @@ class Customer extends Model
         'firstname',
         'middlename',
         'phone_number',
-            'name',
+        'name',
         'email',
         'address',
-        'credit_limit'
+        'credit_limit',
+        'credit_balance'
     ];
 
     /**
@@ -39,7 +41,8 @@ class Customer extends Model
         'id' => 'integer',
         'customer_type_id' => 'integer',
         'title_id' => 'integer',
-        'credit_limit'=>'integer'
+        'credit_limit' => 'decimal:2',
+        'credit_balance' => 'decimal:2'
     ];
 
     public function customerType(): BelongsTo
@@ -51,13 +54,18 @@ class Customer extends Model
     {
         return $this->belongsTo(Title::class);
     }
-      public function branch(): BelongsTo
+    public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
-      public function creditlimit(): BelongsTo
+    public function creditlimit(): BelongsTo
     {
         return $this->belongsTo(CreditLimit::class);
+    }
+
+    public function salesOrder(): HasMany
+    {
+        return $this->hasMany(SalesOrder::class);
     }
 }

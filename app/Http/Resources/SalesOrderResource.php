@@ -40,6 +40,7 @@ class SalesOrderResource extends JsonResource
             'status'=>$this->status,
             'updated_at'=>$this->updated_at,
             'items'=> ItemSoldResource::collection($this->whenLoaded('itemSold')),
+            'customer'=> new CustomerResource($this->whenLoaded('customer')),
             'deposit'=> $this->extraParam == null ? 0 : $this->extraParam,
         ];
     }

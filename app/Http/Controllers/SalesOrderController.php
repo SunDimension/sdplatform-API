@@ -142,28 +142,25 @@ public function getStores(Request $request)
     //     return new SalesOrderCollection($salesOrders);
     // }
 
-
-
-
-
     public function pendingReceipts(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::where('status', 'Pending')->whereNot('payment_type', 'Credit')->get();
-        Log::debug($salesOrders);
+        $salesOrders = SalesOrder::where('status', 'Pending')->where("branch_id", auth()->user()->branch_id)->get();
+        // Log::debug($salesOrders);
         return response()->json(['data' => SalesOrderResource::collection($salesOrders)]);
     }
 
     public function pendingCredit(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
-        $salesOrders = SalesOrder::where('status', 'Pending')->where('payment_type', 'Credit')->get();
+        $salesOrders = SalesOrder::where('status', 'Credit Pending')->where('payment_type', 'Credit')->where("branch_id", auth()->user()->branch_id)->get();
+        
         return response()->json(['data' => SalesOrderResource::collection($salesOrders)]);
     }
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesOrder::with('itemSold')->where('sales_order_number', $orderno)->first();
+        $salesOrders = SalesOrder::with('itemSold','customer')->where('sales_order_number', $orderno)->first();
         $customerId = $salesOrders->customer_id;
         $inflows = PostInflow::where('customer_id', $customerId)->where('inflow_status',3)->sum('amount');;
         $outflows = PostOutflow::where('customer_id', $customerId)->sum('amount');
@@ -229,17 +226,23 @@ public function getStores(Request $request)
 
         $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
         // Create a new Sales Order
-        $salesOrder = SalesOrder::create([
+
+        $order = [
             'sales_order_number' => $salesOrderNumber,
             'customer_id' => $validated['customer_id'],
             'branch_id' => $validated['branch_id'],
             'store_id' => $validated['store_id'],
             'user_id' => $validated['user_id'],
-            'credit_limit' => $validated['credit_limit'] ?? null,
+            // 'credit_limit' => $validated['credit_limit'] ?? null,
             'total_amount' => $validated['total_amount'] ?? null,
             'payment_type' => $validated['payment']['payment_type'],
+        ];
 
-        ]);
+        if($validated['payment']['payment_type']=='Credit')
+        {
+            $order["status"]= 'Credit Pending';
+        }
+        $salesOrder = SalesOrder::create($order);
 
         //Log::alert($validated);
         // Update Items Sold

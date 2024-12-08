@@ -1,0 +1,24 @@
+models: 
+  CreditTransaction:
+    id: id primary
+    branch_id: id foreign:branches
+    customer_id: id foreign:customers
+    sales_order_id: id nullable foreign:sales_orders
+    sales_receipt_id: id nullable foreign:sales_receipts
+    amount: decimal(12,2)
+    credit_limit: decimal(12,2) nullable
+    credit_balance_before: decimal(12,2) nullable
+    type: enum:('credit', 'payment') 
+    created_by: id foreign:users
+    modified_by: id nullable foreign:users
+    deleted_by: id nullable foreign:users
+    softDeletes
+    relationships:
+      hasMany: Branch,Customer,SalesOrder,SalesReceipt
+    
+
+controllers:
+  CreditTransaction:
+    resource: api
+  
+  
