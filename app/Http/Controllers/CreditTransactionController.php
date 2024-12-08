@@ -38,7 +38,7 @@ class CreditTransactionController extends Controller
             $salesOrder->save();
 
             $customer = Customer::findOrFail($creditTransaction->customer_id);
-            $customer->credit_balance = $customer->credit_balance - $creditTransaction->amount;
+            $customer->credit_balance = $customer->credit_balance??$customer->credit_limit - $creditTransaction->amount;
             $customer->save(); 
         }
         elseif($creditTransaction->type == 'payment')
