@@ -5,7 +5,7 @@ use App\Http\Controllers\CreateItemController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RolesController;
-
+use App\Http\Controllers\SalesOrderController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -126,8 +126,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class, 'getbynumber']);
     Route::get('/sales-receipt-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class, 'getbynumber']);
     Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
+    // Route::post('sales-order', App\Http\Controllers\SalesOrderController::class);
 
-    Route::apiResource('sales-invoice', App\Http\Controllers\SalesInvoiceController::class);
+    Route::post('/sales-orders/{id}/cancel', [SalesOrderController::class, 'cancel']);
+
+
 
     /////////// StoreItem////////////////////////////////////////
 
