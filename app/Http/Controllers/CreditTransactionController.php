@@ -32,7 +32,7 @@ class CreditTransactionController extends Controller
             ->whereIn('status', ['Approved', 'Paid'])
             ->where('branch_id', auth()->user()->branch_id)
             ->withSum('salesReceipts as total_paid', 'amount_paid')
-            ->having('total_paid', '!=', DB::raw('total_amount'))
+            ->having('total_paid', '<', DB::raw('total_amount'))
             ->get();
 
         // Log::info("Da", $orders);
