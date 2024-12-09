@@ -1,40 +1,13 @@
 created:
-    - app/Http/Controllers/ReceiveOrderController.php
-    - app/Http/Controllers/ReceiveItemController.php
-    - app/Http/Controllers/StoreTransferOrderController.php
-    - app/Http/Controllers/StoreTransferItemController.php
-    - database/factories/ReceiveOrderFactory.php
-    - database/factories/ReceiveItemFactory.php
-    - database/factories/StoreTransferOrderFactory.php
-    - database/factories/StoreTransferItemFactory.php
-    - database/migrations/2024_10_31_004258_create_receive_orders_table.php
-    - database/migrations/2024_10_31_004259_create_receive_items_table.php
-    - database/migrations/2024_10_31_004300_create_store_transfer_orders_table.php
-    - database/migrations/2024_10_31_004301_create_store_transfer_items_table.php
-    - app/Models/ReceiveOrder.php
-    - app/Models/ReceiveItem.php
-    - app/Models/StoreTransferOrder.php
-    - app/Models/StoreTransferItem.php
-    - tests/Feature/Http/Controllers/ReceiveOrderControllerTest.php
-    - tests/Feature/Http/Controllers/ReceiveItemControllerTest.php
-    - tests/Feature/Http/Controllers/StoreTransferOrderControllerTest.php
-    - tests/Feature/Http/Controllers/StoreTransferItemControllerTest.php
-    - app/Http/Requests/ReceiveOrderStoreRequest.php
-    - app/Http/Requests/ReceiveOrderUpdateRequest.php
-    - app/Http/Requests/ReceiveItemStoreRequest.php
-    - app/Http/Requests/ReceiveItemUpdateRequest.php
-    - app/Http/Requests/StoreTransferOrderStoreRequest.php
-    - app/Http/Requests/StoreTransferOrderUpdateRequest.php
-    - app/Http/Requests/StoreTransferItemStoreRequest.php
-    - app/Http/Requests/StoreTransferItemUpdateRequest.php
-    - app/Http/Resources/ReceiveOrderCollection.php
-    - app/Http/Resources/ReceiveOrderResource.php
-    - app/Http/Resources/ReceiveItemCollection.php
-    - app/Http/Resources/ReceiveItemResource.php
-    - app/Http/Resources/StoreTransferOrderCollection.php
-    - app/Http/Resources/StoreTransferOrderResource.php
-    - app/Http/Resources/StoreTransferItemCollection.php
-    - app/Http/Resources/StoreTransferItemResource.php
+    - app/Http/Controllers/CreditTransactionController.php
+    - database/factories/CreditTransactionFactory.php
+    - database/migrations/2024_12_08_001935_create_credit_transactions_table.php
+    - app/Models/CreditTransaction.php
+    - tests/Feature/Http/Controllers/CreditTransactionControllerTest.php
+    - app/Http/Requests/CreditTransactionStoreRequest.php
+    - app/Http/Requests/CreditTransactionUpdateRequest.php
+    - app/Http/Resources/CreditTransactionCollection.php
+    - app/Http/Resources/CreditTransactionResource.php
 updated:
     - routes/api.php
 models:
@@ -119,3 +92,4 @@ models:
     ReceiveItem: { id: 'uuid primary', receive_order_id: 'uuid foreign:receive_orders', quantity: int, unit_price: double, product_id: 'id foreign:create_items.id', description: 'text nullable', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
     StoreTransferOrder: { id: 'uuid primary', order_number: string, transfer_date: timestamp, source_branch_id: 'id foreign:branches.id', source_store_id: 'id foreign:stores', destination_branch_id: 'id foreign:branches.id', destination_store_id: 'id foreign:stores', approval_stage_id: 'id foreign:approval_stages.id', source_status: "enum('pending','approved', 'cancelled')", source_date_approved: 'timestamp nullable', destination_status: "enum('pending','approved', 'cancelled')", destination_date_approved: 'timestamp nullable', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: ReceiveItem } }
     StoreTransferItem: { id: 'uuid primary', transfer_order_id: 'uuid foreign:store_transfer_orders.id', quantity: int, unit_price: double, product_id: 'id foreign:create_items.id', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
+    CreditTransaction: { id: 'id primary', branch_id: 'id foreign:branches', customer_id: 'id foreign:customers', sales_order_id: 'id nullable foreign:sales_orders', sales_receipt_id: 'id nullable foreign:sales_receipts', amount: 'decimal(12,2)', credit_limit: 'decimal(12,2) nullable', credit_balance_before: 'decimal(12,2) nullable', type: "enum:('credit', 'payment')", created_by: 'id foreign:users', modified_by: 'id nullable foreign:users', deleted_by: 'id nullable foreign:users', softdeletes: softDeletes, relationships: { hasMany: 'Branch,Customer,SalesOrder,SalesReceipt' } }

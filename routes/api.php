@@ -114,14 +114,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class,'index']);
 
-
-
     Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
     Route::post('my-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'myReceipts']);
 
     Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
 
-    Route::get('/sales-orders/pending-credit', [App\Http\Controllers\SalesOrderController::class, 'pendingCredit']);
+    Route::get('/credit-awaiting-payment', [App\Http\Controllers\CreditTransactionController::class, 'pendingPayment']);
+    Route::get('/sales-orders-pending-credit', [App\Http\Controllers\SalesOrderController::class, 'pendingCredit']);
     Route::get('/sales-orders-pending-receipt', [App\Http\Controllers\SalesOrderController::class, 'pendingReceipts']);
     Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class, 'getbynumber']);
     Route::get('/sales-receipt-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class, 'getbynumber']);
@@ -133,7 +132,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     /////////// StoreItem////////////////////////////////////////
-
 
     Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
     Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
@@ -337,4 +335,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
 
     Route::apiResource('store-transfer-items', App\Http\Controllers\StoreTransferItemController::class);
+    Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class);
 });
+
+

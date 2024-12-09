@@ -131,7 +131,7 @@ class SalesReceiptController extends Controller
     public function pendingReleaseStore($storeId)
     {
         //$salesOrders = SalesReceipt::with('salesorder');
-        $user = Auth::user();
+        //$user = Auth::user();
         // Log::debug($user);
 
         $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {

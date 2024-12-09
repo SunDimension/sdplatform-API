@@ -25,7 +25,9 @@ class CustomerResource extends JsonResource
             'customer_type_id' => $this->customer_type_id,
             'title_id' => $this->title_id,
             'branch_id'=>$this->branch_id,
-            'branch_name'=>$this->branch_name
+            'branch_name'=>$this->branch_name,
+            'credit_limit' => $this->credit_limit,
+            'credit_balance' => $this->credit_balance ??$this->credit_limit 
             
         ];
     }

@@ -66,6 +66,7 @@ class SalesOrder extends Model
     {
         return $this->belongsTo(Store::class, 'store_id');
     }
+    
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');
@@ -78,6 +79,6 @@ class SalesOrder extends Model
 
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, "customer_id");
     }
 }
