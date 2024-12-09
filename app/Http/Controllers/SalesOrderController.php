@@ -160,7 +160,8 @@ public function getStores(Request $request)
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesOrder::with('itemSold','customer')->where('sales_order_number', $orderno)->first();
+        $salesOrders = SalesOrder::with('itemSold','customer')->where('sales_order_number', $orderno)->withSum('salesReceipts as total_paid', 'amount_paid')->first();
+
         $customerId = $salesOrders->customer_id;
         $inflows = PostInflow::where('customer_id', $customerId)->where('inflow_status',3)->sum('amount');;
         $outflows = PostOutflow::where('customer_id', $customerId)->sum('amount');

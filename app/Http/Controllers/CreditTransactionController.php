@@ -13,6 +13,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class CreditTransactionController extends Controller
@@ -29,7 +30,7 @@ class CreditTransactionController extends Controller
     {
         $orders = SalesOrder::where('payment_type', 'Credit')
             ->whereIn('status', ['Approved', 'Paid'])
-            ->whereIn('branch', auth()->user()->branch_id)
+            ->where('branch_id', auth()->user()->branch_id)
             ->withSum('salesReceipts as total_paid', 'amount_paid')
             ->having('total_paid', '!=', DB::raw('total_amount'))
             ->get();

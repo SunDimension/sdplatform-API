@@ -7,6 +7,8 @@ use App\Http\Requests\SalesReceiptStoreRequest;
 use App\Http\Requests\SalesReceiptUpdateRequest;
 use App\Http\Resources\SalesReceiptCollection;
 use App\Http\Resources\SalesReceiptResource;
+use App\Models\CreditTransaction;
+use App\Models\Customer;
 use App\Models\PostOutflow;
 use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
@@ -194,14 +196,38 @@ class SalesReceiptController extends Controller
             return $payment['payment_type']  == 'Deposit';
         });
 
-        if(count($filteredPayments)==1)
-        {
+        $filteredPayments = array_filter($payments, function ($payment) {
+            return $payment['payment_type']  == 'Deposit';
+        });
+
+        $filteredPayments1 = array_filter($payments, function ($payment) {
+            return $payment['payment_type']  == 'Credit';
+        });
+
+        if (count($filteredPayments) == 1) {
             $filteredPayments = array_values($filteredPayments);
             Log::debug($filteredPayments);
-            $outflow = ["customer_id"=> $salesreceipt->customer_id, "sales_receipt_id"=>$salesreceipt->id , "amount"=>$filteredPayments[0]['amount'], 'outflow_mode'=> 7,'outflow_date'=>now()];
+            $outflow = ["customer_id" => $salesreceipt->customer_id, "sales_receipt_id" => $salesreceipt->id, "amount" => $filteredPayments[0]['amount'], 'outflow_mode' => 7, 'outflow_date' => now()];
             PostOutflow::create($outflow);
         }
-        
+
+        if ($order->payment_type == "Credit" && count($filteredPayments1) == 0) {
+            $customer = Customer::findOrFail($salesreceipt->customer_id);
+            $data1 = [
+                'branch_id' => $salesreceipt->branch_id,
+                'customer_id' => $salesreceipt->customer_id,
+                'sales_receipt_id' => $salesreceipt->id,
+                'amount' => $salesreceipt->amount_paid,
+                'credit_limit' => $customer->credit_limit,
+                'credit_balance_before' => $customer->credit_balance,
+                'type' => 'payment',
+                'created_by' => auth()->user()->id
+            ];
+            $creditTransaction = CreditTransaction::create($data1);
+            $customer->credit_balance = $customer->credit_balance + $creditTransaction->amount;
+            $customer->save();
+        }
+
         //return new SalesReceiptResource($salesreceipt);
         return response()->json(['message' => 'Sales Receipt Created Successfully', 'data' => $salesreceipt], 200);
     }
