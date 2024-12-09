@@ -42,6 +42,7 @@ class SalesOrderResource extends JsonResource
             'items'=> ItemSoldResource::collection($this->whenLoaded('itemSold')),
             'customer'=> new CustomerResource($this->whenLoaded('customer')),
             'deposit'=> $this->extraParam == null ? 0 : $this->extraParam,
+            'total_paid'=> $this->total_paid ?? null,
         ];
     }
 }

@@ -6,12 +6,14 @@ use App\Http\Requests\CreditTransactionStoreRequest;
 use App\Http\Requests\CreditTransactionUpdateRequest;
 use App\Http\Resources\CreditTransactionCollection;
 use App\Http\Resources\CreditTransactionResource;
+use App\Http\Resources\SalesOrderCollection;
 use App\Models\CreditTransaction;
 use App\Models\Customer;
 use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class CreditTransactionController extends Controller
 {
@@ -21,6 +23,22 @@ class CreditTransactionController extends Controller
 
         return new CreditTransactionCollection($creditTransactions);
     }
+
+
+    public function pendingPayment()
+    {
+        $orders = SalesOrder::where('payment_type', 'Credit')
+            ->whereIn('status', ['Approved', 'Paid'])
+            ->whereIn('branch', auth()->user()->branch_id)
+            ->withSum('salesReceipts as total_paid', 'amount_paid')
+            ->having('total_paid', '!=', DB::raw('total_amount'))
+            ->get();
+
+        // Log::info("Da", $orders);
+        return new SalesOrderCollection($orders);
+    }
+
+
 
     public function store(CreditTransactionStoreRequest $request)
     {
@@ -53,7 +71,7 @@ class CreditTransactionController extends Controller
                     'total_amount' => $salesOrder->total_amount,
                     'amount_paid' => 0,
                     'receipt_date' => now(),
-                    'payment_detail' => [["amount"=>$salesOrder->total_amount,"payment_type"=>"Credit"]],
+                    'payment_detail' => [["amount" => $salesOrder->total_amount, "payment_type" => "Credit"]],
                 ];
                 SalesReceipt::create($data);
             }
