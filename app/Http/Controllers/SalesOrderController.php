@@ -370,4 +370,60 @@ public function getStores(Request $request)
 
         return response()->json(['message' => 'Sales Order Updated Successfully', 'sales_order' => $salesOrder], 200);
     }
+
+    public function cancel($id)
+{
+    // Start a database transaction
+    DB::beginTransaction();
+
+    try {
+        // Find the sales order
+        $salesOrder = SalesOrder::with('itemSold')->findOrFail($id);
+
+        // Check if the sales order is already canceled
+        if ($salesOrder->status === 'Canceled') {
+            return response()->json(['message' => 'Sales Order is already canceled.'], 400);
+        }
+
+        // Loop through items in the sales order and restore stock
+        foreach ($salesOrder->itemSold as $itemSold) {
+            $storeItem = StoreItem::where('create_item_id', $itemSold->product_id)
+                ->where('store_id', $salesOrder->store_id)
+                ->first();
+
+            // If StoreItem is found, restore stock
+            if ($storeItem) {
+                $storeItem->quantity_holding -= $itemSold->quantity;
+                $storeItem->save();
+            } else {
+                // If StoreItem is not found, log an error (optional) and proceed
+                Log::warning("StoreItem for product {$itemSold->product_id} not found in store {$salesOrder->store_id}");
+                // Optionally, you can also throw an exception here if critical
+            }
+        }
+
+        // Update the sales order status to "Canceled"
+        // $salesOrder->status = 'Cancelled';
+        // $salesOrder->canceled_at = now(); // Optional: Record the cancellation time
+        // $salesOrder->save();
+
+         $salesOrder->delete();
+        // Commit the transaction
+        DB::commit();
+
+        return response()->json(['message' => 'Sales Order Canceled Successfully.'], 200);
+
+    } catch (\Exception $e) {
+        // Rollback the transaction in case of error
+        DB::rollBack();
+
+        // Log the error for debugging
+        Log::error('Error canceling sales order: ' . $e->getMessage());
+
+        // Return a response with error message
+        return response()->json(['message' => 'An error occurred while canceling the order.'], 500);
+    }
+}
+
+
 }
