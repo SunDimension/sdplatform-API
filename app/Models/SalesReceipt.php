@@ -46,17 +46,24 @@ class SalesReceipt extends Model
         'sales_order_id' => 'integer',
         'payment_detail' => 'array',
     ];
-
-   protected static function boot()
+protected static function boot()
 {
     parent::boot();
 
-    // Automatically generate sales_order_number when a new SalesOrder is created
+    // Automatically generate sales_receipt_number when a new SalesReceipt is created
     static::creating(function ($salesReceipt) {
-        $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT); // Generates a random 7-digit number
-        $salesReceipt->sales_receipt_number = 'HGV-SR-' . $randomNumber;
+        do {
+            // Generate a random 7-digit number
+            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+            // Prefix the random number with 'HGV-SR-'
+            $salesReceiptNumber = 'HGV-SR-' . $randomNumber;
+        } while (static::where('sales_receipt_number', $salesReceiptNumber)->exists()); // Check uniqueness in the database
+
+        // Assign the unique sales_receipt_number
+        $salesReceipt->sales_receipt_number = $salesReceiptNumber;
     });
 }
+
 
     public function customer(): BelongsTo
     {

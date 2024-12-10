@@ -34,15 +34,19 @@ class SalesOrder extends Model
         'status'
     ];
     protected static function boot()
-    {
-        parent::boot();
+{
+    parent::boot();
 
-        // Automatically generate sales_order_number when a new SalesOrder is created
-        static::creating(function ($salesOrder) {
-            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT); // Generates a random 7-digit number
-            $salesOrder->sales_order_number = 'HGV-SO-' . $randomNumber;
-        });
-    }
+    static::creating(function ($salesOrder) {
+        do {
+            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+            $salesOrderNumber = 'HGV-SO-' . $randomNumber;
+        } while (static::where('sales_order_number', $salesOrderNumber)->exists());
+
+        $salesOrder->sales_order_number = $salesOrderNumber;
+    });
+}
+
 
     public function itemsold(): hasMany
 
