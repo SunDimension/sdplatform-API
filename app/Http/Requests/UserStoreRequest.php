@@ -22,10 +22,11 @@ class UserStoreRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
              'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-             'password' => ['required', 'string', 'min:8', 'confirmed'],
+             'password' => ['required', 'string', 'min:8'],
             'status_id' => ['required', 'integer', 'exists:statuses,id'],
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
+            'store_id' => ['required', 'integer', 'exists:stores,id'],
         ];
     }
 }

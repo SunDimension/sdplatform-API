@@ -29,11 +29,11 @@ class AuthServiceProvider extends ServiceProvider
 
         $permissions = Permission::with('roles')->get();
 
-    foreach ($permissions as $permission) {
-        Gate::define($permission->name, function ($user) use ($permission) {
-            // Check if the user has the permission via their roles
-            return $user->hasPermission($permission->name);
-        });
-    }
+        foreach ($permissions as $permission) {
+            Gate::define($permission->name, function ($user) use ($permission) {
+                // Check if the user has the permission via their roles
+                return $user->hasPermissionTo($permission->name);
+            });
+        }
     }
 }

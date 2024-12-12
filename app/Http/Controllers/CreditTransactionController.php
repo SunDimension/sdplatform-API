@@ -39,8 +39,6 @@ class CreditTransactionController extends Controller
         return new SalesOrderCollection($orders);
     }
 
-
-
     public function store(CreditTransactionStoreRequest $request)
     {
         $data = $request->validated();
