@@ -37,4 +37,10 @@ class PostOutflow extends Model
     {
         return $this->belongsTo(Bank::class);
     }
+
+    // Outflow.php
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class);
+    }
 }
