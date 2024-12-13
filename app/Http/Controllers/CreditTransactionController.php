@@ -34,11 +34,10 @@ class CreditTransactionController extends Controller
             ->withSum('salesReceipts as total_paid', 'amount_paid')
             ->having('total_paid', '<', DB::raw('total_amount'))
             ->get();
-            
+
         // Log::info("Da", $orders);
         return new SalesOrderCollection($orders);
     }
-
 
 
     public function store(CreditTransactionStoreRequest $request)
@@ -57,7 +56,7 @@ class CreditTransactionController extends Controller
             $salesOrder->save();
 
             $customer = Customer::findOrFail($creditTransaction->customer_id);
-            $customer->credit_balance = ($customer->credit_balance != null ) ? $customer->credit_balance - $creditTransaction->amount: $customer->credit_limit - $creditTransaction->amount;
+            $customer->credit_balance = ($customer->credit_balance != null) ? $customer->credit_balance - $creditTransaction->amount : $customer->credit_limit - $creditTransaction->amount;
             $customer->save();
 
             if ($salesOrder->status == "Approved") {

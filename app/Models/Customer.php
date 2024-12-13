@@ -68,4 +68,19 @@ class Customer extends Model
     {
         return $this->hasMany(SalesOrder::class);
     }
+    public function inflows()
+    {
+        return $this->hasMany(PostInflow::class);
+    }
+
+    public function outflows()
+    {
+        return $this->hasMany(PostOutflow::class);
+    }
+
+    public function creditTransactions()
+    {
+        return $this->hasMany(CreditTransaction::class,"customer_id");
+    }
+    
 }

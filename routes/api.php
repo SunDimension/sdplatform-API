@@ -120,6 +120,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
 
     Route::get('/credit-awaiting-payment', [App\Http\Controllers\CreditTransactionController::class, 'pendingPayment']);
+    Route::get('/customer-balances', [App\Http\Controllers\CustomerController::class, 'balances']);
+    Route::get('/customer-balance-history/{id}', [App\Http\Controllers\CustomerController::class, 'customerBalanceHistory']);
     Route::get('/sales-orders-pending-credit', [App\Http\Controllers\SalesOrderController::class, 'pendingCredit']);
     Route::get('/sales-orders-pending-receipt', [App\Http\Controllers\SalesOrderController::class, 'pendingReceipts']);
     Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class, 'getbynumber']);

@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Http\Requests\CustomerStoreRequest;
 use App\Http\Requests\CustomerUpdateRequest;
 use App\Http\Resources\CustomerCollection;
+use App\Http\Resources\CustomerExtendedCollection;
+use App\Http\Resources\CustomerExtendedResource;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 
@@ -16,20 +19,85 @@ class CustomerController extends Controller
 {
        public function index(Request $request): CustomerCollection
     {
-    // Check if the user can view customers
+        // Check if the user can view customers
         $user = auth()->user();
         if (Gate::allows('Can view All Customers')) {
             $customers = Customer::all();
             Log::alert('ED');
             return new CustomerCollection($customers);
-        }
-        elseif (Gate::allows('Can see branch customers')) {
+        } elseif (Gate::allows('Can see branch customers')) {
             Log::alert('ED3');
             $customers = Customer::where('branch_id', $user->branch_id)->get();
             return new CustomerCollection($customers);
         }
-        
+
         return new CustomerCollection([]);
+    }
+
+    public function balances()
+    {
+        $user = auth()->user();
+        if (Gate::allows('Can View All Customers Balance')) {
+
+            $customers = Customer::withSum(['creditTransactions as total_payment' => function ($query) {
+                $query->where('type', 'payment');
+            }], 'amount')
+                ->withSum(['creditTransactions as total_credit' => function ($query) {
+                    $query->where('type', 'credit');
+                }], 'amount')
+                ->withSum('inflows as total_inflow', 'amount')
+                ->withSum('outflows as total_outflow', 'amount')
+                ->get();
+
+            
+            return new CustomerExtendedCollection($customers);
+        } elseif (Gate::allows('Can see branch customers Balance')) {
+            Log::alert('ED3');
+
+            $customers = Customer::where('branch_id', $user->branch_id)
+                ->withSum(['creditTransactions as total_payment' => function ($query) {
+                    $query->where('type', 'payment');
+                }], 'amount')
+                ->withSum(['creditTransactions as total_credit' => function ($query) {
+                    $query->where('type', 'credit');
+                }], 'amount')
+                ->withSum('inflows as total_inflow', 'amount')
+                ->withSum('outflows as total_outflow', 'amount')
+                ->get();
+
+           
+
+            return new CustomerExtendedCollection($customers);
+        }
+        // Log::info("Da", $orders);
+        return new CustomerExtendedCollection([]);
+    }
+
+    public function customerBalanceHistory($id)
+    {
+        $user = auth()->user();
+        $id = 10;
+        $id = 10;
+
+        $customer = Customer::with([
+            'creditTransactions',
+            'inflows',
+            'outflows',
+        ])
+            ->where('id', $id)
+            ->withSum(['creditTransactions as total_payment' => function ($query) {
+                $query->where('type', 'payment');
+            }], 'amount')
+            ->withSum(['creditTransactions as total_credit' => function ($query) {
+                $query->where('type', 'credit');
+            }], 'amount')
+            ->withSum('inflows as total_inflow', 'amount')
+            ->withSum('outflows as total_outflow', 'amount')
+            ->first();
+
+        // new CustomerExtendedResource($customer);
+        // Log::info("Da", $orders);
+        return new CustomerExtendedResource($customer);
     }
 
 
