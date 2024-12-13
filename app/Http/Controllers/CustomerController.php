@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request): CustomerCollection
+       public function index(Request $request): CustomerCollection
     {
     // Check if the user can view customers
         $user = auth()->user();
@@ -31,6 +31,7 @@ class CustomerController extends Controller
         
         return new CustomerCollection([]);
     }
+
 
     public function store(CustomerStoreRequest $request): CustomerResource
     {
