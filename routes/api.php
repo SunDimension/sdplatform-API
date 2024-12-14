@@ -132,6 +132,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/sales-orders/{id}/cancel', [SalesOrderController::class, 'cancel']);
 
 
+    // Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
+
+    Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
 
     /////////// StoreItem////////////////////////////////////////
 

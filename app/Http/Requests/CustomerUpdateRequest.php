@@ -30,9 +30,9 @@ class CustomerUpdateRequest extends FormRequest
             'email' => ['string','email'],
             'address' => ['string'],
             'phone_number' => ['string'],
-            'credit_limit' => ['integer','exists:credit_limit,id'],
-            'credit_amount' => ['string'],
-            'credit_balance' => ['string'],
+            'credit_limit' => ['nullable', 'integer'],
+            'credit_amount' => ['nullable', 'numeric'],
+            'credit_balance' => ['nullable', 'numeric'],
         ];
     }
 }

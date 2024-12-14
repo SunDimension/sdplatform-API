@@ -33,11 +33,38 @@ class CustomerController extends Controller
 
         return new CustomerCollection([]);
     }
+public function assignCredit(Request $request, $id)
+{   
+
+    // Validate the request data
+    $validated = $request->validate([
+        'credit_limit' => ['required', 'integer', 'min:0'],
+        'id'=>['required']
+    ]);
+
+    // Find the customer by ID
+    $customer = Customer::findOrFail($validated["id"]);
+
+    // Update the credit limit
+    $customer->credit_limit = $validated['credit_limit'];
+    $customer->save();
+
+    // Return a success response with the updated customer data
+    return response()->json([
+        'message' => 'Credit limit successfully updated',
+        'customer' => new CustomerResource($customer), // Return updated customer data
+    ], Response::HTTP_OK);
+}
+
+
+
+
+
 
     public function balances()
     {
-        $user = auth()->user();
-        if (Gate::allows('Can View All Customers Balance')) {
+        // $user = auth()->user();
+        // if (Gate::allows('Can View All Customers Balance')) {
 
             $customers = Customer::withSum(['creditTransactions as total_payment' => function ($query) {
                 $query->where('type', 'payment');
@@ -51,26 +78,26 @@ class CustomerController extends Controller
 
             
             return new CustomerExtendedCollection($customers);
-        } elseif (Gate::allows('Can see branch customers Balance')) {
-            Log::alert('ED3');
+        // } elseif (Gate::allows('Can see branch customers Balance')) {
+        //     Log::alert('ED3');
 
-            $customers = Customer::where('branch_id', $user->branch_id)
-                ->withSum(['creditTransactions as total_payment' => function ($query) {
-                    $query->where('type', 'payment');
-                }], 'amount')
-                ->withSum(['creditTransactions as total_credit' => function ($query) {
-                    $query->where('type', 'credit');
-                }], 'amount')
-                ->withSum('inflows as total_inflow', 'amount')
-                ->withSum('outflows as total_outflow', 'amount')
-                ->get();
+        //     $customers = Customer::where('branch_id', $user->branch_id)
+        //         ->withSum(['creditTransactions as total_payment' => function ($query) {
+        //             $query->where('type', 'payment');
+        //         }], 'amount')
+        //         ->withSum(['creditTransactions as total_credit' => function ($query) {
+        //             $query->where('type', 'credit');
+        //         }], 'amount')
+        //         ->withSum('inflows as total_inflow', 'amount')
+        //         ->withSum('outflows as total_outflow', 'amount')
+        //         ->get();
 
            
 
-            return new CustomerExtendedCollection($customers);
-        }
-        // Log::info("Da", $orders);
-        return new CustomerExtendedCollection([]);
+        //     return new CustomerExtendedCollection($customers);
+        // }
+        // // Log::info("Da", $orders);
+        // return new CustomerExtendedCollection([]);
     }
 
     public function customerBalanceHistory($id)
