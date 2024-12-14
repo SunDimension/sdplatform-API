@@ -63,8 +63,8 @@ public function assignCredit(Request $request, $id)
 
     public function balances()
     {
-        // $user = auth()->user();
-        // if (Gate::allows('Can View All Customers Balance')) {
+        $user = auth()->user();
+        if (Gate::allows('Can View All Customers Balance')) {
 
             $customers = Customer::withSum(['creditTransactions as total_payment' => function ($query) {
                 $query->where('type', 'payment');
@@ -78,26 +78,26 @@ public function assignCredit(Request $request, $id)
 
             
             return new CustomerExtendedCollection($customers);
-        // } elseif (Gate::allows('Can see branch customers Balance')) {
-        //     Log::alert('ED3');
+        } elseif (Gate::allows('Can see branch customers Balance')) {
+            Log::alert('ED3');
 
-        //     $customers = Customer::where('branch_id', $user->branch_id)
-        //         ->withSum(['creditTransactions as total_payment' => function ($query) {
-        //             $query->where('type', 'payment');
-        //         }], 'amount')
-        //         ->withSum(['creditTransactions as total_credit' => function ($query) {
-        //             $query->where('type', 'credit');
-        //         }], 'amount')
-        //         ->withSum('inflows as total_inflow', 'amount')
-        //         ->withSum('outflows as total_outflow', 'amount')
-        //         ->get();
+            $customers = Customer::where('branch_id', $user->branch_id)
+                ->withSum(['creditTransactions as total_payment' => function ($query) {
+                    $query->where('type', 'payment');
+                }], 'amount')
+                ->withSum(['creditTransactions as total_credit' => function ($query) {
+                    $query->where('type', 'credit');
+                }], 'amount')
+                ->withSum('inflows as total_inflow', 'amount')
+                ->withSum('outflows as total_outflow', 'amount')
+                ->get();
 
            
 
-        //     return new CustomerExtendedCollection($customers);
-        // }
-        // // Log::info("Da", $orders);
-        // return new CustomerExtendedCollection([]);
+            return new CustomerExtendedCollection($customers);
+        }
+        // Log::info("Da", $orders);
+        return new CustomerExtendedCollection([]);
     }
 
     public function customerBalanceHistory($id)
