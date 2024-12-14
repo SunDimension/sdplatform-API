@@ -59,10 +59,7 @@ class Customer extends Model
         return $this->belongsTo(Branch::class);
     }
 
-    public function creditlimit(): BelongsTo
-    {
-        return $this->belongsTo(CreditLimit::class);
-    }
+ 
 
     public function salesOrder(): HasMany
     {

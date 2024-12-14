@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Log;
 
 class CustomerController extends Controller
 {
-    public function index(Request $request): CustomerCollection
+       public function index(Request $request): CustomerCollection
     {
         // Check if the user can view customers
         $user = auth()->user();
@@ -33,6 +33,31 @@ class CustomerController extends Controller
 
         return new CustomerCollection([]);
     }
+public function assignCredit(Request $request, $id)
+{   
+
+    // Validate the request data
+    $validated = $request->validate([
+        'credit_limit' => ['required', 'integer', 'min:0'],
+        'id'=>['required']
+    ]);
+
+    // Find the customer by ID
+    $customer = Customer::findOrFail($validated["id"]);
+
+    // Update the credit limit
+    $customer->credit_limit = $validated['credit_limit'];
+    $customer->save();
+
+    // Return a success response with the updated customer data
+    return response()->json([
+        'message' => 'Credit limit successfully updated',
+        'customer' => new CustomerResource($customer), // Return updated customer data
+    ], Response::HTTP_OK);
+}
+
+
+
 
     public function balances()
     {
@@ -52,7 +77,7 @@ class CustomerController extends Controller
             
             return new CustomerExtendedCollection($customers);
         } elseif (Gate::allows('Can see branch customers Balance')) {
-            Log::alert('ED3');
+        //     Log::alert('ED3');
 
             $customers = Customer::where('branch_id', $user->branch_id)
                 ->withSum(['creditTransactions as total_payment' => function ($query) {
