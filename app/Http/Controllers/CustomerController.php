@@ -59,8 +59,6 @@ public function assignCredit(Request $request, $id)
 
 
 
-
-
     public function balances()
     {
         $user = auth()->user();
@@ -79,7 +77,7 @@ public function assignCredit(Request $request, $id)
             
             return new CustomerExtendedCollection($customers);
         } elseif (Gate::allows('Can see branch customers Balance')) {
-            Log::alert('ED3');
+        //     Log::alert('ED3');
 
             $customers = Customer::where('branch_id', $user->branch_id)
                 ->withSum(['creditTransactions as total_payment' => function ($query) {
@@ -91,9 +89,7 @@ public function assignCredit(Request $request, $id)
                 ->withSum('inflows as total_inflow', 'amount')
                 ->withSum('outflows as total_outflow', 'amount')
                 ->get();
-
-           
-
+                
             return new CustomerExtendedCollection($customers);
         }
         // Log::info("Da", $orders);
@@ -102,10 +98,6 @@ public function assignCredit(Request $request, $id)
 
     public function customerBalanceHistory($id)
     {
-        $user = auth()->user();
-        $id = 10;
-        $id = 10;
-
         $customer = Customer::with([
             'creditTransactions',
             'inflows',
@@ -122,8 +114,6 @@ public function assignCredit(Request $request, $id)
             ->withSum('outflows as total_outflow', 'amount')
             ->first();
 
-        // new CustomerExtendedResource($customer);
-        // Log::info("Da", $orders);
         return new CustomerExtendedResource($customer);
     }
 

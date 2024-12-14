@@ -30,14 +30,13 @@ class CustomerExtendedResource extends JsonResource
             'credit_balance' => $this->credit_balance ??$this->credit_limit,
             'total_credit' => $this->total_credit ?? 0,
             'total_payment' => $this->total_payment ?? 0,
-             'balance' => ($this->total_payment ?? 0) - ($this->total_payment ?? 0),
+            'balance' => ($this->total_payment ?? 0) - ($this->total_payment ?? 0),
             'total_inflow' => $this->total_inflow ?? 0,
             'total_outflow' => $this->total_outflow ?? 0,
             'deposit_balance' => $this->total_inflow ?? 0 - $this->total_outflow ?? 0,
             'inflows' => PostInflowResource::collection($this->whenLoaded("inflows")),
             'outflows' => PostOutflowResource::collection($this->whenLoaded("outflows")),
-            'creditTransactions' => CreditTransactionResource::collection($this->whenLoaded("creditTransactions")),
-            
+            'creditTransactions' => CreditTransactionResource::collection($this->whenLoaded("creditTransactions")), 
         ];
     }
 }
