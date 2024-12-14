@@ -64,9 +64,7 @@ class CustomerController extends Controller
                 ->withSum('inflows as total_inflow', 'amount')
                 ->withSum('outflows as total_outflow', 'amount')
                 ->get();
-
-           
-
+                
             return new CustomerExtendedCollection($customers);
         }
         // Log::info("Da", $orders);
@@ -75,10 +73,6 @@ class CustomerController extends Controller
 
     public function customerBalanceHistory($id)
     {
-        $user = auth()->user();
-        $id = 10;
-        $id = 10;
-
         $customer = Customer::with([
             'creditTransactions',
             'inflows',
@@ -95,8 +89,6 @@ class CustomerController extends Controller
             ->withSum('outflows as total_outflow', 'amount')
             ->first();
 
-        // new CustomerExtendedResource($customer);
-        // Log::info("Da", $orders);
         return new CustomerExtendedResource($customer);
     }
 
