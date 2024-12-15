@@ -22,6 +22,7 @@ class CreditTransactionResource extends JsonResource
             'credit_limit' => $this->credit_limit,
             'credit_balance_before' => $this->credit_balance_before,
             'type' => $this->type,
+            'created_at' => $this->created_at,
             'created_by' => $this->created_by,
             'modified_by' => $this->modified_by,
             'deleted_by' => $this->deleted_by,

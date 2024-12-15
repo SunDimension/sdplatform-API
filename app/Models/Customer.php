@@ -59,8 +59,6 @@ class Customer extends Model
         return $this->belongsTo(Branch::class);
     }
 
- 
-
     public function salesOrder(): HasMany
     {
         return $this->hasMany(SalesOrder::class);

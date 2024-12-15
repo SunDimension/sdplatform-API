@@ -7,6 +7,7 @@ use App\Http\Requests\CustomerUpdateRequest;
 use App\Http\Resources\CustomerCollection;
 use App\Http\Resources\CustomerExtendedCollection;
 use App\Http\Resources\CustomerExtendedResource;
+use App\Http\Resources\CustomerExtendedResource2;
 use App\Http\Resources\CustomerResource;
 use App\Models\Customer;
 use Illuminate\Http\Request;
