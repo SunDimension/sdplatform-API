@@ -18,9 +18,12 @@ class StoreItemController extends Controller
 {
   
     public function index(Request $request)
-    {
-        $storeitem = StoreItem::all();
-        return StoreItemResource::collection($storeitem);
+    {   $query = StoreItem::query();
+
+    // Filter by branch (authenticated user's branch)
+    $query->where('branch_id', auth()->user()->branch_id);
+
+       return StoreItemResource::collection($query->get());
     }
 
     public function GetInventoryByStore($itemId)

@@ -23,53 +23,66 @@ class SalesReceiptController extends Controller
 
 
 
-    public function index(Request $request)
-    {
+public function index(Request $request)
+{
+    // Validate and retrieve query parameters from the request
+    $validated = $request->validate([
+        'store_id' => 'nullable|integer|exists:stores,id',
+        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+        'from_date' => 'nullable|date',
+        'to_date' => 'nullable|date',
+    ]);
 
+    // Extract validated parameters
+    $storeId = $validated['store_id'] ?? null;
+    $branchId = $validated['branch_id'] ?? null;
+    $fromDate = $validated['from_date'] ?? null;
+    $toDate = $validated['to_date'] ?? null;
 
-        $validated = $request->validate([
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
-            'from_date' => 'nullable|date',
-            'to_date' => 'nullable|date',
-        ]);
+    // Get the authenticated user
+    $user = auth()->user();
 
-        $storeId = $validated['store_id'] ?? null;
-        $branchId = $validated['branch_id'] ?? null;
-        $fromDate = $validated['from_date'] ?? null;
-        $toDate = $validated['to_date'] ?? null;
+    // Start building the query
+    $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
+        ->when($storeId, function ($query, $storeId) {
+            return $query->where('store_id', $storeId);
+        })
+        ->when($branchId, function ($query, $branchId) {
+            return $query->where('branch_id', $branchId);
+        });
 
-        // Start building the query
-        $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
-            ->when($storeId, function ($query, $storeId) {
-                return $query->where('store_id', $storeId);
-            })
-            ->when($branchId, function ($query, $branchId) {
-                // Filter SalesOrder by matching branch_id in related Store
-                return $query->whereHas('store', function ($query) use ($branchId) {
-                    $query->where('branch_id', $branchId);
-                });
-            });
+    // Handle date filtering with branch filtering
+    if ($fromDate || $toDate) {
+     $user = auth()->user();
+        // Convert from_date and to_date to Carbon instances only if provided
+        $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+        $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
-        // Handle date filtering with proper range logic
         if ($fromDate && $toDate) {
-            // Ensure fromDate is not after toDate
-            $query->whereBetween('created_at', [
-                Carbon::parse($fromDate)->startOfDay(),
-                Carbon::parse($toDate)->endOfDay(),
-            ]);
+            // Both from_date and to_date are provided
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
         } elseif ($fromDate) {
-            $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+            // Only from_date is provided
+            $query->where('created_at', '>=', $fromDate);
         } elseif ($toDate) {
-            $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+            // Only to_date is provided
+            $query->where('created_at', '<=', $toDate);
         }
 
-        // Execute the query and get the filtered results
-        $salesReceipts = $query->get();
-
-        // Return as a resource collection
-        return new SalesReceiptCollection($salesReceipts);
+        // Add the user's branch filter directly
+        $query->where('branch_id', $user->branch_id);
     }
+
+    // Fetch the results
+    $salesReceipts = $query->get();
+
+    // Return the results as a collection
+    return new SalesReceiptCollection($salesReceipts);
+}
+
+
+
+
 
     public function myReceipts(Request $request)
     {

@@ -30,7 +30,7 @@ class StoreItemUpdateRequest extends FormRequest
             'discount' => ['nullable', 'numeric'],
             'create_item_id' => ['required','integer','exists:create_items,id'],
             'store_id' => ['required','integer', 'exists:stores,id'],
-            // 'user_id' => ['required', 'integer','exists:users,id']
+            'branch_id' => ['required', 'integer','exists:branch,id']
         ];
     }
 }

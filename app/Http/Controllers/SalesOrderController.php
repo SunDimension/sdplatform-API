@@ -48,9 +48,13 @@ public function index(Request $request): SalesOrderCollection
         $query->where('store_id', $storeId);
     }
 
-    // Apply branch filter if provided
+    // Apply branch filter if provided or based on the logged-in user
     if ($branchId) {
         $query->where('branch_id', $branchId);
+    } else {
+        // Assuming you want to apply the branch_id from the logged-in user if no branch_id is provided in the request
+        // $user = auth()->user();
+        // $query->where('branch_id', $user->branch_id);
     }
 
     // Apply date range filters if provided
@@ -59,6 +63,7 @@ public function index(Request $request): SalesOrderCollection
         $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
         $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
+        // Apply date filter for the selected range along with the branch condition
         if ($fromDate && $toDate) {
             // Both from_date and to_date are provided
             $query->whereBetween('created_at', [$fromDate, $toDate]);
@@ -69,6 +74,10 @@ public function index(Request $request): SalesOrderCollection
             // Only to_date is provided
             $query->where('created_at', '<=', $toDate);
         }
+
+        // Ensure transactions are fetched only for the user's branch when filtering by date
+        $user = auth()->user(); // Get the logged-in user
+        $query->where('branch_id', $user->branch_id); // Filter by branch_id (user's branch)
     }
 
     // Fetch the results
@@ -77,6 +86,7 @@ public function index(Request $request): SalesOrderCollection
     // Return the results as a collection
     return new SalesOrderCollection($salesOrders);
 }
+
 
 
 
