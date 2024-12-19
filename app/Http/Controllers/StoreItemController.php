@@ -7,6 +7,8 @@ use App\Http\Resources\StoreItemResource;
 use App\Http\Resources\StoreItemCollection;
 use App\Http\Requests\StoreItemStoreRequest;
 use App\Http\Requests\StoreItemUpdateRequest;
+use App\Http\Resources\CreateItemResource;
+use App\Models\CreateItem;
 use App\Models\Store;
 use App\Models\StoreItem;
 use Illuminate\Http\Request;
@@ -24,6 +26,16 @@ class StoreItemController extends Controller
     $query->where('branch_id', auth()->user()->branch_id);
 
        return StoreItemResource::collection($query->get());
+    }
+
+    public function myStoreItems()
+    {
+        $item_ids = Store::where('branch_id', auth()->user()->branch_id)->pluck('id');
+        // $storeItems = StoreItem::whereIn('store_id', $item_ids)->get()->pluck('create_item_id');
+        $createIds = StoreItem::where('branch_id', auth()->user()->branch_id)->pluck('create_item_id');
+        Log::alert("dada",[$createIds]);
+        $item = CreateItem::whereIn('id',$createIds)->get();
+        return  CreateItemResource::collection($item);
     }
 
     public function GetInventoryByStore($itemId)
@@ -49,6 +61,7 @@ class StoreItemController extends Controller
             
         return  StoreItemResource::collection($storeItems);
     }
+
     public function store(StoreItemStoreRequest $request): StoreItemResource
     {
         $storeitem = StoreItem::create($request->validated());

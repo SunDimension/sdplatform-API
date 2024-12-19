@@ -139,6 +139,8 @@ Route::middleware('auth:sanctum')->group(function () {
     /////////// StoreItem////////////////////////////////////////
 
     Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
+    
+    Route::get('my-store-items', [App\Http\Controllers\StoreItemController::class, "myStoreItems"]);
     Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
     Route::get('get-inventory-by-branch-store/{itemId}/{branchId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStoreBranch"]);
 
