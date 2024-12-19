@@ -33,7 +33,7 @@ class CreateItemStoreRequest extends FormRequest
             // // 'reorder_level' => ['string'],
             // 'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
             // 'weight_id' => ['required', 'integer', 'exists:weights,id'],
-            // 'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'integer', 'exists:branches,id'],
             // 'warehouse' => ['required','integer','exists:warehouses,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
            

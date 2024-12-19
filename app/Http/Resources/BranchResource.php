@@ -20,6 +20,8 @@ class BranchResource extends JsonResource
             'email' => $this->email,
             'phone' => $this->phone,
             'state_id' => $this->state_id,
+            'branch_id' => $this->branch_id,
+             'branch_name' => $this->branch ? $this->branch->name : null,
             'country_id' => $this->country_id,
         ];
     }

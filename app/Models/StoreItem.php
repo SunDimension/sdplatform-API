@@ -18,7 +18,7 @@ class StoreItem extends Model
         'reorder_level',
         'quantity',
         'store_id',
-        
+        'branch_id',
         'discount',
         'quantity_holding'
 
@@ -28,7 +28,7 @@ class StoreItem extends Model
         'id'=>'integer',
         'item_category_id'=>'integer',
         'create_item_id'=>'integer',
-        // 'unit_id'=>'integer',
+         'branch_id'=>'integer',
         'store_id'=>'integer',
        'quantity_holding' => 'integer'
     ];
@@ -41,5 +41,11 @@ class StoreItem extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
+
+    }
+
+     public function branch()
+    {
+        return $this->belongsTo(Branch::class);
     }
 }

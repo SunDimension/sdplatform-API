@@ -21,7 +21,8 @@ class CreateItemResource extends JsonResource
             'batch_number' => $this->batch_number,
             // 'unit_id' => $this->unit_id,
             'brand_id' => $this->brand_id,
-            
+            'branch_id' => $this->branch_id,
+             'branch_name' => $this->branch ? $this->branch->name : null,
             'vendor_id' => $this->vendor_id,
          
         ];

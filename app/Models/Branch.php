@@ -22,6 +22,7 @@ class Branch extends Model
         'email',
         'phone',
         'state_id',
+      
         'country_id',
     ];
 
@@ -33,6 +34,7 @@ class Branch extends Model
     protected $casts = [
         'id' => 'integer',
         'state_id' => 'integer',
+       
         'country_id' => 'integer',
     ];
 
@@ -45,4 +47,6 @@ class Branch extends Model
     {
         return $this->belongsTo(Country::class);
     }
+
+   
 }

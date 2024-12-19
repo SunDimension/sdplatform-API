@@ -130,7 +130,7 @@ private static function generateBatchNumber()
 
     public function branch(): BelongsTo
     {
-        return $this->belongsTo(Branch::class);
+        return $this->belongsTo(Branch::class,'branch_id');
     }
 
     public function warehouse(): BelongsTo
@@ -156,6 +156,8 @@ private static function generateBatchNumber()
     {
         return $this->hasMany(Release::class); // A CreateItem can have many releases
     }
+
+    
     // public function item($id)
 // {
 //     // Find the item by ID

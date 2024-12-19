@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('reorder_level');
             $table->foreignId('discount')->constrained('discounts');
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('branch_id')->constrained('branches');
             $table->foreignId('store_id')->constrained('stores');
             $table->timestamps();
         });
