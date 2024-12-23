@@ -18,6 +18,7 @@ class ReceiveItemResource extends JsonResource
             'quantity' => $this->quantity,
             'unit_price' => $this->unit_price,
             'product_id' => $this->product_id,
+            'product_name' => $this->product->name,
             'description' => $this->description,
             'created_by' => $this->created_by,
             'modified_by' => $this->modified_by,

@@ -336,7 +336,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::apiResource('receive-orders', App\Http\Controllers\ReceiveOrderController::class);
-
+    Route::get('pending-receive-orders', [App\Http\Controllers\ReceiveOrderController::class,'pending']);
+    Route::post('approve-receive-order', [App\Http\Controllers\ReceiveOrderController::class,'approve']);
+    
     Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
 
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
