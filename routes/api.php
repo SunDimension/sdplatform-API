@@ -285,6 +285,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('stores', App\Http\Controllers\StoreController::class);
     Route::get('my-stores/{branchid}', [App\Http\Controllers\StoreController::class, 'mystore2']);
     Route::get('my-stores', [App\Http\Controllers\StoreController::class, 'mystore']);
+    Route::get('my-stores-with-items', [App\Http\Controllers\StoreController::class, 'mystorewithItems']);
 
     Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
     Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);

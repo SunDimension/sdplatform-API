@@ -10,15 +10,15 @@ class Store extends Model
 {
     use HasFactory;
 
-       protected $fillable = [
+    protected $fillable = [
         'store_type_id',
         'name',
         'branch_id',
-        
+
     ];
 
 
-     /**
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -27,16 +27,22 @@ class Store extends Model
         'id' => 'integer',
         'store_type_id' => 'integer',
         'branch_id' => 'integer',
-        
+
     ];
 
-       public function storetype(): BelongsTo
+    public function storetype(): BelongsTo
     {
         return $this->belongsTo(StoreType::class);
     }
 
-       public function branch(): BelongsTo
+    public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
+
+    public function storeItems()
+    {
+        return $this->hasMany(StoreItem::class);
+    }
+
 }

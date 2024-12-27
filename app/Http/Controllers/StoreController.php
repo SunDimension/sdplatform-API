@@ -27,6 +27,13 @@ class StoreController extends Controller
         return new StoreCollection($store);
     }
 
+    public function mystorewithitems(Request $request): StoreCollection
+    {
+        //$store = Store::all();
+        $store = Store::where('branch_id', auth()->user()->branch_id)->get();
+        return new StoreCollection($store->load('storeItems'));
+    }
+
     public function mystore2($branchId): StoreCollection
     {
         $store = Store::where('branch_id', $branchId)->get();
@@ -37,7 +44,6 @@ class StoreController extends Controller
     public function store(StoreStoreRequest $request): StoreResource
     {
         $store = Store::create($request->validated());
-
         return new StoreResource($store);
     }
 

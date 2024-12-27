@@ -12,7 +12,6 @@ class StoreItem extends Model
     protected $fillable = [
         'item_category_id',
         'create_item_id',
-        
         'cost_price',
         'selling_price',
         'reorder_level',
@@ -25,12 +24,12 @@ class StoreItem extends Model
     ];
 
     protected $cast = [
-        'id'=>'integer',
-        'item_category_id'=>'integer',
-        'create_item_id'=>'integer',
-         'branch_id'=>'integer',
-        'store_id'=>'integer',
-       'quantity_holding' => 'integer'
+        'id' => 'integer',
+        'item_category_id' => 'integer',
+        'create_item_id' => 'integer',
+        'branch_id' => 'integer',
+        'store_id' => 'integer',
+        'quantity_holding' => 'integer'
     ];
 
     public function createItem()
@@ -41,10 +40,9 @@ class StoreItem extends Model
     public function store()
     {
         return $this->belongsTo(Store::class);
-
     }
 
-     public function branch()
+    public function branch()
     {
         return $this->belongsTo(Branch::class);
     }

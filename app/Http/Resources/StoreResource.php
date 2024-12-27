@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\StoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -18,7 +19,8 @@ class StoreResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'branch_id'=>$this->branch_id,
-            'store_type_id'=>$this->store_type_id
+            'store_type_id'=>$this->store_type_id,
+            'items' => StoreItemResource::collection($this->whenLoaded("storeItems"))
         ];
     }
 }

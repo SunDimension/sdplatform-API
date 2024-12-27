@@ -12,25 +12,23 @@ class StoreItemResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-     public function toArray(Request $request): array
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'item_category_id'=>$this->item_category_id,
-            
-            'create_item_id'=>$this->create_item_id,
-             
-           'cost_price'=>$this->cost_price, 
-            'selling_price'=>$this->selling_price, 
-            'reorder_level'=>$this->reorder_level, 
-            'quantity'=>$this->quantity - $this->quantity_holding, 
-            'quantity_holding'=>$this->quantity_holding, 
-            'store_id'=>$this->store_id,
-            'branch_id'=>$this->branch_id,
-            
-            'discount'=>$this->discount,
-          
-           
+            'name'=> $this->createItem->name,
+            'item_category_id' => $this->item_category_id,
+            'create_item_id' => $this->create_item_id,
+            'cost_price' => $this->cost_price,
+            'selling_price' => $this->selling_price,
+            'reorder_level' => $this->reorder_level,
+            'quantity' => $this->quantity - $this->quantity_holding,
+            'quantity_holding' => $this->quantity_holding,
+            'store_id' => $this->store_id,
+            'branch_id' => $this->branch_id,
+            'discount' => $this->discount,
+
+
         ];
     }
 }

@@ -42,7 +42,6 @@ class ReceiveOrderController extends Controller
                 'created_by' => auth()->user()->id
             ]);
         }
-
         return new ReceiveOrderResource($receiveOrder);
     }
 
