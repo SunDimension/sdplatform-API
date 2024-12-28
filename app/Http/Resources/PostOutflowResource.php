@@ -17,7 +17,7 @@ class PostOutflowResource extends JsonResource
         return [
             'id' => $this->id,
             'org_bank' => $this->org_bank,
-            'beneficiary' => $this->beneficiary,
+            'customer_id' => $this->customer_id,
             'amount' => $this->amount,
             'account_name' => $this->account_name,
             'account_number' => $this->account_number,

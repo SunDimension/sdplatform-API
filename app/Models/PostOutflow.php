@@ -13,7 +13,7 @@ class PostOutflow extends Model
     protected $fillable = [
         
         "org_bank",
-        "beneficiary",
+        // "beneficiary",
         "amount",
         "account_name",
         "account_number",

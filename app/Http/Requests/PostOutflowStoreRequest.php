@@ -24,7 +24,6 @@ class PostOutflowStoreRequest extends FormRequest
     {
         return [
             'org_bank'    => 'required|exists:banks,id', // Ensure it exists
-            'beneficiary'           => 'nullable|string',       // Ensure it exists
             'amount'            => 'nullable|numeric',         // Ensure it exists
             'account_name'         => 'nullable|string',      // Ensure it exists
             'account_number'        => 'nullable|numeric',                      // Must be a valid date
