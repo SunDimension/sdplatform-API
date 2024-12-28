@@ -345,7 +345,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
 
     Route::apiResource('store-transfer-items', App\Http\Controllers\StoreTransferItemController::class);
-    Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class);
+    Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class); 
+    Route::apiResource('price-changes', App\Http\Controllers\PriceChangeController::class);
+    Route::apiResource('change-reasons', App\Http\Controllers\ChangeReasonController::class);
+    Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class,'pending']);
+    Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class,'approve']);
+
+    
+
+    
 });
-
-

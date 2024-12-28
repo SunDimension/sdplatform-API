@@ -16,9 +16,8 @@ class CreateItemController extends Controller
 {
     public function index(Request $request)
     {   
-       $query = CreateItem::query();
-      $query->where('branch_id', auth()->user()->branch_id);
-
+        $query = CreateItem::query();
+        // $query->where('branch_id', auth()->user()->branch_id);
         return CreateItemResource::collection($query->get());
     }
     

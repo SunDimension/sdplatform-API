@@ -1,0 +1,26 @@
+models:
+  PriceChange:
+    details: json
+    store_id: foreignId:constrained:stores
+    branch_id: foreignId:constrained:branches
+    change_reason_id: foreignId:constrained:change_reasons
+    status: enum:pending,approved,declined default:pending
+    approved_by: foreignId:constrained:users nullable
+    approval_date: timestamp nullable
+    comment: string:1000
+    created_by: foreignId:constrained:users
+    created_at: timestamp
+    updated_at: timestamp
+
+  ChangeReason:
+    name: string:255
+    created_at: timestamp
+    updated_at: timestamp
+
+controllers:
+  PriceChangeController:
+    resource: api
+  ChangeReason:
+    resource: api
+
+    

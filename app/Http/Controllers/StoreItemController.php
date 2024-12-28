@@ -18,12 +18,11 @@ use Illuminate\Support\Facades\Log;
 
 class StoreItemController extends Controller
 {
-  
     public function index(Request $request)
     {   $query = StoreItem::query();
 
     // Filter by branch (authenticated user's branch)
-    $query->where('branch_id', auth()->user()->branch_id);
+        $query->where('branch_id', auth()->user()->branch_id);
 
        return StoreItemResource::collection($query->get());
     }
@@ -31,10 +30,10 @@ class StoreItemController extends Controller
     public function myStoreItems()
     {
         $item_ids = Store::where('branch_id', auth()->user()->branch_id)->pluck('id');
-        // $storeItems = StoreItem::whereIn('store_id', $item_ids)->get()->pluck('create_item_id');
-        $createIds = StoreItem::where('branch_id', auth()->user()->branch_id)->pluck('create_item_id');
-        Log::alert("dada",[$createIds]);
-        $item = CreateItem::whereIn('id',$createIds)->get();
+        $storeItems = StoreItem::whereIn('store_id', $item_ids)->get()->pluck('create_item_id');
+        //$createIds = StoreItem::where('branch_id', auth()->user()->branch_id)->pluck('create_item_id');
+        Log::alert("dada",[$storeItems]);
+        $item = CreateItem::whereIn('id',$storeItems)->get();
         return  CreateItemResource::collection($item);
     }
 

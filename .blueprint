@@ -1,95 +1,130 @@
 created:
-    - app/Http/Controllers/CreditTransactionController.php
-    - database/factories/CreditTransactionFactory.php
-    - database/migrations/2024_12_08_001935_create_credit_transactions_table.php
-    - app/Models/CreditTransaction.php
-    - tests/Feature/Http/Controllers/CreditTransactionControllerTest.php
-    - app/Http/Requests/CreditTransactionStoreRequest.php
-    - app/Http/Requests/CreditTransactionUpdateRequest.php
-    - app/Http/Resources/CreditTransactionCollection.php
-    - app/Http/Resources/CreditTransactionResource.php
+    - app/Http/Controllers/PriceChangeController.php
+    - app/Http/Controllers/ChangeReasonController.php
+    - database/factories/PriceChangeFactory.php
+    - database/factories/ChangeReasonFactory.php
+    - database/migrations/2024_12_27_102811_create_price_changes_table.php
+    - database/migrations/2024_12_27_102812_create_change_reasons_table.php
+    - app/Models/PriceChange.php
+    - app/Models/ChangeReason.php
+    - tests/Feature/Http/Controllers/PriceChangeControllerTest.php
+    - tests/Feature/Http/Controllers/ChangeReasonControllerTest.php
+    - app/Http/Requests/PriceChangeStoreRequest.php
+    - app/Http/Requests/PriceChangeUpdateRequest.php
+    - app/Http/Requests/ChangeReasonStoreRequest.php
+    - app/Http/Requests/ChangeReasonUpdateRequest.php
+    - app/Http/Resources/PriceChangeCollection.php
+    - app/Http/Resources/PriceChangeResource.php
+    - app/Http/Resources/ChangeReasonCollection.php
+    - app/Http/Resources/ChangeReasonResource.php
 updated:
     - routes/api.php
 models:
+    Account: { id: 'char:36', name: string, code: string, account_group_id: 'char:36', account_type_id: 'char:36', account_subtype_id: 'char:36', account_owner_id: 'string nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    AccountGroup: { id: 'char:36', name: string, created_by: 'integer nullable default:NULL', modified_by: 'integer nullable default:NULL', deleted_by: 'integer nullable default:NULL' }
+    AccountOpeningBalance: { id: 'char:36', financial_year_id: 'char:36', financial_period_id: 'char:36', debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: string, account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    AccountSubtype: { id: 'char:36', name: string, account_type_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    AccountType: { id: 'char:36', account_group_id: 'char:36', name: string, code: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
     AdjustmentType: { name: string }
+    ApprovalInstance: {  }
+    ApprovalLimit: {  }
+    ApprovalProcessFlow: {  }
+    ApprovalProcessModule: {  }
+    ApprovalProcessType: {  }
+    ApprovalStage: {  }
+    ApprovalType: {  }
     Attribute: { name: string }
     Bank: { name: string }
     Branch: { name: string, address: string, contact_person: string, email: string, phone: string, state_id: 'biginteger unsigned', country_id: 'biginteger unsigned' }
     Brand: { name: string }
     Carrier: { name: string }
+    Chart: { id: 'char:36', chart_title: string, chart_type_id: 'char:36', chart_category_id: 'char:36', sql_query: text, is_active: string, module_id: string, filterColumn: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    ChartCard: { id: 'char:36', card_title: string, card_size: string, is_active: string, sql_query: text, module_id: string, submodule_id: string, sequence: string, color: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    ChartCategory: { id: 'char:36', chart_provider_id: 'char:36', chart_category: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    ChartProvider: { id: 'char:36', chart_provider: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    ChartType: { id: 'char:36', chart_category_id: 'char:36', chart_type: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
     Country: { name: string }
-    CreateItem: { name: string, item_category_id: 'biginteger unsigned', item_type_id: 'biginteger unsigned', description: string, batch_number: string, unit_id: 'biginteger unsigned', brand_id: 'biginteger unsigned', cost_price: double, selling_price: double, reorder_level: string, dimension_id: 'biginteger unsigned', weight_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse: 'biginteger unsigned', vendor_id: 'biginteger unsigned', image_url: string, barcode: string }
+    CreateItem: { name: string, item_category_id: 'biginteger unsigned', batch_number: 'string nullable default:NULL', brand_id: 'biginteger unsigned', vendor_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', user_id: 'biginteger unsigned' }
     CreditLimit: { name: string }
     CreditSale: { customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', product_id: 'biginteger unsigned', credit_limit: 'biginteger unsigned', credit_amount: string, credit_balance: string }
-    Customer: { customer_type_id: 'biginteger unsigned', title_id: 'biginteger unsigned', surname: string, firstname: string, middlename: string, phone_number: string, fullname: string }
+    CreditTransaction: { branch_id: 'biginteger unsigned', customer_id: 'biginteger unsigned', sales_order_id: 'biginteger unsigned nullable default:NULL', sales_receipt_id: 'biginteger unsigned nullable default:NULL', amount: string, credit_limit: 'string nullable default:NULL', credit_balance_before: 'string nullable default:NULL', type: "enum:'credit','payment'", created_by: 'biginteger unsigned', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    Customer: { name: string, customer_type_id: 'biginteger unsigned', title_id: 'biginteger unsigned', surname: string, firstname: string, middlename: string, address: 'string nullable default:NULL', phone_number: string, credit_limit: 'decimal:12,0 nullable default:NULL', credit_balance: 'decimal:12,0 nullable default:NULL', branch_id: 'integer nullable default:NULL' }
     CustomerType: { name: string }
+    DashboardSetting: { id: 'char:36', chart_id: 'char:36', module_id: 'char:36', chart_type_id: 'char:36', chart_category_id: 'char:36', chart_title: string, is_active: string, order_by: string, is_group: string, submodule_Id: string, add_condition: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
     Delivery: { customer_id: 'biginteger unsigned', sales_order_number: string, delivery_order_number: string, delivery_date: timestamp, carrier_id: 'biginteger unsigned', notes: string }
     Designation: { name: string }
     Dimension: { name: string }
     Discount: { name: string }
     ExpenseAccount: { name: string }
-    InventoryAdjustment: { item_id: 'biginteger unsigned', adjustment_type_id: 'biginteger unsigned', date: timestamp, reason_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', description: string, item_category_id: 'biginteger unsigned', cost_price: double, selling_price: double, quantity: string }
+    FinancialPeriod: { id: 'char:36', name: string, date_from: date, date_to: date, is_active: boolean, financial_year_id: 'char:36', financial_quarter_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    FinancialQuarter: { id: 'char:36', name: string, date_from: date, date_to: date, is_active: boolean, financial_year_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    FinancialYear: { id: 'char:36', name: string, date_from: date, date_to: date, is_active: boolean, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    InflowStatus: { name: 'string:150 nullable default:NULL' }
+    InventoryAdjustment: { item_id: 'biginteger unsigned nullable default:NULL', adjustment_type_id: 'biginteger unsigned nullable default:NULL', date: 'date nullable default:NULL', reason_id: 'biginteger unsigned nullable default:NULL', branch_id: 'biginteger unsigned nullable default:NULL', warehouse_id: 'biginteger unsigned nullable default:NULL', description: 'string nullable default:NULL', item_category_id: 'biginteger unsigned nullable default:NULL', cost_price: 'double nullable default:NULL', selling_price: 'double nullable default:NULL', quantity: 'string nullable default:NULL', store_id: 'biginteger unsigned nullable default:NULL' }
     Invoice: { branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', customer_id: 'biginteger unsigned', invoice_number: string, order_number: string, invoice_date: timestamp, item_id: 'biginteger unsigned', rate: string, quantity: string, discount_id: 'biginteger unsigned', tax_id: 'biginteger unsigned', amount: string }
     ItemCategory: { name: string }
+    ItemPrice: {  }
+    ItemSold: { sales_order_id: 'biginteger unsigned', product_id: 'biginteger unsigned', quantity: 'integer nullable default:NULL', unit_price: 'decimal:10,2 nullable default:NULL', amount: 'decimal:10,2 nullable default:NULL', sales_date: 'date nullable default:NULL', store_id: 'biginteger unsigned', discount: 'double default:0.00', status: "string:50 nullable default:'pending'" }
     ItemType: { name: string }
+    JournalEntry: { id: 'char:36', description: string, payment_date: timestamp, warehouse_id: 'biginteger unsigned', vendor_id: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    JournalEntryDetail: { id: 'char:36', journal_entry_id: 'char:36', journal_type_id: 'char:36', amount: double, description: text, account_id: 'char:36', account_no: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    JournalType: { id: 'char:36', name: string, sign: string }
     Manufacturer: { name: string }
-    NewPayment: { vendor_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', payment_amount: string, payment_mode_id: 'biginteger unsigned', description: string }
-    NewPurchaseOrder: { item_category_id: 'biginteger unsigned', item_id: 'biginteger unsigned', vendor_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', purchase_order_number: string, purchase_amount: string, purchase_date: timestamp, expected_delivery_date: date, payment_type_id: 'biginteger unsigned' }
-    NewPurchaseReceived: { vendor_id: 'biginteger unsigned', purchase_order_number: string, purchase_received_number: string, received_date: date }
+    NewPayment: { branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', payment_amount: string, vendor_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', description: string }
+    NewPurchaseOrder: { item_category_id: 'biginteger unsigned', item_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', purchase_order_number: string, vendor_id: 'biginteger unsigned', purchase_amount: string, purchase_date: timestamp, expected_delivery_date: date, payment_type_id: 'biginteger unsigned' }
+    NewPurchaseReceived: { purchase_order_number: string, purchase_received_number: string, vendor_id: 'biginteger unsigned', received_date: date }
+    OutflowMode: { name: 'string:150 nullable default:NULL' }
     PaymentMode: { name: string }
     PaymentReceived: { customer_id: 'biginteger unsigned', amount_received: string, bank_charges: double, payment_number: string, deposit_bank_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', invoice_number: string }
     PaymentTerm: { name: string }
     PaymentType: { name: string }
-    PaymentVoucher: { product_id: 'biginteger unsigned', expense_date: timestamp, amount: string, description: string, branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', tax_id: 'biginteger unsigned', vendor_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', expense_account_id: 'biginteger unsigned' }
+    PaymentVoucher: { product_id: 'biginteger unsigned', expense_date: timestamp, amount: string, description: string, vendor_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', tax_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', expense_account_id: 'biginteger unsigned' }
     PaymentVoucherDetail: { Expense_account_id: string, amount: string, quantity: string, item_id: 'biginteger unsigned' }
+    PeriodAccount: { id: 'char:36', financial_period_id: 'char:36', debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: 'string nullable default:NULL', account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    PeriodAccountDaily: { id: 'char:36', period_date: date, debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: string, account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    PeriodAccountYear: { id: 'char:36', financial_year_id: 'char:36', debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: 'string nullable default:NULL', account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    Permission: { name: string }
+    PostInflow: { amount: double, inflow_date: date, narration: string, bank_id: 'biginteger unsigned', inflow_status: 'biginteger unsigned', customer_id: 'integer nullable default:NULL' }
+    PostOutflow: { org_bank: 'biginteger unsigned nullable default:NULL', beneficiary: 'string:150 nullable default:NULL', amount: 'decimal:10,0 nullable default:NULL', account_name: 'string:150 nullable default:NULL', account_number: 'decimal:10,0 nullable default:NULL', bene_bank: 'biginteger unsigned nullable default:NULL', narration: 'string:150 nullable default:NULL', outflow_date: 'date nullable default:NULL', outflow_mode: 'biginteger unsigned', customer_id: 'integer nullable default:NULL', sales_receipt_id: 'biginteger nullable default:NULL' }
     PurchaseOrderDetail: { item_category_id: 'biginteger unsigned', purchase_order_id: string, item_id: 'biginteger unsigned', unit_price: string, quantity: string, unit_id: 'biginteger unsigned' }
     PurchaseReceivedDetail: { new_purchased_received_id: 'biginteger unsigned', item_category_id: 'biginteger unsigned', item_id: 'biginteger unsigned', unit_price: string, quantity: string, unit_id: 'biginteger unsigned' }
     Reason: { name: string }
-    Role: { name: string, description: 'string nullable default:NULL' }
-    Sale: { customer_id: 'biginteger unsigned', product_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', quantity: double, price: double, discount_id: 'biginteger unsigned', discount: double, sales_order_number: string, total_amount: string, amount_paid: double, balance_amount: double, payment_mode: 'biginteger unsigned' }
-    SalesReceipt: { customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', product_id: 'biginteger unsigned', tax_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', discount_id: 'biginteger unsigned', quantity: string, rate: string, amount: string, receipt_date: timestamp, customer_note: string }
+    ReceiveItem: { id: 'char:36', receive_order_id: 'char:36', quantity: integer, unit_price: double, product_id: 'biginteger unsigned', description: 'text nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    ReceiveOrder: { id: 'char:36', purchase_order_number: 'string nullable default:NULL', receive_date: date, branch_id: 'biginteger unsigned', store_id: 'biginteger unsigned', vendor_id: 'biginteger unsigned nullable default:NULL', status: "enum:'pending','approved','cancelled' default:'pending'", approval_date: 'timestamp nullable default:NULL', approved_by: 'biginteger unsigned nullable default:NULL', approval_comment: 'string nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    RefundType: { name: string }
+    Release: { branch_id: 'biginteger unsigned', store_id: 'biginteger unsigned', customer_id: 'biginteger unsigned', sales_receipt_id: 'biginteger unsigned', user_id: 'biginteger unsigned', release_date: date, sales_order_id: 'biginteger nullable default:NULL' }
+    ReleaseDetails: { release_id: 'biginteger unsigned', product_id: 'biginteger unsigned', release_quantity: string, amount: string }
+    ReturnDetails: {  }
+    ReturnItem: {  }
+    Role: { name: 'string nullable default:NULL', guard_name: 'string nullable default:NULL' }
+    Sale: {  }
+    Sales: {  }
+    SalesInvoice: {  }
+    SalesOrder: { customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', store_id: 'biginteger unsigned', sales_order_number: string, total_amount: 'decimal:10,2 default:0.00', credit_limit: 'decimal:10,2 nullable default:NULL', credit_balance: 'decimal:10,2 default:0.00', payment_type: "enum:'Cash','Bank','Paylater','Credit' default:'Cash'", status: "enum:'Pending','Approved','Paid','Cancelled','Credit Pending' default:'Pending'", user_id: 'biginteger nullable default:NULL' }
+    SalesReceipt: { sales_receipt_number: 'string:150 nullable default:NULL', customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', payment_type: "enum:'Cash','Bank','Deposit','POS','Multi-Payment'", store_id: 'biginteger unsigned', total_amount: 'decimal:10,2 nullable default:NULL', amount_paid: 'decimal:10,2 nullable default:NULL', receipt_date: 'date nullable default:NULL', sales_order_id: 'biginteger unsigned nullable default:NULL', payment_detail: longtext, user_id: 'biginteger nullable default:NULL', cashier_id: 'biginteger nullable default:NULL' }
+    SalesType: {  }
+    ServiceType: { name: 'string nullable default:NULL' }
+    SettleCredit: {  }
     State: { name: string }
     Status: { name: string }
+    Store: { name: string, branch_id: 'biginteger unsigned', store_type_id: 'biginteger unsigned' }
+    StoreItem: { item_category_id: 'biginteger unsigned', create_item_id: 'biginteger unsigned', unit_id: 'biginteger unsigned', quantity: double, quantity_holding: 'double default:0.00', cost_price: double, selling_price: double, reorder_level: string, discount: 'biginteger unsigned nullable default:NULL', user_id: 'biginteger unsigned', store_id: 'biginteger unsigned', branch_id: 'biginteger nullable default:NULL' }
+    StoreTransferItem: { id: 'char:36', transfer_order_id: 'char:36', quantity: integer, unit_price: double, product_id: 'biginteger unsigned', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    StoreTransferOrder: { id: 'char:36', order_number: string, transfer_date: timestamp, source_branch_id: 'biginteger unsigned', source_store_id: 'biginteger unsigned', destination_branch_id: 'biginteger unsigned', destination_store_id: 'biginteger unsigned', approval_stage_id: 'biginteger unsigned nullable default:NULL', source_status: "enum:'pending','approved','cancelled' default:'pending'", source_date_approved: 'timestamp nullable default:NULL', destination_status: "enum:'pending','approved','cancelled' default:'pending'", destination_date_approved: 'timestamp nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    StoreType: { name: string }
     Tax: { name: string }
     Title: { name: string }
-    TransferOrder: { transfer_order_number: string, transfer_date: timestamp, transfer_reason: string, source_id: 'biginteger unsigned', destination_id: 'biginteger unsigned', image_url: string, transfer_quantity: string, item_id: 'biginteger unsigned' }
+    Transaction: { id: 'char:36', financial_period_id: 'char:36', transaction_date: date, transcode: string, transtype: string, naration: string, debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: string, account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
+    TransactionType: {  }
+    TransferOrder: { transfer_order_number: string, transfer_date: date, transfer_reason: string, source_id: 'biginteger unsigned', destination_id: 'biginteger unsigned', image_url: string, transfer_quantity: string, item_id: 'biginteger unsigned', created_by: 'biginteger unsigned nullable default:NULL', updated_by: 'biginteger unsigned nullable default:NULL' }
     Unit: { name: string }
-    User: { role_id: 'biginteger unsigned', name: string, email: string, password: string, status_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned' }
-    Vendor: { name: string, address: string, contact_title: string, contact_designation: string, contact_surname: string, contact_firstname: string, contact_middlename: string, contact_fullname: string, vendor_type_id: 'biginteger unsigned', phone_number: string, email: string, image_url: string, tin: string, bank_id: 'biginteger unsigned', account_number: string }
-    VendorCredit: { vendor_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', credit_number: string, purchase_order_number: string, vendor_credit_date: date }
+    User: { name: string, email: string, password: string, store_id: 'biginteger unsigned', status_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned' }
+    Vendor: { vendor_type: 'biginteger unsigned', name: 'string nullable default:NULL', service_type: 'biginteger unsigned', title: 'biginteger unsigned', designation: 'biginteger unsigned', contact_surname: 'string nullable default:NULL', contact_firstname: 'string nullable default:NULL', contact_middlename: 'string nullable default:NULL', contact_email: 'string nullable default:NULL', contact_phone_number: 'string nullable default:NULL', bank: 'biginteger unsigned', account_number: 'string nullable default:NULL', account_name: 'string nullable default:NULL', tin: 'string:150 nullable default:NULL', image_url: 'string nullable default:NULL' }
+    VendorCredit: { warehouse_id: 'biginteger unsigned', credit_number: string, purchase_order_number: string, vendor_id: 'biginteger unsigned', vendor_credit_date: date }
+    VendorTarget: {  }
     VendorType: { name: string }
     Warehouse: { name: string, branch_id: 'biginteger unsigned', warehouse_address: string, zipcode: string, contact_person: string, email: string, phone: string }
     Weight: { name: string }
-    AccountGroup: { id: 'uuid primary', name: string, created_by: int, modified_by: int, deleted_by: int, relationships: { hasMany: 'Account,AccountType' } }
-    AccountType: { id: 'uuid primary', account_group_id: 'uuid foreign:account_groups', name: string, code: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', relationships: { hasMany: 'Account,AccountSubtype' } }
-    AccountSubtype: { id: 'uuid primary', name: string, account_type_id: 'uuid foreign:account_types', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', relationships: { hasMany: Account } }
-    Account: { id: 'uuid primary', name: string, code: string, account_group_id: 'uuid foreign:account_groups', account_type_id: 'uuid foreign:account_types', account_subtype_id: 'uuid foreign:account_subtypes', account_owner_id: int, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id' }
-    Chart: { id: 'uuid primary', chart_title: string, chart_type_id: 'uuid foreign', chart_category_id: 'uuid foreign', sql_query: text, is_active: int, module_id: int, filterColumn: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: Dashboardsetting } }
-    ChartCard: { id: 'uuid primary', card_title: string, card_size: int, is_active: int, sql_query: text, module_id: int, submodule_id: int, sequence: int, color: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    ChartCategory: { id: 'uuid primary', chart_provider_id: 'uuid foreign:chart_providers', chart_category: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: 'ChartType,DashboardSetting' } }
-    ChartProvider: { id: 'uuid primary', chart_provider: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: ChartCategory } }
-    ChartType: { id: 'uuid primary', chart_category_id: 'uuid foreign:chart_categories', chart_type: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: DashboardSetting } }
-    DashboardSetting: { id: 'uuid primary', chart_id: 'uuid foreign:charts', module_id: 'uuid foreign:modules', chart_type_id: 'uuid foreign:chart_types', chart_category_id: 'uuid foreign:chart_categories', chart_title: string, is_active: int, order_by: int, is_group: int, submodule_Id: int, add_condition: int, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    FinancialYear: { id: 'uuid primary', name: string, date_from: date, date_to: date, is_active: boolean, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', relationships: { hasMany: 'FinancialQuarter, FinancialPeriod' } }
-    FinancialQuarter: { id: 'uuid primary', name: string, date_from: date, date_to: date, is_active: boolean, financial_year_id: 'uuid foreign:financial_years', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', relationships: { hasMany: FinancialPeriod } }
-    FinancialPeriod: { id: 'uuid primary', name: string, date_from: date, date_to: date, is_active: boolean, financial_year_id: 'uuid foreign:financial_years', financial_quarter_id: 'uuid foreign:financial_quarters', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', relationships: { hasMany: Transaction } }
-    JournalType: { id: 'uuid primary', name: string, sign: int }
-    JournalEntry: { id: 'uuid primary', description: string, payment_date: timestamp, warehouse_id: 'id foreign:warehouses', vendor_id: int, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: JournalEntryDetail } }
-    JournalEntryDetail: { id: 'uuid primary', journal_entry_id: 'uuid foreign:journal_entries', journal_type_id: 'uuid foreign:journal_types', amount: double, description: text, account_id: 'uuid:foreign:accounts', account_no: string, created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    Transaction: { id: 'uuid primary', financial_period_id: 'uuid foreign:financial_periods', transaction_date: date, transcode: string, transtype: string, naration: string, debit: double, credit: double, amount: double, warehouse_id: 'id foreign:warehouses', account_no: string, account_id: 'uuid foreign:accounts', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    AccountOpeningBalance: { id: 'uuid primary', financial_year_id: 'uuid foreign:financial_years', financial_period_id: 'uuid foreign:financial_periods', debit: double, credit: double, amount: double, warehouse_id: 'id foreign:warehouses', account_no: string, account_id: 'uuid foreign:accounts', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    PeriodAccount: { id: 'uuid primary', financial_period_id: 'uuid foreign:financial_periods', debit: double, credit: double, amount: double, warehouse_id: 'id foreign:warehouses', account_no: 'string nullable', account_id: 'uuid foreign:accounts', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    PeriodAccountYear: { id: 'uuid primary', financial_year_id: 'uuid foreign:financial_years', debit: double, credit: double, amount: double, warehouse_id: 'id foreign:warehouses', account_no: 'string  nullable', account_id: 'uuid foreign:accounts', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    PeriodAccountDaily: { id: 'uuid primary', period_date: date, debit: double, credit: double, amount: double, warehouse_id: 'id foreign:warehouses', account_no: string, account_id: 'uuid foreign:accounts', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    ApprovalLimit: { id: 'uuid primary', amount: float, user_id: 'id foreign:users', created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ApprovalProcessModule: { id: 'uuid primary', name: longtext, max_approval_count: int, created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ApprovalProcessType: { id: 'uuid primary', name: string, created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ApprovalStage: { id: 'uuid primary', name: string, process_type_id: 'uuid foreign:approval_process_types', created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ApprovalType: { id: 'uuid primary', name: string, description: longtext, created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ApprovalInstance: { id: 'uuid primary', approval_stage_id: 'uuid foreign:approval_stages', approval_type_id: 'uuid foreign:approval_types', created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ApprovalProcessFlow: { id: 'uuid primary', sequence_no: int, process_module_id: 'uuid foreign:approval_process_modules', approval_stage_id: 'uuid foreign:approval_stages', status_id: int, created_by: 'id foreign:users', modified_by: 'id foreign:users', deleted_by: 'id foreign:users', softdeletes: softDeletes }
-    ReceiveOrder: { id: 'uuid primary', purchase_order_number: string, receive_date: timestamp, store_id: 'id foreign:stores', vendor_id: int, status: "enum('pending','approved', 'cancelled')", created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: ReceiveItem } }
-    ReceiveItem: { id: 'uuid primary', receive_order_id: 'uuid foreign:receive_orders', quantity: int, unit_price: double, product_id: 'id foreign:create_items.id', description: 'text nullable', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    StoreTransferOrder: { id: 'uuid primary', order_number: string, transfer_date: timestamp, source_branch_id: 'id foreign:branches.id', source_store_id: 'id foreign:stores', destination_branch_id: 'id foreign:branches.id', destination_store_id: 'id foreign:stores', approval_stage_id: 'id foreign:approval_stages.id', source_status: "enum('pending','approved', 'cancelled')", source_date_approved: 'timestamp nullable', destination_status: "enum('pending','approved', 'cancelled')", destination_date_approved: 'timestamp nullable', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes, relationships: { hasMany: ReceiveItem } }
-    StoreTransferItem: { id: 'uuid primary', transfer_order_id: 'uuid foreign:store_transfer_orders.id', quantity: int, unit_price: double, product_id: 'id foreign:create_items.id', created_by: 'id nullable foreign:users.id', modified_by: 'id nullable foreign:users.id', deleted_by: 'id nullable foreign:users.id', softdeletes: softDeletes }
-    CreditTransaction: { id: 'id primary', branch_id: 'id foreign:branches', customer_id: 'id foreign:customers', sales_order_id: 'id nullable foreign:sales_orders', sales_receipt_id: 'id nullable foreign:sales_receipts', amount: 'decimal(12,2)', credit_limit: 'decimal(12,2) nullable', credit_balance_before: 'decimal(12,2) nullable', type: "enum:('credit', 'payment')", created_by: 'id foreign:users', modified_by: 'id nullable foreign:users', deleted_by: 'id nullable foreign:users', softdeletes: softDeletes, relationships: { hasMany: 'Branch,Customer,SalesOrder,SalesReceipt' } }
+    Year: { name: 'string:150 nullable default:NULL' }
+    PriceChange: { details: json, store_id: 'foreignId:constrained:stores', branch_id: 'foreignId:constrained:branches', change_reason_id: 'foreignId:constrained:change_reasons', status: 'enum:pending,approved,declined default:pending', approved_by: 'foreignId:constrained:users nullable', approval_date: 'timestamp nullable', comment: 'string:1000', created_by: 'foreignId:constrained:users', created_at: timestamp, updated_at: timestamp }
+    ChangeReason: { name: 'string:255', created_at: timestamp, updated_at: timestamp }
