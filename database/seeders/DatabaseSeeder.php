@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             WarehouseSeeder::class,
             UserSeeder::class,
             StoreItemSeeder::class,
+            ChangeReasonSeeder::class,
             //ChartProviderSeeder::class,
             //ChartCategorySeeder::class,
             //ChartTypeSeeder::class,

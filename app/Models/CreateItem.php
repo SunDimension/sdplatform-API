@@ -38,7 +38,7 @@ class CreateItem extends Model
         'discount',
         'dimension_id',
         'weight_id',
-        'branch_id',
+        // 'branch_id',
         'warehouse',
         'vendor_id',
         'image_url',

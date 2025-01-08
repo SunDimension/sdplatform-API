@@ -93,8 +93,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
 
+    Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpensesController::class);
 
-
+     Route::apiResource('cashier-remittance', App\Http\Controllers\CashierRemittanceController::class);
     ///////////// Sales Routes /////////////////
     // Route::post('sales-orders', [SalesOrderController::class,'store']);
     // Route::get('/sales-orders/{id}/edit', [SalesOrderController::class, 'edit']);
