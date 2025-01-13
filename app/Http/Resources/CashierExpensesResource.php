@@ -17,9 +17,10 @@ class CashierExpensesResource extends JsonResource
         return [
             'id' => $this->id,
             'branch_id' => $this->branch_id,
-            'expense_name' => $this->expense_name,
+            'branch_name' => $this->branch ? $this->branch->name : null,
+            'expense_line_id' => $this->expense_line_id,
             'user_id' => $this->user_id,
-            
+            'user_name' => $this->user ? $this->user->name : null,
             'amount' => $this->amount,
             'date' => $this->date,
             'store_id' => $this->store_id,

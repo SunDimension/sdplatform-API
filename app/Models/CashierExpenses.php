@@ -17,7 +17,7 @@ class CashierExpenses extends Model
      * @var array
      */
     protected $fillable = [
-        'expense_name',
+        'expense_line_id',
         'branch_id',
         'amount',
         'user_id',
@@ -36,6 +36,7 @@ class CashierExpenses extends Model
         'branch_id' => 'integer',
         'user_id' => 'integer',
         'store_id' => 'integer',
+        'expense_line_id' => 'integer',
 ];
 
       public function branch(): BelongsTo
@@ -49,5 +50,11 @@ class CashierExpenses extends Model
        public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+
+    }
+
+       public function expense()
+    {
+        return $this->belongsTo(ExpenseLine::class,);
     }
 }

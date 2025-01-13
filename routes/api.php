@@ -92,7 +92,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
     Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
-
+    Route::apiResource('cash-discrepancies', App\Http\Controllers\CashDiscrepancyController::class);
+    Route::apiResource('expense-lines', App\Http\Controllers\ExpenseLineController::class);
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpensesController::class);
 
      Route::apiResource('cashier-remittance', App\Http\Controllers\CashierRemittanceController::class);

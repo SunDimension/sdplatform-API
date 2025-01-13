@@ -21,10 +21,10 @@ class CashierExpenseStoreRequest extends FormRequest
     {
         return [
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'expense_name' => ['required', 'string'],
+            'expense_line_id' => ['required', 'integer', 'exists:expense_lines,id'],
             'store_id' => ['required', 'integer', 'exists:stores,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
-            'amount' => ['required', 'string'],
+            'amount' => ['required', 'numeric'],
             'date' => ['required', 'date'],
            
         ];

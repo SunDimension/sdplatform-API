@@ -14,8 +14,12 @@ return new class extends Migration
         Schema::create('cashier_remittance', function (Blueprint $table) {
             $table->id();
             $table->foreignId('branch_id')->constrained('branches');
+            $table->foreignId('cash_discrepancy_id')->constrained('cash_discrepancies');
             $table->float('amount');
+            $table->float('discrepancy_amount');
+             $table->timestamps('approval_date');
             $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('approved_by')->constrained('users');
             $table->foreignId('store_id')->constrained('stores');
             $table->date('date');
             $table->timestamps();
