@@ -25,6 +25,8 @@ class CashierExpensesResource extends JsonResource
             'date' => $this->date,
             'store_id' => $this->store_id,
             'store_name' => $this->store->name,
+            'approval_date'=>$this->approval_date,
+            'approval_by'=>$this->approval_by,
             
         ];
     }

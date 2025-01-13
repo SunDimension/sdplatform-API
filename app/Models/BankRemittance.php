@@ -24,7 +24,8 @@ class BankRemittance extends Model
         'user_id',
         'store_id',
         'date',
-        'account_number'
+        'account_number',
+        
         
 
     ];

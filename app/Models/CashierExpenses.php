@@ -22,7 +22,9 @@ class CashierExpenses extends Model
         'amount',
         'user_id',
         'store_id',
-        'date'
+        'date',
+        'approved_by',
+        'approval_date',
 
     ];
 
@@ -37,6 +39,7 @@ class CashierExpenses extends Model
         'user_id' => 'integer',
         'store_id' => 'integer',
         'expense_line_id' => 'integer',
+        'approved_by' => 'integer',
 ];
 
       public function branch(): BelongsTo
