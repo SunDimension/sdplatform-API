@@ -27,7 +27,7 @@ class CashierRemittanceResource extends JsonResource
             'amount' => $this->amount,
             'date' => $this->date,
             'store_id' => $this->store_id,
-            'store_name' => $this->store->name,
+            // 'store_name' => $this->store->name,
             
         ];
     }

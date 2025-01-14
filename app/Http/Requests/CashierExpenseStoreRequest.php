@@ -27,7 +27,6 @@ class CashierExpenseStoreRequest extends FormRequest
             'amount' => ['required', 'numeric'],
             'date' => ['required', 'date'],
             'approved_by' => ['nullable'],
-            'approval_date' => ['required'],
             'status' => ['nullable', 'string'],
            
         ];

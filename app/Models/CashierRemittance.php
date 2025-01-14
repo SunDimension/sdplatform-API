@@ -51,7 +51,7 @@ class CashierRemittance extends Model
     }
     public function store()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class,'store_id');
     }
     public function user()
     {
@@ -65,6 +65,6 @@ class CashierRemittance extends Model
 
     public function discrepancy()
     {
-        return $this->belongsTo(CashDiscrepancy::class,);
+        return $this->belongsTo(CashDiscrepancy::class,'cash_discrepancy_id');
     }
 }
