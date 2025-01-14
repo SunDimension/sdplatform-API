@@ -94,12 +94,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
     Route::apiResource('cash-discrepancies', App\Http\Controllers\CashDiscrepancyController::class);
     Route::apiResource('expense-lines', App\Http\Controllers\ExpenseLineController::class);
-    Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpensesController::class);
-
+    
+    Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
+    Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
+
+    Route::get('cashier-expense-pending', [App\Http\Controllers\CashierExpenseController::class,'pending']);
+    Route::get('bank-remittance-pending', [App\Http\Controllers\BankRemittanceController::class,'pending']);
+    Route::get('cashier-remittance-pending', [App\Http\Controllers\CashierRemittanceController::class,'pending']);
+
+    Route::post('cashier-expense-approve', [App\Http\Controllers\CashierExpenseController::class,'approve']);
+    Route::post('bank-remittance-approve', [App\Http\Controllers\BankRemittanceController::class,'approve']);
+    Route::post('cashier-remittance-approve', [App\Http\Controllers\CashierRemittanceController::class,'approve']);
 
 
-     Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
     ///////////// Sales Routes /////////////////
     // Route::post('sales-orders', [SalesOrderController::class,'store']);
     // Route::get('/sales-orders/{id}/edit', [SalesOrderController::class, 'edit']);
@@ -355,8 +363,5 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('change-reasons', App\Http\Controllers\ChangeReasonController::class);
     Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class,'pending']);
     Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class,'approve']);
-
-    
-
     
 });

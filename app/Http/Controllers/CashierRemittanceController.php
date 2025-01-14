@@ -19,6 +19,30 @@ class CashierRemittanceController extends Controller
         return new CashierRemittanceCollection($cashierExpenses);
     }
 
+    public function pending(Request $request): CashierRemittanceCollection
+    {
+        $cashierExpenses = CashierRemittance::where('status','pending')->where('branch_id',auth()->user()->branch_id)->get();
+
+        return new CashierRemittanceCollection($cashierExpenses);
+    }
+
+    public function approve(Request $request)
+    {
+        $validated = $request->validate([
+            'comment' => ['nullable'],
+            'status' => ['required', 'string'],
+            'id'=>['required',]
+        ]);
+        $receiveOrder = CashierRemittance::findOrFail($validated['id']);
+        $receiveOrder->approval_comment = $validated['comment'];
+        $receiveOrder->status = $validated['status'];
+        $receiveOrder->approved_by = auth()->user()->id;
+        $receiveOrder->approval_date = now();
+        $receiveOrder->save();
+
+        return new CashierRemittanceCollection($receiveOrder);
+    }
+
     public function store(CashierRemittanceStoreRequest $request): CashierRemittanceResource
     {
         $cashierExpenses = CashierRemittance::create($request->validated());

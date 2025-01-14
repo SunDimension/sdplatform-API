@@ -25,6 +25,8 @@ class BankRemittance extends Model
         'store_id',
         'date',
         'account_number',
+        'approval_comment',
+        'status',
         
         
 
