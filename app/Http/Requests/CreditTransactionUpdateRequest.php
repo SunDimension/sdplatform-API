@@ -27,7 +27,6 @@ class CreditTransactionUpdateRequest extends FormRequest
             'amount' => ['required', 'string'],
             'credit_limit' => ['nullable', 'string'],
             'credit_balance_before' => ['nullable', 'string'],
-            'type' => ['required', 'in:('credit','],
             'created_by' => ['required'],
             'modified_by' => ['nullable'],
             'deleted_by' => ['nullable'],
