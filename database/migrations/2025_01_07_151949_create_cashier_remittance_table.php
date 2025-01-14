@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('cash_discrepancy_id')->constrained('cash_discrepancies');
             $table->float('amount');
             $table->float('discrepancy_amount');
-             $table->timestamps('approval_date');
+             $table->timestamp('approval_date');
             $table->foreignId('user_id')->constrained('users');
             $table->foreignId('approved_by')->constrained('users');
             $table->foreignId('store_id')->constrained('stores');

@@ -19,6 +19,30 @@ class CashDiscrepancyController extends Controller
         return new CashDiscrepancyCollection($cashDs);
     }
 
+    public function pending(Request $request): CashDiscrepancyCollection
+    {
+        $cashierExpenses = CashDiscrepancy::where('status','pending')->where('branch_id',auth()->user()->branch_id)->get();
+
+        return new CashDiscrepancyCollection($cashierExpenses);
+    }
+
+    public function approve(Request $request)
+    {
+        $validated = $request->validate([
+            'comment' => ['nullable'],
+            'status' => ['required', 'string'],
+            'id'=>['required']
+        ]);
+        $receiveOrder = CashDiscrepancy::findOrFail($validated['id']);
+        $receiveOrder->approval_comment = $validated['comment'];
+        $receiveOrder->status = $validated['status'];
+        $receiveOrder->approved_by = auth()->user()->id;
+        $receiveOrder->approval_date = now();
+        $receiveOrder->save();
+
+        return new CashDiscrepancyCollection($receiveOrder);
+    }
+
     public function store(CashDiscrepancyStoreRequest $request): CashDiscrepancyResource
     {
         $cashDs = CashDiscrepancy::create($request->validated());

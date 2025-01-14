@@ -26,7 +26,9 @@ class CashierRemittance extends Model
         'approved_by',
         'approval_date',
         'discrepancy_amount',
-        'cash_discrepancy_id'
+        'cash_discrepancy_id',
+        'approval_comment',
+        'status'
 
     ];
 
@@ -41,29 +43,28 @@ class CashierRemittance extends Model
         'user_id' => 'integer',
         'store_id' => 'integer',
         'approved_by' => 'integer',
-         'cash_discrepancy_id'=>'integer'
-];
-          public function branch(): BelongsTo
+        'cash_discrepancy_id' => 'integer'
+    ];
+    public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
-       public function store()
+    public function store()
     {
         return $this->belongsTo(Store::class);
     }
-       public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-
     }
 
-         public function approvedby()
+    public function approvedby()
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-        public function discrepancy()
+    public function discrepancy()
     {
-        return $this->belongsTo(CashDiscrepancy::class, );
+        return $this->belongsTo(CashDiscrepancy::class,);
     }
 }

@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 
-class CashierExpenses extends Model
+class CashierExpense extends Model
 {
-  use HasFactory;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
@@ -25,6 +25,8 @@ class CashierExpenses extends Model
         'date',
         'approved_by',
         'approval_date',
+        'approval_comment',
+        'status'
 
     ];
 
@@ -40,24 +42,23 @@ class CashierExpenses extends Model
         'store_id' => 'integer',
         'expense_line_id' => 'integer',
         'approved_by' => 'integer',
-];
+    ];
 
-      public function branch(): BelongsTo
+    public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
-       public function store()
+    public function store()
     {
         return $this->belongsTo(Store::class);
     }
-       public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-
     }
 
-       public function expense()
+    public function expense()
     {
-        return $this->belongsTo(ExpenseLine::class,);
+        return $this->belongsTo(ExpenseLine::class,'expense_line_id');
     }
 }

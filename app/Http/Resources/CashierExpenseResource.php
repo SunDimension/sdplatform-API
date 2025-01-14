@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CashierExpensesResource extends JsonResource
+class CashierExpenseResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -19,6 +19,7 @@ class CashierExpensesResource extends JsonResource
             'branch_id' => $this->branch_id,
             'branch_name' => $this->branch ? $this->branch->name : null,
             'expense_line_id' => $this->expense_line_id,
+            'expense_line' => $this->expense->name,
             'user_id' => $this->user_id,
             'user_name' => $this->user ? $this->user->name : null,
             'amount' => $this->amount,
