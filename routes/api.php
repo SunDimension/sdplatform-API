@@ -96,6 +96,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('expense-lines', App\Http\Controllers\ExpenseLineController::class);
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpensesController::class);
 
+
+    Route::get('pending-cash-expenses', [App\Http\Controllers\ExpenseLineController::class,'pending']);
+    Route::post('approve-cash-expenses', [App\Http\Controllers\ExpenseLineController::class,'approve']);
+    
+
+
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
 
 

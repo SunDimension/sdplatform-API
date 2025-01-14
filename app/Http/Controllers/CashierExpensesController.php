@@ -26,6 +26,13 @@ class CashierExpensesController extends Controller
         return new CashierExpensesResource($cashierExpenses);
     }
 
+      public function pending(Request $request)
+    {
+        $cashierExpenses = CashierExpenses::where('status','Pending')->where('store_id',auth()->user()->store_id)->get();
+        // $receiveOrders = ReceiveOrder::where('status','Pending')->get();
+        return new CashierExpensesCollection($cashierExpenses);
+    }
+
     public function show(Request $request, CashierExpenses $cashierExpenses): CashierExpensesResource
     {
         return new CashierExpensesResource($cashierExpenses);
