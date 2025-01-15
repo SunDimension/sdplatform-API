@@ -14,16 +14,24 @@ class CashierRemittanceController extends Controller
 {
     public function index(Request $request): CashierRemittanceCollection
     {
-        $cashierExpenses = CashierRemittance::all();
+        $cashierRemit = CashierRemittance::all();
 
-        return new CashierRemittanceCollection($cashierExpenses);
+        return new CashierRemittanceCollection($cashierRemit);
+    }
+
+    public function newGet()
+    {
+        $cashierRemit = CashierRemittance::all();
+
+        return new CashierRemittanceCollection($cashierRemit);
+
     }
 
     public function pending(Request $request): CashierRemittanceCollection
     {
-        $cashierExpenses = CashierRemittance::where('status','pending')->where('branch_id',auth()->user()->branch_id)->get();
+        $cashierRemit = CashierRemittance::where('status','pending')->where('branch_id',auth()->user()->branch_id)->get();
 
-        return new CashierRemittanceCollection($cashierExpenses);
+        return new CashierRemittanceCollection($cashierRemit);
     }
 
     public function approve(Request $request)
@@ -45,14 +53,14 @@ class CashierRemittanceController extends Controller
 
     public function store(CashierRemittanceStoreRequest $request): CashierRemittanceResource
     {
-        $cashierExpenses = CashierRemittance::create($request->validated());
+        $cashierRemit = CashierRemittance::create($request->validated());
 
-        return new CashierRemittanceResource($cashierExpenses);
+        return new CashierRemittanceResource($cashierRemit);
     }
 
-    public function show(Request $request, CashierRemittance $cashierExpenses): CashierRemittanceResource
+    public function show(Request $request, CashierRemittance $cashierRemit): CashierRemittanceResource
     {
-        return new CashierRemittanceResource($cashierExpenses);
+        return new CashierRemittanceResource($cashierRemit);
     }
 
     // public function update(BranchUpdateRequest $request, Branch $branch): BranchResource

@@ -3,69 +3,93 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\BankRemittanceStoreRequest;
-// use App\Http\Requests\BranchUpdateRequest;
 use App\Http\Resources\BankRemittanceCollection;
 use App\Http\Resources\BankRemittanceResource;
 use App\Models\BankRemittance;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Log;
 
 class BankRemittanceController extends Controller
 {
     public function index(Request $request): BankRemittanceCollection
     {
-        $cashierExpenses = BankRemittance::all();
+        Log::info('Fetching all bank remittances.');
 
-        return new BankRemittanceCollection($cashierExpenses);
+        $bankRemit = BankRemittance::all();
+
+        Log::info('Fetched bank remittances:', ['count' => $bankRemit->count()]);
+
+        return new BankRemittanceCollection($bankRemit);
     }
 
     public function pending(Request $request): BankRemittanceCollection
     {
-        $cashierExpenses = BankRemittance::where('status','pending')->where('branch_id',auth()->user()->branch_id)->get();
+        $user = auth()->user();
+        Log::info('Fetching pending bank remittances for branch.', ['branch_id' => $user->branch_id, 'user_id' => $user->id]);
 
-        return new BankRemittanceCollection($cashierExpenses);
+        $bankRemit = BankRemittance::where('status', 'pending')
+            ->where('branch_id', $user->branch_id)
+            ->get();
+
+        Log::info('Fetched pending bank remittances:', ['count' => $bankRemit->count()]);
+
+        return new BankRemittanceCollection($bankRemit);
     }
 
     public function approve(Request $request)
     {
+        Log::info('Approving bank remittance.', ['request_data' => $request->all()]);
+
         $validated = $request->validate([
             'comment' => ['nullable'],
             'status' => ['required', 'string'],
-            'id'=>['required']
+            'id' => ['required']
         ]);
+
         $receiveOrder = BankRemittance::findOrFail($validated['id']);
+        Log::info('Found bank remittance to approve.', ['id' => $validated['id']]);
+
         $receiveOrder->approval_comment = $validated['comment'];
         $receiveOrder->status = $validated['status'];
         $receiveOrder->approved_by = auth()->user()->id;
         $receiveOrder->approval_date = now();
         $receiveOrder->save();
 
-        return new BankRemittanceCollection($receiveOrder);
+        Log::info('Bank remittance approved.', ['id' => $validated['id'], 'status' => $validated['status']]);
+
+        return new BankRemittanceResource($receiveOrder);
     }
 
     public function store(BankRemittanceStoreRequest $request): BankRemittanceResource
     {
-        $cashierExpenses = BankRemittance::create($request->validated());
+        Log::info('Storing new bank remittance.', ['request_data' => $request->validated()]);
 
-        return new BankRemittanceResource($cashierExpenses);
+        $bankRemit = BankRemittance::create($request->validated());
+
+        Log::info('New bank remittance created.', ['id' => $bankRemit->id]);
+
+        return new BankRemittanceResource($bankRemit);
     }
 
-    public function show(Request $request, BankRemittance $cashierExpenses): BankRemittanceResource
+    public function show(Request $request, BankRemittance $bankRemit): BankRemittanceResource
     {
-        return new BankRemittanceResource($cashierExpenses);
+        Log::info('Fetching bank remittance details.', ['id' => $bankRemit->id]);
+
+        return new BankRemittanceResource($bankRemit);
     }
-
-    // public function update(BranchUpdateRequest $request, Branch $branch): BranchResource
-    // {
-    //     $branch->update($request->validated());
-
-    //     return new BranchResource($branch);
-    // }
 
     public function destroy($id)
     {
-        // $branch->delete();
-        BankRemittance::destroy($id);
+        Log::info('Deleting bank remittance.', ['id' => $id]);
+
+        $result = BankRemittance::destroy($id);
+
+        if ($result) {
+            Log::info('Bank remittance deleted successfully.', ['id' => $id]);
+        } else {
+            Log::warning('Failed to delete bank remittance.', ['id' => $id]);
+        }
 
         return response(null, Response::HTTP_NO_CONTENT);
     }

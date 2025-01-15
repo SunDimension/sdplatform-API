@@ -97,8 +97,13 @@ Route::middleware('auth:sanctum')->group(function () {
     
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
+    
+    
     Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
-
+    
+    // Route::get('cashier-remit', App\Http\Controllers\CashierRemittanceController::class,'newGet');
+    
+    // Route::get('cashier-remittances-get', [App\Http\Controllers\CashierRemittanceController::class,'index']);
     Route::get('cashier-expense-pending', [App\Http\Controllers\CashierExpenseController::class,'pending']);
     Route::get('bank-remittance-pending', [App\Http\Controllers\BankRemittanceController::class,'pending']);
     Route::get('cashier-remittance-pending', [App\Http\Controllers\CashierRemittanceController::class,'pending']);

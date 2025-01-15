@@ -17,6 +17,7 @@ class BankRemittanceResource extends JsonResource
         return [
             'id' => $this->id,
             'bank_id' => $this->bank_id,
+            'bank_name' => $this->bank ? $this->bank->name : null,
             'branch_id' => $this->branch_id,
             'branch_name' => $this->branch ? $this->branch->name : null,
             'user_id' => $this->user_id,
