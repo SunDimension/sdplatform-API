@@ -79,6 +79,13 @@ class BankRemittanceController extends Controller
         return new BankRemittanceResource($bankRemit);
     }
 
+    public function get($id): BankRemittanceResource
+    { 
+        $cashierRemit = BankRemittance::findOrFail($id);
+        return new BankRemittanceResource($cashierRemit);
+    }
+
+
     public function destroy($id)
     {
         Log::info('Deleting bank remittance.', ['id' => $id]);

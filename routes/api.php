@@ -100,6 +100,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
     
     Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
+    Route::get('get-cashier-remittance/{id}', [App\Http\Controllers\CashierRemittanceController::class,'get']);
+    Route::get('get-bank-remittance/{id}', [App\Http\Controllers\BankRemittanceController::class,'get']);
     
     // Route::get('cashier-remit', App\Http\Controllers\CashierRemittanceController::class,'newGet');
     

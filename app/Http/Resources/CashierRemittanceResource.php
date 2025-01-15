@@ -23,11 +23,11 @@ class CashierRemittanceResource extends JsonResource
             'user_id' => $this->user_id,
             'user_name' => $this->user ? $this->user->name : null,
             'approval_date'=>$this->approval_date,
-            'approval_by'=>$this->approval_by,
+            'approved_by'=>$this->approved_by,
             'amount' => $this->amount,
             'date' => $this->date,
             'store_id' => $this->store_id,
-            // 'store_name' => $this->store->name,
+            'store_name' => $this->store->name,
             
         ];
     }

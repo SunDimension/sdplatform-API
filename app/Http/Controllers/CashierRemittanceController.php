@@ -48,13 +48,19 @@ class CashierRemittanceController extends Controller
         $receiveOrder->approval_date = now();
         $receiveOrder->save();
 
-        return new CashierRemittanceCollection($receiveOrder);
+        return new CashierRemittanceResource($receiveOrder);
     }
 
     public function store(CashierRemittanceStoreRequest $request): CashierRemittanceResource
     {
         $cashierRemit = CashierRemittance::create($request->validated());
 
+        return new CashierRemittanceResource($cashierRemit);
+    }
+
+    public function get($id): CashierRemittanceResource
+    { 
+        $cashierRemit = CashierRemittance::findOrFail($id);
         return new CashierRemittanceResource($cashierRemit);
     }
 
