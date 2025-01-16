@@ -67,4 +67,9 @@ class CashierRemittance extends Model
     {
         return $this->belongsTo(CashDiscrepancy::class,'cash_discrepancy_id');
     }
+
+       public function getCashDiscrepancyNameAttribute()
+    {
+        return $this->discrepancy ? $this->discrepancy->name : null;
+    }
 }

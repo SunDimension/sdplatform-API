@@ -52,9 +52,7 @@ public function index(Request $request): SalesOrderCollection
     if ($branchId) {
         $query->where('branch_id', $branchId);
     } else {
-        // Assuming you want to apply the branch_id from the logged-in user if no branch_id is provided in the request
-        // $user = auth()->user();
-        // $query->where('branch_id', $user->branch_id);
+        
     }
 
     // Apply date range filters if provided
