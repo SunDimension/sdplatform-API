@@ -31,7 +31,7 @@ public function index(Request $request): BankRemittanceCollection
 
         
         $query = BankRemittance::with(['store', 'user', 'branch', 'bank']);
-
+            $query->where('status', 'approved');
           if ($bankId) {
         $query->where('bank_id', $bankId);
     }

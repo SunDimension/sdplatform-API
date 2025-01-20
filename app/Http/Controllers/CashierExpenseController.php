@@ -30,6 +30,9 @@ class CashierExpenseController extends Controller
         
         $query = CashierExpense::with(['store', 'user', 'branch', 'expense']);
 
+            // Add where status = 'approved'
+    $query->where('status', 'approved');
+
           if ($storeId) {
         $query->where('store_id', $storeId);
     }

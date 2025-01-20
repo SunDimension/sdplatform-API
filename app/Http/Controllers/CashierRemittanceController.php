@@ -30,6 +30,7 @@ class CashierRemittanceController extends Controller
         
         $query = CashierRemittance::with(['store', 'user', 'branch', 'discrepancy']);
 
+            $query->where('status', 'approved');
           if ($storeId) {
         $query->where('store_id', $storeId);
     }
