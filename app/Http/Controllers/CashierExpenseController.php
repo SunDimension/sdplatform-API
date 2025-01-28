@@ -9,15 +9,71 @@ use App\Http\Resources\CashierExpenseResource;
 use App\Models\CashierExpense;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Carbon\Carbon;
 
 class CashierExpenseController extends Controller
 {
     public function index(Request $request): CashierExpenseCollection
     {
-        $CashierExpense = CashierExpense::all();
+        $validated = $request->validate([
+        'store_id' => 'nullable|integer|exists:stores,id',
+        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+        'from_date' => 'nullable|date',
+        'to_date' => 'nullable|date',
+    ]);
+         // Extract validated parameters
+        $storeId = $validated['store_id'] ?? null;
+        $branchId = $validated['branch_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
 
-        return new CashierExpenseCollection($CashierExpense);
+        
+        $query = CashierExpense::with(['store', 'user', 'branch', 'expense']);
+
+            // Add where status = 'approved'
+    $query->where('status', 'approved');
+
+          if ($storeId) {
+        $query->where('store_id', $storeId);
     }
+
+    // Apply branch filter if provided or based on the logged-in user
+    if ($branchId) {
+        $query->where('branch_id', $branchId);
+    } else {
+        
+    }
+    if ($fromDate || $toDate) {
+        // Convert from_date and to_date to Carbon instances only if provided
+        $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+        $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+
+        // Apply date filter for the selected range along with the branch condition
+        if ($fromDate && $toDate) {
+            // Both from_date and to_date are provided
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        } elseif ($fromDate) {
+            // Only from_date is provided
+            $query->where('created_at', '>=', $fromDate);
+        } elseif ($toDate) {
+            // Only to_date is provided
+            $query->where('created_at', '<=', $toDate);
+        }
+
+        // Ensure transactions are fetched only for the user's branch when filtering by date
+        $user = auth()->user(); // Get the logged-in user
+        $query->where('branch_id', $user->branch_id); // Filter by branch_id (user's branch)
+    }
+
+    // Fetch the results
+    $cashierRemit = $query->get();
+
+    // Return the results as a collection
+    
+
+        return new CashierExpenseCollection($cashierRemit);
+    }
+
 
     public function pending(Request $request): CashierExpenseCollection
     {

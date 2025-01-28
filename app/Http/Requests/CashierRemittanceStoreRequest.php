@@ -25,10 +25,10 @@ class CashierRemittanceStoreRequest extends FormRequest
             'store_id' => ['required', 'integer', 'exists:stores,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'approved_by' => ['nullable'],
-            'amount' => ['required', 'numeric'],
+            'amount' => ['required'],
             'date' => ['required', 'date'],
             'approval_date' => ['nullable'],
-            'discrepancy_amount' => ['required', 'numeric'],
+            'discrepancy_amount' => ['nullable'],
 
            
         ];

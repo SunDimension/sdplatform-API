@@ -25,7 +25,7 @@ class BankRemittanceStoreRequest extends FormRequest
             'store_id' => ['required', 'integer', 'exists:stores,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'bank_id' => ['required', 'integer', 'exists:banks,id'],
-            'amount' => ['required', 'numeric'],
+            'amount' => ['required'],
             'account_number' => ['required', 'numeric'],
             'date' => ['required', 'date'],
             

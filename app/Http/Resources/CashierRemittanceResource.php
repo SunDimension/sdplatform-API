@@ -17,6 +17,7 @@ class CashierRemittanceResource extends JsonResource
         return [
             'id' => $this->id,
             'cash_discrepancy_id' => $this->cash_discrepancy_id,
+            'cash_discrepancy_name' => $this->discrepancy->name,
             'discrepancy_amount' => $this->discrepancy_amount,
             'branch_id' => $this->branch_id,
             'branch_name' => $this->branch ? $this->branch->name : null,
