@@ -26,6 +26,11 @@ class CustomerController extends Controller
             $customers = Customer::all();
             Log::alert('ED');
             return new CustomerCollection($customers);
+        }
+        elseif (Gate::allows('Can view Regional Customers')) {
+            $customers = Customer::all();
+            Log::alert('ED');
+            return new CustomerCollection($customers);
         } elseif (Gate::allows('Can see branch customers')) {
             Log::alert('ED3');
             $customers = Customer::where('branch_id', $user->branch_id)->get();

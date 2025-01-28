@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Resources\SalesOrderResource;
 use App\Http\Resources\SalesOrderCollection;
 use App\Http\Resources\StoreCollection;
+use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\SalesOrder;
 use App\Models\ItemSold;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\Log as FacadesLog;
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Response as HttpResponse;
+use ProcessDelination;
 
 class SalesOrderController extends Controller
 {
@@ -42,6 +44,10 @@ public function index(Request $request): SalesOrderCollection
 
     // Start building the query with all sales orders
     $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
+    $user = auth()->user();
+
+    $query = ProcessDelination::partitionUserData($query,  $user->branch_id, ["Can view All Sales Order","Can view Regional Sales Order", "Can see branch Sales order"]);
+       
 
     // Apply store filter if provided
     if ($storeId) {
@@ -51,11 +57,7 @@ public function index(Request $request): SalesOrderCollection
     // Apply branch filter if provided or based on the logged-in user
     if ($branchId) {
         $query->where('branch_id', $branchId);
-    } else {
-        // Assuming you want to apply the branch_id from the logged-in user if no branch_id is provided in the request
-        // $user = auth()->user();
-        // $query->where('branch_id', $user->branch_id);
-    }
+    } 
 
     // Apply date range filters if provided
     if ($fromDate || $toDate) {
@@ -77,7 +79,7 @@ public function index(Request $request): SalesOrderCollection
 
         // Ensure transactions are fetched only for the user's branch when filtering by date
         $user = auth()->user(); // Get the logged-in user
-        $query->where('branch_id', $user->branch_id); // Filter by branch_id (user's branch)
+        // $query->where('branch_id', $user->branch_id); // Filter by branch_id (user's branch)
     }
 
     // Fetch the results

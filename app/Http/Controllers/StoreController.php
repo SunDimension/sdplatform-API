@@ -6,9 +6,13 @@ use App\Http\Requests\StoreStoreRequest;
 use App\Http\Requests\StoreUpdateRequest;
 use App\Http\Resources\StoreCollection;
 use App\Http\Resources\StoreResource;
+use App\Models\Branch;
 use App\Models\Store;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
+use ProcessDelination;
 
 class StoreController extends Controller
 {
@@ -22,8 +26,10 @@ class StoreController extends Controller
     public function mystore(Request $request): StoreCollection
     {
         //$store = Store::all();
-        $store = Store::where('branch_id', auth()->user()->branch_id)->get();
-
+        $query = Store::query();
+        $user = auth()->user();
+        $query = ProcessDelination::partitionUserData($query,  $user->branch_id, ["Can See All Stores","Can See Regional Stores", "Can See Branch Stores"]);
+        $store = $query->get();
         return new StoreCollection($store);
     }
 
