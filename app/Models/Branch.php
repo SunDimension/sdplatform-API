@@ -22,7 +22,7 @@ class Branch extends Model
         'email',
         'phone',
         'state_id',
-      
+        'region_id',
         'country_id',
     ];
 
@@ -34,7 +34,7 @@ class Branch extends Model
     protected $casts = [
         'id' => 'integer',
         'state_id' => 'integer',
-       
+        'region_id' => 'integer',
         'country_id' => 'integer',
     ];
 

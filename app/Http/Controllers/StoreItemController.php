@@ -37,6 +37,32 @@ class StoreItemController extends Controller
         return  CreateItemResource::collection($item);
     }
 
+    public function setLimit(Request $request, $id)
+{   
+    // Validate the request data
+    $validated = $request->validate([
+        'set_limit' => ['nullable', 'integer', 'min:0'], // Allow null values
+        'id' => ['required', 'exists:store_items,id'] // Ensure customer exists
+    ]);
+
+    // Find the customer by ID
+    $storeItem = StoreItem::findOrFail($validated["id"]);
+
+    // Update the credit limit (allow null to remove it)
+    $storeItem->set_limit = $validated['set_limit'] ?? null;
+    $storeItem->save();
+
+    // Return a success response with the updated customer data
+    return response()->json([
+        'message' => $validated['set_limit'] === null 
+            ? 'Set limit removed successfully' 
+            : 'Set limit successfully updated',
+        'storeItem' => new StoreItemResource($storeItem),
+    ], Response::HTTP_OK);
+}
+
+
+
     public function GetInventoryByStore($itemId)
     {
         //$storeitem = StoreItem::where("item_id", $item_id)->where;

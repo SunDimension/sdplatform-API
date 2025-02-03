@@ -26,6 +26,7 @@ class BranchStoreRequest extends FormRequest
             'email' => ['required', 'email'],
             'phone' => ['required', 'string'],
             'state_id' => ['required', 'integer', 'exists:states,id'],
+            'region_id' => ['required', 'integer', 'exists:regions,id'],
             'country_id' => ['required', 'integer', 'exists:countries,id'],
         ];
     }

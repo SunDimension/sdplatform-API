@@ -23,6 +23,7 @@ class CashierExpenseResource extends JsonResource
             'user_id' => $this->user_id,
             'user_name' => $this->user ? $this->user->name : null,
             'amount' => $this->amount,
+            'narration' => $this->narration,
             'date' => $this->date,
             'store_id' => $this->store_id,
             'store_name' => $this->store->name,

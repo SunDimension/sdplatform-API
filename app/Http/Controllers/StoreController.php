@@ -12,7 +12,8 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use ProcessDelination;
+use App\Classes\ProcessDelination;
+
 
 class StoreController extends Controller
 {

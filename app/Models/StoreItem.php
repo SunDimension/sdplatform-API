@@ -19,7 +19,8 @@ class StoreItem extends Model
         'store_id',
         'branch_id',
         'discount',
-        'quantity_holding'
+        'quantity_holding',
+        'set_limit'
 
     ];
 
@@ -34,7 +35,7 @@ class StoreItem extends Model
 
     public function createItem()
     {
-        return $this->belongsTo(CreateItem::class);
+        return $this->belongsTo(CreateItem::class,'create_item_id');
     }
 
     public function store()

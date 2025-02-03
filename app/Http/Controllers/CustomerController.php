@@ -39,28 +39,31 @@ class CustomerController extends Controller
 
         return new CustomerCollection([]);
     }
-public function assignCredit(Request $request, $id)
+    
+    public function assignCredit(Request $request, $id)
 {   
-
     // Validate the request data
     $validated = $request->validate([
-        'credit_limit' => ['required', 'integer', 'min:0'],
-        'id'=>['required']
+        'credit_limit' => ['nullable', 'integer', 'min:0'], // Allow null values
+        'id' => ['required', 'exists:customers,id'] // Ensure customer exists
     ]);
 
     // Find the customer by ID
     $customer = Customer::findOrFail($validated["id"]);
 
-    // Update the credit limit
-    $customer->credit_limit = $validated['credit_limit'];
+    // Update the credit limit (allow null to remove it)
+    $customer->credit_limit = $validated['credit_limit'] ?? null;
     $customer->save();
 
     // Return a success response with the updated customer data
     return response()->json([
-        'message' => 'Credit limit successfully updated',
-        'customer' => new CustomerResource($customer), // Return updated customer data
+        'message' => $validated['credit_limit'] === null 
+            ? 'Credit limit removed successfully' 
+            : 'Credit limit successfully updated',
+        'customer' => new CustomerResource($customer),
     ], Response::HTTP_OK);
 }
+
 
 
 

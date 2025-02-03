@@ -25,6 +25,7 @@ class CashierExpenseStoreRequest extends FormRequest
             'store_id' => ['required', 'integer', 'exists:stores,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'amount' => ['required'],
+            'narration'=>['nullable'],
             'date' => ['required', 'date'],
             'approved_by' => ['nullable'],
             'approval_date' => ['nullable'],

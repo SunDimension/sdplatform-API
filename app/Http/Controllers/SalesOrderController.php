@@ -21,10 +21,60 @@ use Illuminate\Support\Facades\Log as FacadesLog;
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Response as HttpResponse;
-use ProcessDelination;
+use App\Classes\ProcessDelination;
 
 class SalesOrderController extends Controller
 {
+
+// public function index(Request $request): SalesOrderCollection
+// {
+//     $validated = $request->validate([
+//         'store_id'  => 'nullable|integer|exists:stores,id',
+//         'branch_id' => 'nullable|integer|exists:branches,id',
+//         'from_date' => 'nullable|date',
+//         'to_date'   => 'nullable|date',
+//     ]);
+
+//     $user = auth()->user(); // Get authenticated user
+
+//     // Extract validated parameters
+//     $storeId  = $validated['store_id'] ?? null;
+//     $branchId = $validated['branch_id'] ?? null;
+//     $fromDate = $validated['from_date'] ? Carbon::parse($validated['from_date'])->startOfDay() : null;
+//     $toDate   = $validated['to_date'] ? Carbon::parse($validated['to_date'])->endOfDay() : null;
+
+//     // Start building query
+//     $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
+
+//     // Apply user-specific data partitioning
+//     $query = ProcessDelination::partitionUserData($query, $user->branch_id, [
+//         "Can view All Sales Order",
+//         "Can view Regional Sales Order",
+//         "Can see branch Sales order"
+//     ]);
+
+//     // Apply filters if provided
+//     if ($storeId) {
+//         $query->where('store_id', $storeId);
+//     }
+
+//     if ($branchId) {
+//         $query->where('branch_id', $branchId);
+//     }
+
+//     if ($fromDate && $toDate) {
+//         $query->whereBetween('created_at', [$fromDate, $toDate]);
+//     } elseif ($fromDate) {
+//         $query->where('created_at', '>=', $fromDate);
+//     } elseif ($toDate) {
+//         $query->where('created_at', '<=', $toDate);
+//     }
+
+//     return new SalesOrderCollection($query->get());
+// }
+
+
+
 
 public function index(Request $request): SalesOrderCollection
 {
@@ -44,10 +94,6 @@ public function index(Request $request): SalesOrderCollection
 
     // Start building the query with all sales orders
     $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
-    $user = auth()->user();
-
-    $query = ProcessDelination::partitionUserData($query,  $user->branch_id, ["Can view All Sales Order","Can view Regional Sales Order", "Can see branch Sales order"]);
-       
 
     // Apply store filter if provided
     if ($storeId) {
@@ -57,7 +103,9 @@ public function index(Request $request): SalesOrderCollection
     // Apply branch filter if provided or based on the logged-in user
     if ($branchId) {
         $query->where('branch_id', $branchId);
-    } 
+    } else {
+        
+    }
 
     // Apply date range filters if provided
     if ($fromDate || $toDate) {
@@ -79,7 +127,7 @@ public function index(Request $request): SalesOrderCollection
 
         // Ensure transactions are fetched only for the user's branch when filtering by date
         $user = auth()->user(); // Get the logged-in user
-        // $query->where('branch_id', $user->branch_id); // Filter by branch_id (user's branch)
+        $query->where('branch_id', $user->branch_id); // Filter by branch_id (user's branch)
     }
 
     // Fetch the results
@@ -88,10 +136,6 @@ public function index(Request $request): SalesOrderCollection
     // Return the results as a collection
     return new SalesOrderCollection($salesOrders);
 }
-
-
-
-
 
 
 public function getStores(Request $request)

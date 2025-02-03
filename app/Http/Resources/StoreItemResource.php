@@ -27,6 +27,7 @@ class StoreItemResource extends JsonResource
             'store_id' => $this->store_id,
             'branch_id' => $this->branch_id,
             'discount' => $this->discount,
+            'set_limit' => $this->set_limit,
 
 
         ];

@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('email');
             $table->string('phone');
             $table->foreignId('state_id')->constrained();
+             $table->foreignId('region_id')->constrained();
             $table->foreignId('country_id')->constrained();
             $table->timestamps();
         });

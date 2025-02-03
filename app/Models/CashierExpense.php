@@ -26,7 +26,8 @@ class CashierExpense extends Model
         'approved_by',
         'approval_date',
         'approval_comment',
-        'status'
+        'status',
+        'narration'
 
     ];
 
