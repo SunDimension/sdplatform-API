@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\YearStoreRequest;
 use App\Http\Requests\YearUpdateRequest;
 use App\Http\Resources\YearCollection;
