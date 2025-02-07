@@ -54,7 +54,7 @@ class AuthController extends Controller
 
     // If credentials are valid, get the authenticated user
     $user = $request->user();
-    $user->load(['roles']);
+    $user->load(['branch','store', 'roles']);
     Log::alert($user);
     // Create a new token for this user
     $token = $user->createToken('authToken')->plainTextToken;
