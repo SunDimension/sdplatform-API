@@ -95,6 +95,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cash-discrepancies', App\Http\Controllers\CashDiscrepancyController::class);
     Route::apiResource('expense-lines', App\Http\Controllers\ExpenseLineController::class);
     
+     Route::apiResource('regions', App\Http\Controllers\RegionController::class);
+
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
     
@@ -158,6 +160,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
 
+    Route::post('/store-items/{id}/set-limit', [App\Http\Controllers\StoreItemController::class, 'setLimit']);
     /////////// StoreItem////////////////////////////////////////
 
     Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
