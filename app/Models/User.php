@@ -46,10 +46,10 @@ class User extends Authenticatable
      */
     protected $casts = [
         'id' => 'integer',
-        'status_id' => 'integer',
-        'branch_id' => 'integer',
-        'warehouse_id' => 'integer',
-        'store_id' => 'integer'
+        // 'status_id' => 'integer',
+        // 'branch_id' => 'integer',
+        // 'warehouse_id' => 'integer',
+        // 'store_id' => 'integer'
     ];
 
      public function roles(): BelongsToMany
