@@ -16,7 +16,7 @@ class StoreItemResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name'=> $this->createItem->name,
+            'create_item_name' => $this->createItem->name,
             'item_category_id' => $this->item_category_id,
             'create_item_id' => $this->create_item_id,
             'cost_price' => $this->cost_price,

@@ -18,14 +18,15 @@ use Illuminate\Support\Facades\Log;
 
 class StoreItemController extends Controller
 {
-    public function index(Request $request)
-    {   $query = StoreItem::query();
+ public function index(Request $request)
+{   
+    $query = StoreItem::with('createItem') // 👈 Eager-load createItem
+        ->where('branch_id', auth()->user()->branch_id)
+        ->get();
 
-    // Filter by branch (authenticated user's branch)
-        $query->where('branch_id', auth()->user()->branch_id);
+    return StoreItemResource::collection($query);
+}
 
-       return StoreItemResource::collection($query->get());
-    }
 
     public function myStoreItems()
     {
