@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Weight extends Model
+class Unit extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -26,4 +27,12 @@ class Weight extends Model
     protected $casts = [
         'id' => 'integer',
     ];
+
+    public function unit(){
+    $unit = Unit::find(1);
+    $unit->delete(); 
+ // Includes soft deleted records
+
+}
+    
 }

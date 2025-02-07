@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Weight extends Model
+class Warehouse extends Model
 {
     use HasFactory;
+
+        public $table = "warehouses";
 
     /**
      * The attributes that are mass assignable.
@@ -16,6 +19,12 @@ class Weight extends Model
      */
     protected $fillable = [
         'name',
+        'branch_id',
+        'warehouse_address',
+        'zipcode',
+        'contact_person',
+        'email',
+        'phone',
     ];
 
     /**
@@ -25,5 +34,11 @@ class Weight extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'branch_id' => 'integer',
     ];
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 }
