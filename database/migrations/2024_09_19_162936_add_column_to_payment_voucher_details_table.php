@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
-            $table->id();
-             $table->string('name');
-            $table->timestamps();
+        Schema::table('payment_voucher_details', function (Blueprint $table) {
+            $table->string('description');
         });
     }
 
@@ -23,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('region');
+        Schema::table('payment_voucher_details', function (Blueprint $table) {
+            $table->dropColumn('description');
+        });
     }
 };

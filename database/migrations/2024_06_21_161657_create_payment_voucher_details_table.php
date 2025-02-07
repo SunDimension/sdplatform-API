@@ -11,11 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
+        Schema::disableForeignKeyConstraints();
+
+        Schema::create('payment_voucher_details', function (Blueprint $table) {
             $table->id();
-             $table->string('name');
+            $table->string('Expense_account_id');
+            $table->string('amount');
+            $table->string('quantity');
+            $table->foreignId('item_id')->constrained('create_items');
             $table->timestamps();
         });
+
+        Schema::enableForeignKeyConstraints();
     }
 
     /**
@@ -23,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('region');
+        Schema::dropIfExists('payment_voucher_details');
     }
 };

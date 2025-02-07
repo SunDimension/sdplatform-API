@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regions', function (Blueprint $table) {
+        Schema::create('sales_invoice', function (Blueprint $table) {
             $table->id();
-             $table->string('name');
+            $table->foreignId('sales_order_id')->constrained('sales_order')->onDelete('cascade');
+            $table->string('sales_invoice_number')->unique();
+            $table->date('invoice_date');
+            $table->string('invoice_amount');
             $table->timestamps();
         });
     }
@@ -23,6 +26,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('region');
+        Schema::dropIfExists('sales_invoice');
     }
 };
