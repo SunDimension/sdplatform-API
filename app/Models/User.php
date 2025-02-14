@@ -27,10 +27,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'status_id',
-        'store_id',
-        'branch_id',
-        'warehouse_id',
+       
     ];
 
     /**
@@ -49,10 +46,10 @@ class User extends Authenticatable
      */
     protected $casts = [
         'id' => 'integer',
-        'status_id' => 'integer',
-        'branch_id' => 'integer',
-        'warehouse_id' => 'integer',
-        'store_id' => 'integer'
+        // 'status_id' => 'integer',
+        // 'branch_id' => 'integer',
+        // 'warehouse_id' => 'integer',
+        // 'store_id' => 'integer'
     ];
 
      public function roles(): BelongsToMany
@@ -60,25 +57,25 @@ class User extends Authenticatable
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    public function status(): BelongsTo
-    {
-        return $this->belongsTo(Status::class);
-    }
+    // public function status(): BelongsTo
+    // {
+    //     return $this->belongsTo(Status::class);
+    // }
 
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class);
-    }
+    // public function branch(): BelongsTo
+    // {
+    //     return $this->belongsTo(Branch::class);
+    // }
 
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
-    }
+    // public function warehouse(): BelongsTo
+    // {
+    //     return $this->belongsTo(Warehouse::class);
+    // }
 
-    public function store(): BelongsTo
-    {
-        return $this->belongsTo(Store::class);
-    }
+    // public function store(): BelongsTo
+    // {
+    //     return $this->belongsTo(Store::class);
+    // }
 
     public function hasPermissionTo($name)
     {

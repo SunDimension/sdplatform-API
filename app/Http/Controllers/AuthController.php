@@ -23,20 +23,13 @@ class AuthController extends Controller
       'email' => 'required|string|email|max:255|unique:users',
       'password' => 'required|string|min:8',
       'role_id' => 'required',
-      'status_id' => 'required',
-      'store_id' => 'required',
-      'branch_id' => 'required',
-      'warehouse_id' => 'required',
+      
     ]);
     // Create new User
     $user = User::create([
       'name' => $request->name,
       'email' => $request->email,
       'role_id' => $request->role_id,
-      'status_id' => $request->status_id,
-      'branch_id' => $request->branch_id,
-      'store_id' => $request->store_id,
-      'warehouse_id' => $request->warehouse_id,
       'password' => bcrypt($request->password), // Hash the password
     ]);
 
