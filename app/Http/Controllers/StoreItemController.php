@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StoreItemResource;
+use App\Http\Resources\StoreItemResource2;
 use App\Http\Resources\StoreItemCollection;
 use App\Http\Requests\StoreItemStoreRequest;
 use App\Http\Requests\StoreItemUpdateRequest;
@@ -38,12 +39,22 @@ class StoreItemController extends Controller
         return  CreateItemResource::collection($item);
     }
 
+     public function myStoreItemsSetLimit()
+    {
+        $item_ids = Store::where('branch_id', auth()->user()->branch_id)->pluck('id');
+        $storeItems = StoreItem::whereIn('store_id', $item_ids)->get();
+        //$createIds = StoreItem::where('branch_id', auth()->user()->branch_id)->pluck('create_item_id');
+        Log::alert("dada",[$storeItems]);
+        // $item = CreateItem::whereIn('id',$storeItems)->get();
+        return  StoreItemResource2::collection($storeItems);
+    }
+
     public function setLimit(Request $request, $id)
 {   
     // Validate the request data
     $validated = $request->validate([
-        'set_limit' => ['nullable', 'integer', 'min:0'], // Allow null values
-        'id' => ['required', 'exists:store_items,id'] // Ensure customer exists
+        'set_limit' => ['nullable', 'string', 'min:0'], // Allow null values
+        'id' => ['required','integer', 'exists:store_items,id'] // Ensure customer exists
     ]);
 
     // Find the customer by ID

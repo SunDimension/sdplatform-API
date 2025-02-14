@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Carbon\Carbon;
 use GuzzleHttp\Psr7\Response;
+
 use Illuminate\Http\Response as HttpResponse;
 use App\Classes\ProcessDelination;
 
@@ -241,91 +242,113 @@ public function getStores(Request $request)
 
 
     // Method to create a new Sales Order
-    public function store(Request $request)
-    {
-        // Validate incoming request data
-        $validated = $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'branch_id' => 'required|exists:branches,id',
-            'store_id' => 'required|exists:stores,id',
-            'user_id' => 'required|exists:users,id',
-            'credit_limit' => 'nullable|numeric',
-            'items' => 'required|array',
-            'items.*.product_id' => 'required|exists:create_items,id',
-            'items.*.quantity' => 'required|integer',
-            'items.*.unit_price' => 'required|numeric',
-            'items.*.store_id' => 'required|integer',
-            'items.*.discount' => 'required|numeric',
-            'total_amount' => 'required|numeric',
-            'invoice' => 'nullable|array',
-            'payment' => 'nullable|array',
-            'payment.total_amount' => 'required|numeric',
-            'payment.amount_paid' => 'required|numeric',
-            'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit', // Payment type now explicitly validated
-            // 'payment.item_sold_id' => 'required|integer|exists:item_solds,id',  // item_sold_id is foreign key in sales_receipt
+public function store(Request $request)
+{
+    // Validate incoming request data
+    $validated = $request->validate([
+        'customer_id' => 'required|exists:customers,id',
+        'branch_id' => 'required|exists:branches,id',
+        'store_id' => 'required|exists:stores,id',
+        'user_id' => 'required|exists:users,id',
+        'credit_limit' => 'nullable|numeric',
+        'items' => 'required|array',
+        'items.*.product_id' => 'required|exists:create_items,id',
+        'items.*.quantity' => 'required|integer',
+        'items.*.unit_price' => 'required|numeric',
+        'items.*.store_id' => 'required|integer',
+        'items.*.discount' => 'required|numeric',
+        'total_amount' => 'required|numeric',
+        'invoice' => 'nullable|array',
+        'payment' => 'nullable|array',
+        'payment.total_amount' => 'required|numeric',
+        'payment.amount_paid' => 'required|numeric',
+        'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit', 
+    ]);
+
+    $errors = [];
+
+    foreach ($validated['items'] as $item) {
+        $storeItem = StoreItem::where('create_item_id', $item['product_id'])
+            ->where('store_id', $item['store_id'])
+            ->first();
+
+        if (!$storeItem) {
+            $errors[] = "Item not found in store.";
+            continue;
+        }
+
+        // Check if requested quantity exceeds available stock
+        if (($storeItem->quantity - $storeItem->quantity_holding) < $item['quantity']) {
+            $storeItem->load('createItem');
+            $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
+        }
+
+        // Enforce set_limit restriction
+        if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
+            $storeItem->load('createItem');
+            $errors[] = "Sale quantity for " . $storeItem->createItem->name . 
+                        " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
+        }
+    }
+
+    // If any errors were found, return a bad request response
+    if (count($errors) > 0) {
+       return response()->json(['error' => implode(", ", $errors)], 400);
+
+    }
+
+    // Generate Sales Order Number
+    $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
+
+    // Create a new Sales Order
+    $order = [
+        'sales_order_number' => $salesOrderNumber,
+        'customer_id' => $validated['customer_id'],
+        'branch_id' => $validated['branch_id'],
+        'store_id' => $validated['store_id'],
+        'user_id' => $validated['user_id'],
+        'total_amount' => $validated['total_amount'],
+        'payment_type' => $validated['payment']['payment_type'],
+    ];
+
+    if ($validated['payment']['payment_type'] == 'Credit') {
+        $order["status"] = 'Credit Pending';
+    }
+
+    $salesOrder = SalesOrder::create($order);
+
+    // Process Each Item in the Order
+    $itemSoldIds = [];
+
+    foreach ($validated['items'] as $item) {
+        $itemSold = ItemSold::create([
+            'sales_order_id' => $salesOrder->id,
+            'product_id' => $item['product_id'],
+            'quantity' => $item['quantity'],
+            'unit_price' => $item['unit_price'],
+            'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
+            'store_id' => $item['store_id'],
+            'discount' => $item['discount'],
+            'sales_date' => now(),
         ]);
 
-        $errors = [];
-        foreach ($validated['items'] as $item) {
-            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id'])->first();
-            // Check if there is enough 
-            // Log::debug($createItem);
-            if (($createItem->quantity - $createItem->quantity_holding) < $item['quantity']) {
-                $createItem->load('createItem');
-                $errors[] = $createItem->createItem->name;
-                // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
-            }
-        }
-        // Check if there is enough stock
-        if (count($errors) > 0) {
-            return response()->json(['error' => 'Insufficient stock for ' . implode(",", $errors)], HttpResponse::HTTP_BAD_REQUEST);
-        }
+        $itemSoldIds[] = $itemSold->id;
 
-        $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
-        // Create a new Sales Order
+        // Update Stock: Increase quantity_holding
+        $storeItem = StoreItem::where('create_item_id', $item['product_id'])
+            ->where('store_id', $item['store_id'])
+            ->first();
 
-        $order = [
-            'sales_order_number' => $salesOrderNumber,
-            'customer_id' => $validated['customer_id'],
-            'branch_id' => $validated['branch_id'],
-            'store_id' => $validated['store_id'],
-            'user_id' => $validated['user_id'],
-            // 'credit_limit' => $validated['credit_limit'] ?? null,
-            'total_amount' => $validated['total_amount'] ?? null,
-            'payment_type' => $validated['payment']['payment_type'],
-        ];
-
-        if($validated['payment']['payment_type']=='Credit')
-        {
-            $order["status"]= 'Credit Pending';
-        }
-        $salesOrder = SalesOrder::create($order);
-
-        //Log::alert($validated);
-        // Update Items Sold
-        $itemSoldIds = [];
-        foreach ($validated['items'] as $item) {
-            $itemSold = ItemSold::create([
-                'sales_order_id' => $salesOrder->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'],
-                'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
-                'store_id' => $item['store_id'],
-                'discount' => $item['discount'],
-                'sales_date' => now(),
-
-            ]);
-            $itemSoldIds[] = $itemSold->id;
-
-            $createItem2 = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $item['store_id'])->first();
-            // $createItem->quantity -= $validated['quantity_released'];
-            $createItem2->quantity_holding += $item['quantity'];
-            $createItem2->save();
-        }
-
-        return response()->json(['message' => 'Sales Order Created Successfully', 'data' => $salesOrder], 200);
+        $storeItem->quantity_holding += $item['quantity'];
+        $storeItem->save();
     }
+
+    return response()->json([
+        'message' => 'Sales Order Created Successfully',
+        'data' => $salesOrder
+    ], 200);
+}
+
     //   public function show(Request $request, SalesOrder $salesOrder): SalesOrderResource
     // {
     //     return new SalesOrderResource($salesOrder);

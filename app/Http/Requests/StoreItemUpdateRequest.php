@@ -27,6 +27,7 @@ class StoreItemUpdateRequest extends FormRequest
             'cost_price' => ['numeric'],
             'selling_price' => ['numeric'],
             'reorder_level' => ['string'],
+            'set_limit'=>['string'],
             'discount' => ['nullable', 'numeric'],
             'create_item_id' => ['required','integer','exists:create_items,id'],
             'store_id' => ['required','integer', 'exists:stores,id'],
