@@ -62,20 +62,20 @@ class User extends Authenticatable
     //     return $this->belongsTo(Status::class);
     // }
 
-    // public function branch(): BelongsTo
-    // {
-    //     return $this->belongsTo(Branch::class);
-    // }
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     // public function warehouse(): BelongsTo
     // {
     //     return $this->belongsTo(Warehouse::class);
     // }
 
-    // public function store(): BelongsTo
-    // {
-    //     return $this->belongsTo(Store::class);
-    // }
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
 
     public function hasPermissionTo($name)
     {
