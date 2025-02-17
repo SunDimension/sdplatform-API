@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Classes\ProcessDelination;
 use App\Http\Requests\StoreStoreRequest;
 use App\Http\Requests\StoreUpdateRequest;
 use App\Http\Resources\StoreCollection;
@@ -13,6 +12,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
+use App\Classes\ProcessDelination;
 
 
 class StoreController extends Controller
