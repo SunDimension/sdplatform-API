@@ -23,6 +23,7 @@ use GuzzleHttp\Psr7\Response;
 
 use Illuminate\Http\Response as HttpResponse;
 use App\Classes\ProcessDelination;
+use App\Classes\StockUtil;
 
 class SalesOrderController extends Controller
 {
@@ -277,8 +278,10 @@ public function store(Request $request)
             continue;
         }
 
+        $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'],$item['store_id']);
+        
         // Check if requested quantity exceeds available stock
-        if (($storeItem->quantity - $storeItem->quantity_holding) < $item['quantity']) {
+        if($quantityAvailable < $item['quantity']) {
             $storeItem->load('createItem');
             $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
         }

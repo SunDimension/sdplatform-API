@@ -26,7 +26,8 @@ class ItemSold extends Model
         'amount',
         'store_id',
         'sales_date',
-        'discount'
+        'discount',
+        'status'
         
     ];
 

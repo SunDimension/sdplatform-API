@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Classes\StockUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -25,6 +26,8 @@ class StoreItemResource extends JsonResource
             'reorder_level' => $this->reorder_level,
             'quantity' => $this->quantity - $this->quantity_holding,
             'quantity_holding' => $this->quantity_holding,
+            'quantity_actual' => StockUtil::getActualQuantity($this->createItem->id, $this->store_id),
+            'quantity_request' => StockUtil::getQuantityForRequest($this->createItem->id, $this->store_id),
             'store_id' => $this->store_id,
             'branch_id' => $this->branch_id,
             'discount' => $this->discount,
