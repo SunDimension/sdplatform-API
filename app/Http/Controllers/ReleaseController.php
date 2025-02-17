@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\StockUtil;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ReleaseStoreRequest;
 use App\Http\Requests\ReleaseUpdateRequest;
@@ -82,7 +83,8 @@ class ReleaseController extends Controller
             $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
             // Check if there is enough stock
             Log::debug($createItem);
-            if($createItem->quantity < $item['quantity']) {
+            $quantity = StockUtil::getActualQuantity($validated['product_id'], $validated['store_id']);
+            if($quantity < $item['quantity']) {
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
                 // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
