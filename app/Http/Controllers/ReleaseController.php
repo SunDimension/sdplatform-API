@@ -23,53 +23,51 @@ use Carbon\Carbon;
 class ReleaseController extends Controller
 {
 
- 
+
     public function index(Request $request)
     {
-
-
-    $validated = $request->validate([
-        'store_id' => 'nullable|integer|exists:stores,id',
-        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
-        'from_date' => 'nullable|date',
-        'to_date' => 'nullable|date',
-    ]);
-
-    $storeId = $validated['store_id'] ?? null;
-    $branchId = $validated['branch_id'] ?? null;
-    $fromDate = $validated['from_date'] ?? null;
-    $toDate = $validated['to_date'] ?? null;
-
-    // Start building the query
-    $query = Release::with(['customer', 'store', 'user', 'branch', 'releasedetail'])
-        ->when($storeId, function ($query, $storeId) {
-            return $query->where('store_id', $storeId);
-        })
-        ->when($branchId, function ($query, $branchId) {
-            // Filter SalesOrder by matching branch_id in related Store
-            return $query->whereHas('store', function ($query) use ($branchId) {
-                $query->where('branch_id', $branchId);
-            });
-        });
-
-    // Handle date filtering with proper range logic
-    if ($fromDate && $toDate) {
-        // Ensure fromDate is not after toDate
-        $query->whereBetween('created_at', [
-            Carbon::parse($fromDate)->startOfDay(),
-            Carbon::parse($toDate)->endOfDay(),
+        $validated = $request->validate([
+            'store_id' => 'nullable|integer|exists:stores,id',
+            'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
         ]);
-    } elseif ($fromDate) {
-        $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
-    } elseif ($toDate) {
-        $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
-    }
 
-    // Execute the query and get the filtered results
-    $releases = $query->get();
+        $storeId = $validated['store_id'] ?? null;
+        $branchId = $validated['branch_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
 
-    // Return as a resource collection
-    return new ReleaseCollection($releases);
+        // Start building the query
+        $query = Release::with(['customer', 'store', 'user', 'branch', 'releasedetail'])
+            ->when($storeId, function ($query, $storeId) {
+                return $query->where('store_id', $storeId);
+            })
+            ->when($branchId, function ($query, $branchId) {
+                // Filter SalesOrder by matching branch_id in related Store
+                return $query->whereHas('store', function ($query) use ($branchId) {
+                    $query->where('branch_id', $branchId);
+                });
+            });
+
+        // Handle date filtering with proper range logic
+        if ($fromDate && $toDate) {
+            // Ensure fromDate is not after toDate
+            $query->whereBetween('created_at', [
+                Carbon::parse($fromDate)->startOfDay(),
+                Carbon::parse($toDate)->endOfDay(),
+            ]);
+        } elseif ($fromDate) {
+            $query->where('created_at', '>=', Carbon::parse($fromDate)->startOfDay());
+        } elseif ($toDate) {
+            $query->where('created_at', '<=', Carbon::parse($toDate)->endOfDay());
+        }
+
+        // Execute the query and get the filtered results
+        $releases = $query->get();
+
+        // Return as a resource collection
+        return new ReleaseCollection($releases);
     }
 
 
@@ -80,22 +78,22 @@ class ReleaseController extends Controller
         Log::debug($validated);
         $errors = [];
         foreach ($validated['items'] as $item) {
-            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
+            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $validated['store_id'])->first();
             // Check if there is enough stock
             Log::debug($createItem);
             $quantity = StockUtil::getActualQuantity($validated['product_id'], $validated['store_id']);
-            if($quantity < $item['quantity']) {
+            if ($quantity < $item['quantity']) {
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
                 // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
             }
         }
         // Check if there is enough stock
-        if (count($errors)>0) {
-            return response()->json(['error' => 'Insufficient stock for '. implode(",", $errors)], Response::HTTP_BAD_REQUEST);
+        if (count($errors) > 0) {
+            return response()->json(['error' => 'Insufficient stock for ' . implode(",", $errors)], Response::HTTP_BAD_REQUEST);
         }
 
-    
+
         // Record the release in the Release table
         $release = Release::create([
             'sales_receipt_id'   => $validated['sales_receipt_id'],
@@ -105,7 +103,7 @@ class ReleaseController extends Controller
             // 'create_item_id'     => $createItem->id, // From inventory
             // 'quantity_released'  => $validated['quantity_released'],
             'release_date'       => now(),
-            'user_id'            =>  $validated['user_id'],//Auth::id()
+            'user_id'            =>  $validated['user_id'], //Auth::id()
         ]); // The user who authorized the release
 
         $items = [];
@@ -118,18 +116,18 @@ class ReleaseController extends Controller
             ]);
             $items[] = $item['product_id'];
             // Reduce stock from CreateItem (inventory)
-            $createItem = StoreItem::where('create_item_id',$item['product_id'])->where('store_id', $validated['store_id'])->first();
+            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $validated['store_id'])->first();
             $createItem->quantity -= $item['quantity'];
             $createItem->quantity_holding -= $item['quantity'];
             $createItem->save();
         }
 
-        $order= SalesReceipt::where('id', $validated['sales_receipt_id'])->first();
+        $order = SalesReceipt::where('id', $validated['sales_receipt_id'])->first();
 
-        $sql = "update item_solds set status ='released' where sales_order_id=".$order->sales_order_id. " and store_id = ".$validated['store_id']. " and product_id in (". implode(",", $items).")";
+        $sql = "update item_solds set status ='released' where sales_order_id=" . $order->sales_order_id . " and store_id = " . $validated['store_id'] . " and product_id in (" . implode(",", $items) . ")";
         DB::update($sql);
         //return new ReleaseResource($release);
-        
+
         return response()->json(['message' => 'Release Created Successfully', 'data' => $release], 200);
     }
 
