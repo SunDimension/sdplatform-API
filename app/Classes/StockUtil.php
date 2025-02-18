@@ -30,7 +30,7 @@ class StockUtil
             return 0;
         }
 
-        $openStock = $storeItem->quantity;
+        $openStock = $storeItem->open_stock;
 
         // Calculate total received quantity
         $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
@@ -64,7 +64,7 @@ class StockUtil
             return 0;
         }
 
-        $openStock = $storeItem->quantity;
+        $openStock = $storeItem->open_stock;
 
         // Calculate total received quantity
         $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
