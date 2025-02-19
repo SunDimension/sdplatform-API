@@ -81,7 +81,7 @@ class ReleaseController extends Controller
             $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $validated['store_id'])->first();
             // Check if there is enough stock
             Log::debug($createItem);
-            $quantity = StockUtil::getActualQuantity($validated['product_id'], $validated['store_id']);
+            $quantity = StockUtil::getActualQuantity($item['product_id'], $validated['store_id']);
             if ($quantity < $item['quantity']) {
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
