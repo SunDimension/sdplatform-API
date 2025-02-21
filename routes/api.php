@@ -172,7 +172,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-    Route::get('my-store-items-invt', [App\Http\Controllers\StoreItemController::class, 'myStoreItems2']);
 
     Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
     Route::get('get-inventory-by-branch-store/{itemId}/{branchId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStoreBranch"]);
@@ -231,7 +230,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('discounts', App\Http\Controllers\DiscountController::class);
 
-    Route::apiResource('taxes', App\Http\Controllers\TaxController::class);
+    // Route::apiResource('taxes', App\Http\Controllers\TaxController::class);
 
     Route::apiResource('titles', App\Http\Controllers\TitleController::class);
 
