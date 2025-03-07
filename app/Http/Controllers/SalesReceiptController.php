@@ -262,4 +262,56 @@ public function index(Request $request)
         SalesReceipt::destroy($id);
         return response(null, Response::HTTP_NO_CONTENT);
     }
+    public function CustomerAndDate(Request $request)
+{
+    // Validate and retrieve query parameters from the request
+    $validated = $request->validate([
+        'customer_id' => 'nullable|integer|exists:customers,id', // Ensure customer_id exists in customers table
+        'from_date' => 'nullable|date',
+        'to_date' => 'nullable|date',
+    ]);
+
+    // Extract validated parameters
+    $customerId = $validated['customer_id'] ?? null;
+    $fromDate = $validated['from_date'] ?? null;
+    $toDate = $validated['to_date'] ?? null;
+
+    // Get the authenticated user
+    $user = auth()->user();
+
+    // Start building the query
+    $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
+        ->when($customerId, function ($query, $customerId) {
+            return $query->where('customer_id', $customerId);
+        });
+
+    // Handle date filtering
+    if ($fromDate || $toDate) {
+        // Convert from_date and to_date to Carbon instances only if provided
+        $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+        $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+
+        if ($fromDate && $toDate) {
+            // Both from_date and to_date are provided
+            $query->whereBetween('created_at', [$fromDate, $toDate]);
+        } elseif ($fromDate) {
+            // Only from_date is provided
+            $query->where('created_at', '>=', $fromDate);
+        } elseif ($toDate) {
+            // Only to_date is provided
+            $query->where('created_at', '<=', $toDate);
+        }
+    }
+
+    // Optionally, filter by the user's branch if needed
+    if ($user->branch_id) {
+        $query->where('branch_id', $user->branch_id);
+    }
+
+    // Fetch the results
+    $salesReceipts = $query->get();
+
+    // Return the results as a collection
+    return new SalesReceiptCollection($salesReceipts);
+}
 }

@@ -86,7 +86,9 @@ class ReleaseController extends Controller
                 $createItem->load('createItem');
                 $errors[] = $createItem->createItem->name;
                 // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
-            }
+            }else {
+        $errors[] = "Unknown item (ID: {$item['product_id']}) - Not found in store.";
+    }
         }
         // Check if there is enough stock
         if (count($errors) > 0) {
