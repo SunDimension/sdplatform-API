@@ -238,11 +238,11 @@ class SalesOrderController extends Controller
             }
 
             // Enforce set_limit restriction
-            if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
-                $storeItem->load('createItem');
-                $errors[] = "Sale quantity for " . $storeItem->createItem->name .
-                    " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
-            }
+            // if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
+            //     $storeItem->load('createItem');
+            //     $errors[] = "Sale quantity for " . $storeItem->createItem->name .
+            //         " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
+            // }
         }
 
         // If any errors were found, return a bad request response
