@@ -137,6 +137,7 @@ class StockUtil
             ->where('item_solds.product_id', $item_id)
             ->where('item_solds.store_id', $store_id)
             ->where('item_solds.status', 'pending')
+            ->whereIn('sales_orders.status', ['Pending','Approved','Paid'])
             ->groupBy('item_solds.product_id')
             ->first();
 
