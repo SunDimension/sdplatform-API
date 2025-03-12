@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
@@ -15,23 +16,22 @@ class StoreItemUpdateRequest extends FormRequest
 
     /**
      * Get the validation rules that apply to the request.
-     *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-     public function rules(): array
+    public function rules(): array
     {
         return [
-            'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
-            'quantity'=>['numeric'],
-            'cost_price' => ['numeric'],
-            'selling_price' => ['numeric'],
-            'reorder_level' => ['string'],
-            'set_limit'=>['string'],
-            'discount' => ['nullable', 'numeric'],
-            'create_item_id' => ['required','integer','exists:create_items,id'],
-            'store_id' => ['required','integer', 'exists:stores,id'],
-            'branch_id' => ['required', 'integer','exists:branches,id']
+            'item_category_id' => ['sometimes', 'integer', 'exists:item_categories,id'],
+            'quantity' => ['sometimes', 'numeric'],
+            'cost_price' => ['sometimes', 'numeric'],
+            'selling_price' => ['sometimes', 'numeric'],
+            'reorder_level' => ['sometimes', 'string'],
+            'discount' => ['sometimes', 'numeric'],
+            'set_limit' => ['sometimes', 'numeric'],
+            'create_item_id' => ['sometimes', 'integer', 'exists:create_items,id'],
+            'store_id' => ['sometimes', 'integer', 'exists:stores,id'],
+            'branch_id' => ['sometimes', 'integer', 'exists:branches,id'],
+            'quantity_in_package' => ['sometimes', 'numeric', 'min:1'], // Add this line
+            'selling_price_per_unit' => ['sometimes', 'numeric', 'min:0'], // Add this line
         ];
     }
 }
-

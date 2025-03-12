@@ -6,6 +6,7 @@ use App\Http\Controllers\UsersController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SalesOrderController;
+use App\Http\Controllers\PostOutflowController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -97,6 +98,8 @@ Route::middleware('auth:sanctum')->group(function () {
     
      Route::apiResource('regions', App\Http\Controllers\RegionController::class);
 
+
+    Route::apiResource('measurements', App\Http\Controllers\MeasurementController::class);
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
     
@@ -143,7 +146,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
 
-
+    Route::get('/post-outflow/customer-inflow-details', [PostOutflowController::class, 'getCustomerInflowDetails']);
     Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
 
     Route::get('/credit-awaiting-payment', [App\Http\Controllers\CreditTransactionController::class, 'pendingPayment']);

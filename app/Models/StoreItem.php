@@ -20,7 +20,9 @@ class StoreItem extends Model
         'branch_id',
         'discount',
         'quantity_holding',
-        'set_limit'
+        'set_limit',
+        'quantity_in_package', // Add this line
+        'selling_price_per_unit', 
 
     ];
 

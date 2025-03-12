@@ -43,4 +43,15 @@ class PostOutflow extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+       protected $appends = ['error', 'message'];
+
+    public function getErrorAttribute()
+    {
+        return $this->attributes['error'] ?? false;
+    }
+
+    public function getMessageAttribute()
+    {
+        return $this->attributes['message'] ?? null;
+    }
 }

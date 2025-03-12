@@ -70,68 +70,63 @@ class ReleaseController extends Controller
         return new ReleaseCollection($releases);
     }
 
+public function store(Request $request)
+{
+    Log::debug($request->all());
+    $errors = [];
 
-    public function store(ReleaseStoreRequest $request)
-    {
-        // Validate input (make sure you get both the create_item_id and quantity to be released)
-        $validated = $request->validated();
-        Log::debug($validated);
-        $errors = [];
-        foreach ($validated['items'] as $item) {
-            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $validated['store_id'])->first();
-            // Check if there is enough stock
-            Log::debug($createItem);
-            $quantity = StockUtil::getActualQuantity($item['product_id'], $validated['store_id']);
-            if ($quantity < $item['quantity']) {
-                $createItem->load('createItem');
-                $errors[] = $createItem->createItem->name;
-                // return response()->json(['error' => 'Insufficient stock'], Response::HTTP_BAD_REQUEST);
-            }else {
-        $errors[] = "Unknown item (ID: {$item['product_id']}) - Not found in store.";
+    foreach ($request->items as $item) {
+        $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
+        Log::debug($createItem);
+        $quantity = StockUtil::getActualQuantity($item['product_id'], $request->store_id);
+        
+        if ($createItem && $quantity < $item['quantity']) {
+            $createItem->load('createItem');
+            $errors[] = $createItem->createItem->name;
+        } elseif (!$createItem) {
+            $errors[] = "Unknown item (ID: {$item['product_id']}) - Not found in store.";
+        }
     }
-        }
-        // Check if there is enough stock
-        if (count($errors) > 0) {
-            return response()->json(['error' => 'Insufficient stock for ' . implode(",", $errors)], Response::HTTP_BAD_REQUEST);
-        }
 
+    if (count($errors) > 0) {
+        return response()->json(['error' => 'Insufficient stock for ' . implode(",", $errors)], Response::HTTP_BAD_REQUEST);
+    }
 
-        // Record the release in the Release table
-        $release = Release::create([
-            'sales_receipt_id'   => $validated['sales_receipt_id'],
-            'branch_id'          => $validated['branch_id'],
-            'store_id'           => $validated['store_id'],
-            'customer_id'        => $validated['customer_id'],
-            // 'create_item_id'     => $createItem->id, // From inventory
-            // 'quantity_released'  => $validated['quantity_released'],
-            'release_date'       => now(),
-            'user_id'            =>  $validated['user_id'], //Auth::id()
-        ]); // The user who authorized the release
+    $release = Release::create([
+        'sales_receipt_id'   => $request->sales_receipt_id,
+        'branch_id'          => $request->branch_id,
+        'store_id'           => $request->store_id,
+        'customer_id'        => $request->customer_id,
+        'release_date'       => now(),
+        'user_id'            => $request->user_id,
+    ]);
 
-        $items = [];
-        foreach ($validated['items'] as $item) {
-            ReleaseDetails::create([
-                'release_id' => $release->id,
-                'product_id' => $item['product_id'],
-                'release_quantity' => $item['quantity'],
-                'amount' => $item['amount'],
-            ]);
-            $items[] = $item['product_id'];
-            // Reduce stock from CreateItem (inventory)
-            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $validated['store_id'])->first();
+    $items = [];
+    foreach ($request->items as $item) {
+        ReleaseDetails::create([
+            'release_id' => $release->id,
+            'product_id' => $item['product_id'],
+            'release_quantity' => $item['quantity'],
+            'amount' => $item['amount'],
+        ]);
+        
+        $items[] = $item['product_id'];
+        
+        $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
+        if ($createItem) {
             $createItem->quantity -= $item['quantity'];
             $createItem->quantity_holding -= $item['quantity'];
             $createItem->save();
         }
-
-        $order = SalesReceipt::where('id', $validated['sales_receipt_id'])->first();
-
-        $sql = "update item_solds set status ='released' where sales_order_id=" . $order->sales_order_id . " and store_id = " . $validated['store_id'] . " and product_id in (" . implode(",", $items) . ")";
-        DB::update($sql);
-        //return new ReleaseResource($release);
-
-        return response()->json(['message' => 'Release Created Successfully', 'data' => $release], 200);
     }
+
+    $order = SalesReceipt::where('id', $request->sales_receipt_id)->first();
+    $sql = "update item_solds set status ='released' where sales_order_id=" . $order->sales_order_id . " and store_id = " . $request->store_id . " and product_id in (" . implode(",", $items) . ")";
+    DB::update($sql);
+
+    return response()->json(['message' => 'Release Created Successfully', 'data' => $release], 200);
+}
+
 
     public function show(Request $request, Release $release): ReleaseResource
     {

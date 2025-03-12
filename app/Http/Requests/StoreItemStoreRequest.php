@@ -21,16 +21,17 @@ class StoreItemStoreRequest extends FormRequest
     {
         return [
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
-            'quantity'=>['numeric'],
+            'quantity' => ['numeric'],
             'cost_price' => ['numeric'],
             'selling_price' => ['numeric'],
             'reorder_level' => ['string'],
             'discount' => ['numeric'],
-            'set_limit'=>['numeric'],
-            'create_item_id' => ['required','integer','exists:create_items,id'],
-            'store_id' => ['required','integer', 'exists:stores,id'],
-            'branch_id' => ['required', 'integer','exists:branches,id']
+            'set_limit' => ['numeric'],
+            'create_item_id' => ['required', 'integer', 'exists:create_items,id'],
+            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'quantity_in_package' => ['required', 'numeric', 'min:1'], // Add this line
+            'selling_price_per_unit' => ['required', 'numeric', 'min:0'], // Add this line
         ];
     }
 }
-

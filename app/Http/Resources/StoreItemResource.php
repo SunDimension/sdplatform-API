@@ -32,6 +32,8 @@ class StoreItemResource extends JsonResource
             'branch_id' => $this->branch_id,
             'discount' => $this->discount,
             'set_limit' => $this->set_limit,
+            'quantity_in_package' => $this->quantity_in_package, // Add this line
+        'selling_price_per_unit' => $this->selling_price_per_unit, 
 
 
         ];
