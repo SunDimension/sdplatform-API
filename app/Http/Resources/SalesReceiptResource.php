@@ -34,6 +34,7 @@ class SalesReceiptResource extends JsonResource
             //'items_sold' => ItemSoldResource::collection($this->whenLoaded('itemsSold')),
             //'sales_invoice' => $this->sales_invoice,
             'amount_paid' => $this->amount_paid,
+            'unit_measurement'=>$this->unit_measurement,
             'receipt_date' => $this->receipt_date,
             'total_amount' => $this->total_amount,
             'payment_detail' => $details,

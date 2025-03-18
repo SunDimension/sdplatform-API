@@ -24,6 +24,7 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Response as HttpResponse;
 use App\Classes\ProcessDelination;
 use App\Classes\StockUtil;
+use App\Models\Measurement;
 
 class SalesOrderController extends Controller
 {
@@ -206,6 +207,7 @@ class SalesOrderController extends Controller
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:create_items,id',
             'items.*.quantity' => 'required|integer',
+            'items.*.unit_measurement' => 'required|integer',
             'items.*.unit_price' => 'required|numeric',
             'items.*.store_id' => 'required|integer',
             'items.*.discount' => 'nullable|numeric',
@@ -224,15 +226,18 @@ class SalesOrderController extends Controller
                 ->where('store_id', $item['store_id'])
                 ->first();
 
+            $unit = Measurement::where('id', $item['unit_measurement'])
+                ->first()->name;
+
             if (!$storeItem) {
                 $errors[] = "Item not found in store.";
                 continue;
             }
 
             $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'], $item['store_id']);
-
+            $item['quantity_pieces'] = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
             // Check if requested quantity exceeds available stock
-            if ($quantityAvailable < $item['quantity']) {
+            if ($quantityAvailable < $item['quantity_pieces']) {
                 $storeItem->load('createItem');
                 $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
             }

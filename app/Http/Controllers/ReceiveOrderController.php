@@ -30,15 +30,20 @@ class ReceiveOrderController extends Controller
     public function store(ReceiveOrderStoreRequest $request)
     {
         $validated = $request->validated();
+        
+            // $unit = Measurement::where('id', $item['unit_measurement'])
+                // ->first()->name;
         $receiveOrder = ReceiveOrder::create($validated);
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
+        
             ReceiveItem::create([
                 'receive_order_id' => $receiveOrder->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
                 'unit_price' => $item['unit_price'],
                 'description' => $item['description'],
+                'unit_measurement' => $item['unit_measurement'],
                 'created_by' => auth()->user()->id
             ]);
         }

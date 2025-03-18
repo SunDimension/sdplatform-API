@@ -143,19 +143,56 @@ public function index(Request $request)
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
     }
 
-    public function pendingReleaseStore($storeId)
-    {
-        //$salesOrders = SalesReceipt::with('salesorder');
-        //$user = Auth::user();
-        // Log::debug($user);
+    
 
-        $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
-            // Add your specific criteria for ItemSold here
-            $query->where('store_id', $storeId)->where('status', 'pending'); // Example condition
-        })->get();
-        //Log::debug($salesOrders);
-        return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
+
+public function pendingReleaseStore($storeId, Request $request)
+{
+    // Get today's date
+    $today = now()->format('Y-m-d');
+
+    // Initialize the query
+    $query = SalesReceipt::with('salesOrder')
+        ->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
+            $query->where('store_id', $storeId)->where('status', 'pending');
+        });
+
+    // Check if start_date and end_date are provided
+    if ($request->has('start_date') && $request->has('end_date')) {
+        $startDate = $request->input('start_date');
+        $endDate = $request->input('end_date');
+
+        // If both dates are the same, filter for just that day
+        if ($startDate === $endDate) {
+            $query->whereDate('created_at', $startDate);
+        } else {
+            // Otherwise, apply date range
+            $query->whereBetween('created_at', ["$startDate 00:00:00", "$endDate 23:59:59"]);
+        }
+    } else {
+        // Default to today's data if no date range is provided
+        $query->whereDate('created_at', $today);
     }
+
+    // Execute the query
+    $salesReceipts = $query->get();
+
+    return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
+}
+
+
+    // public function pendingReleaseStore($storeId)
+    // {
+        
+
+    //     $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
+    //         // Add your specific criteria for ItemSold here
+    //         $query->where('store_id', $storeId)->where('status', 'pending'); // Example condition
+    //     })->get();
+    
+    //     return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
+    // }
+
 
     public function pendingReleaseOrder($orderno)
     {

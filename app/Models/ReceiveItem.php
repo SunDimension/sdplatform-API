@@ -22,6 +22,8 @@ class ReceiveItem extends Model
         'quantity',
         'unit_price',
         'product_id',
+        'quantity_pieces',
+        'unit_measurement',
         'description',
         'created_by',
         'modified_by',
@@ -65,5 +67,10 @@ class ReceiveItem extends Model
     public function deletedBy(): BelongsTo
     {
         return $this->belongsTo(User::class,'deleted_by');
+    }
+
+     public function measurement()
+    {
+        return $this->belongsTo(Measurement::class,"unit_measurement");
     }
 }

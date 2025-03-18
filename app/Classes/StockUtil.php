@@ -64,7 +64,7 @@ class StockUtil
             return 0;
         }
 
-        $openStock = $storeItem->open_stock;
+        $openStock = $storeItem->open_stock * $storeItem->quantity_in_package;
 
         // Calculate total received quantity
         $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
@@ -93,7 +93,7 @@ class StockUtil
     {
         $result = ReceiveItem::query()
             ->join('receive_orders', 'receive_items.receive_order_id', '=', 'receive_orders.id')
-            ->select('receive_items.product_id', DB::raw('SUM(receive_items.quantity) as total_quantity'))
+            ->select('receive_items.product_id', DB::raw('SUM(receive_items.quantity_pieces) as total_quantity'))
             ->where('receive_items.product_id', $item_id)
             ->where('receive_orders.store_id', $store_id)
             ->groupBy('receive_items.product_id')
@@ -113,7 +113,7 @@ class StockUtil
     {
         $result = ReleaseDetails::query()
             ->join('releases', 'release_details.release_id', '=', 'releases.id')
-            ->select('release_details.product_id', DB::raw('SUM(release_details.release_quantity) as total_quantity'))
+            ->select('release_details.product_id', DB::raw('SUM(release_details.quantity_pieces) as total_quantity'))
             ->where('release_details.product_id', $item_id)
             ->where('releases.store_id', $store_id)
             ->groupBy('release_details.product_id')
@@ -133,7 +133,7 @@ class StockUtil
     {
         $result = ItemSold::query()
             ->join('sales_orders', 'item_solds.sales_order_id', '=', 'sales_orders.id')
-            ->select('item_solds.product_id', DB::raw('SUM(item_solds.quantity) as total_quantity'))
+            ->select('item_solds.product_id', DB::raw('SUM(item_solds.quantity_pieces) as total_quantity'))
             ->where('item_solds.product_id', $item_id)
             ->where('item_solds.store_id', $store_id)
             ->where('item_solds.status', 'pending')
@@ -142,5 +142,15 @@ class StockUtil
             ->first();
 
         return $result ? $result->total_quantity : 0;
+    }
+
+    public static function getPieceQuivalent($unit, $package_size,$quantity)
+    {
+        if($unit=='full')
+            $quantity = $quantity*$package_size;
+        elseif($unit=='half')
+            $quantity = $quantity*$package_size/2.0;
+
+        return $quantity;
     }
 }

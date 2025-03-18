@@ -38,7 +38,7 @@ class SalesOrderResource extends JsonResource
             'payment_type' => $this->payment_type,
             'created_at' => $this->created_at,
             'status'=>$this->status,
-            'measurement'=>$this->measurement,
+            'unit_measurement'=>$this->unit_measurement,
             'updated_at'=>$this->updated_at,
             'items'=> ItemSoldResource::collection($this->whenLoaded('itemSold')),
             'customer'=> new CustomerResource($this->whenLoaded('customer')),

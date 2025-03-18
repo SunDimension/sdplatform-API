@@ -22,6 +22,8 @@ class ItemSold extends Model
         'sales_order_id',
         'product_id',
         'quantity',
+        'quantity_pieces',
+        'unit_measurement',
         'unit_price',
         'amount',
         'store_id',
@@ -61,4 +63,11 @@ class ItemSold extends Model
     {
         return $this->belongsTo(CreateItem::class,"product_id");
     }
+
+    public function measurement()
+    {
+        return $this->belongsTo(Measurement::class,"unit_measurement");
+    }
+
+    
 }

@@ -24,6 +24,8 @@ class ReceiveOrder extends Model
         'store_id',
         'branch_id',
         'vendor_id',
+        'quantity_pieces',
+        'unit_measurement',
         'status',
         'created_by',
         'modified_by',
@@ -104,5 +106,10 @@ class ReceiveOrder extends Model
     public function approvedBy(): BelongsTo
     {
         return $this->belongsTo(User::class, 'approved_by');
+    }
+
+       public function measurement()
+    {
+        return $this->belongsTo(Measurement::class,"unit_measurement");
     }
 }
