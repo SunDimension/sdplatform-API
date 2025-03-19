@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Classes\StockUtil;
 use App\Http\Requests\ReceiveOrderStoreRequest;
 use App\Http\Requests\ReceiveOrderUpdateRequest;
 use App\Http\Resources\ReceiveOrderCollection;
 use App\Http\Resources\ReceiveOrderResource;
+use App\Models\Measurement;
 use App\Models\ReceiveItem;
 use App\Models\ReceiveOrder;
+use App\Models\StoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -31,16 +34,17 @@ class ReceiveOrderController extends Controller
     {
         $validated = $request->validated();
         
-            // $unit = Measurement::where('id', $item['unit_measurement'])
-                // ->first()->name;
+            
         $receiveOrder = ReceiveOrder::create($validated);
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
-        
+            $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
             ReceiveItem::create([
                 'receive_order_id' => $receiveOrder->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
+                'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
                 'unit_price' => $item['unit_price'],
                 'description' => $item['description'],
                 'unit_measurement' => $item['unit_measurement'],
@@ -64,18 +68,18 @@ class ReceiveOrderController extends Controller
         $receiveOrder->approval_date = now();
         $receiveOrder->save();
 
-        if($receiveOrder->status == 'Approved')
-        {
-            $sql = "UPDATE store_items si INNER JOIN (
-                    SELECT sum(quantity) quantity, product_id, avg(quantity*unit_price)/sum(quantity) unit_price, ro.store_id  
-                    from receive_items ri INNER JOIN receive_orders ro ON ro.id = ri.receive_order_id
-                    WHERE receive_order_id = ?
-                    group BY product_id) A ON si.store_id = A.store_id  and si.create_item_id = A.product_id
-                    SET si.quantity = si.quantity+A.quantity,
-                    si.cost_price = A.unit_price ";
+        // if($receiveOrder->status == 'Approved')
+        // {
+        //     $sql = "UPDATE store_items si INNER JOIN (
+        //             SELECT sum(quantity) quantity, product_id, avg(quantity*unit_price)/sum(quantity) unit_price, ro.store_id  
+        //             from receive_items ri INNER JOIN receive_orders ro ON ro.id = ri.receive_order_id
+        //             WHERE receive_order_id = ?
+        //             group BY product_id) A ON si.store_id = A.store_id  and si.create_item_id = A.product_id
+        //             SET si.quantity = si.quantity+A.quantity,
+        //             si.cost_price = A.unit_price ";
 
-            DB::update($sql, [$validated['id']]);
-        }
+        //     DB::update($sql, [$validated['id']]);
+        // }
 
         return new ReceiveOrderResource($receiveOrder);
     }

@@ -34,6 +34,7 @@ class ReceiveOrderStoreRequest extends FormRequest
             'items.*.unit_price' => ['required', 'numeric'],
             'items.*.product_id' => ['required', 'integer', 'exists:create_items,id'],
             'items.*.description' => ['nullable', 'string'],
+            'items.*.unit_measurement' => ['nullable', 'integer'],
         ];
     }
 }
