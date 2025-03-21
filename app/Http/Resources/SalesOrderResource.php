@@ -39,6 +39,7 @@ class SalesOrderResource extends JsonResource
             'created_at' => $this->created_at,
             'status'=>$this->status,
             'unit_measurement'=>$this->unit_measurement,
+             'unit_measurement_name'=>$this->unit_measurement_name,
             'updated_at'=>$this->updated_at,
             'items'=> ItemSoldResource::collection($this->whenLoaded('itemSold')),
             'customer'=> new CustomerResource($this->whenLoaded('customer')),

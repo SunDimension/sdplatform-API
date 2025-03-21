@@ -20,6 +20,9 @@ class ReleaseDetailsResource extends JsonResource
             'quantity' => $this->release_quantity,
             'product_id' => $this->product_id,
             'product_name' => $this->product->name,
+            'unit_measurement' => $this->unit_measurement,
+            'unit_measurement_name' => $this->unit_measurement_name,
+
             'amount' => $this->amount,
         ];
     }

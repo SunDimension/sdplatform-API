@@ -85,4 +85,9 @@ class SalesOrder extends Model
     {
         return $this->belongsTo(Customer::class, "customer_id");
     }
+
+     public function measurement()
+    {
+        return $this->belongsTo(Measurement::class,"unit_measurement");
+    }
 }

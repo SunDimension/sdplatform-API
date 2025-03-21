@@ -242,12 +242,12 @@ class SalesOrderController extends Controller
                 $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
             }
 
-            // Enforce set_limit restriction
-            // if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
-            //     $storeItem->load('createItem');
-            //     $errors[] = "Sale quantity for " . $storeItem->createItem->name .
-            //         " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
-            // }
+            //Enforce set_limit restriction
+            if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
+                $storeItem->load('createItem');
+                $errors[] = "Sale quantity for " . $storeItem->createItem->name .
+                    " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
+            }
         }
 
         // If any errors were found, return a bad request response
@@ -279,6 +279,8 @@ class SalesOrderController extends Controller
         $itemSoldIds = [];
 
         foreach ($validated['items'] as $item) {
+         $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
             $itemSold = ItemSold::create([
                 'sales_order_id' => $salesOrder->id,
                 'product_id' => $item['product_id'],
@@ -287,6 +289,8 @@ class SalesOrderController extends Controller
                 'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
                 'store_id' => $item['store_id'],
                 'discount' => $item['discount'],
+                    'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
+                'unit_measurement' => $item['unit_measurement'],
                 'sales_date' => now(),
             ]);
 

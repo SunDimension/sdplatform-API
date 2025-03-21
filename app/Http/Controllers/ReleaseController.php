@@ -115,6 +115,7 @@ class ReleaseController extends Controller
                 'product_id' => $item['product_id'],
                 'release_quantity' => $item['quantity'],
                 'amount' => $item['amount'],
+                'unit_measurement' => $item['unit_measurement'],
                 'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity'])
             ]);
 

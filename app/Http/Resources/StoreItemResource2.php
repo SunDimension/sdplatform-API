@@ -29,7 +29,7 @@ class StoreItemResource2 extends JsonResource
             'store_name' => $this->store->name,
             'branch_id' => $this->branch_id,
             'discount' => $this->discount,
-            'set_limit' => $this->set_limit,
+            'set_limit' => $this->set_limit !== null ? (int)$this->set_limit : null,
 
 
         ];

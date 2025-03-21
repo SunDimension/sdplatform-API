@@ -32,7 +32,8 @@ class StoreItem extends Model
         'create_item_id' => 'integer',
         'branch_id' => 'integer',
         'store_id' => 'integer',
-        'quantity_holding' => 'integer'
+        'quantity_holding' => 'integer',
+        'set_limit' => 'integer', // or 'float' if it can be a decimal value
     ];
 
     public function createItem()

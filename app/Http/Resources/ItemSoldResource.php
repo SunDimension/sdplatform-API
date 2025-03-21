@@ -25,6 +25,8 @@ class ItemSoldResource extends JsonResource
             'store_id' => $this->store_id,
             'store_name' => $this->store->name,
             'quantity' => $this->quantity,
+            'unit_measurement' => $this->unit_measurement,
+            'unit_measurement_name' => $this->measurement->name,
             'discount' => $this->discount ?? 0,
         ];
     }

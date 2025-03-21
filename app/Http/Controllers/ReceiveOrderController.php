@@ -14,6 +14,7 @@ use App\Models\StoreItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ReceiveOrderController extends Controller
 {
@@ -33,11 +34,13 @@ class ReceiveOrderController extends Controller
     public function store(ReceiveOrderStoreRequest $request)
     {
         $validated = $request->validated();
-        
+        //Log::debug($validated);
             
         $receiveOrder = ReceiveOrder::create($validated);
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
+        //Log::debug($item);
+
             $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
             $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
             ReceiveItem::create([
@@ -50,6 +53,7 @@ class ReceiveOrderController extends Controller
                 'unit_measurement' => $item['unit_measurement'],
                 'created_by' => auth()->user()->id
             ]);
+            
         }
         return new ReceiveOrderResource($receiveOrder);
     }

@@ -146,10 +146,16 @@ class StockUtil
 
     public static function getPieceQuivalent($unit, $package_size,$quantity)
     {
-        if($unit=='full')
+           // Log::alert($unit);
+
+        if($unit=='Full'){
             $quantity = $quantity*$package_size;
-        elseif($unit=='half')
+            //Log::alert('f');
+        }
+        elseif($unit=='Half'){
+           // Log::alert('h');
             $quantity = $quantity*$package_size/2.0;
+        }
 
         return $quantity;
     }
