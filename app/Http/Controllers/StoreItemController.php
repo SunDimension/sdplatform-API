@@ -30,22 +30,38 @@ class StoreItemController extends Controller
 
     public function myStoreItems()
     {
-        $item_ids = Store::where('branch_id', auth()->user()->branch_id)->pluck('id');
-        $storeItems = StoreItem::whereIn('store_id', $item_ids)->get()->pluck('create_item_id');
-        //$createIds = StoreItem::where('branch_id', auth()->user()->branch_id)->pluck('create_item_id');
-        Log::alert("dada",[$storeItems]);
-        $item = CreateItem::whereIn('id',$storeItems)->get();
-        return  CreateItemResource::collection($item);
+        $items = CreateItem::whereIn('id', function($query) {
+            $query->select('create_item_id')
+                ->from('store_items')
+                ->whereIn('store_id', function($subQuery) {
+                    $subQuery->select('id')
+                        ->from('stores')
+                        ->where('branch_id', auth()->user()->branch_id);
+                });
+        })
+        ->with(['storeItems' => function($query) {
+            $query->whereIn('store_id', function($subQuery) {
+                $subQuery->select('id')
+                    ->from('stores')
+                    ->where('branch_id', auth()->user()->branch_id);
+            });
+        }])
+        ->get();
+
+        return CreateItemResource::collection($items);
     }
 
      public function myStoreItemsSetLimit()
     {
-        $item_ids = Store::where('branch_id', auth()->user()->branch_id)->pluck('id');
-        $storeItems = StoreItem::whereIn('store_id', $item_ids)->get();
-        //$createIds = StoreItem::where('branch_id', auth()->user()->branch_id)->pluck('create_item_id');
-        Log::alert("dada",[$storeItems]);
-        // $item = CreateItem::whereIn('id',$storeItems)->get();
-        return  StoreItemResource2::collection($storeItems);
+        return StoreItemResource2::collection(
+            StoreItem::whereIn('store_id', function($query) {
+                $query->select('id')
+                    ->from('stores')
+                    ->where('branch_id', auth()->user()->branch_id);
+            })
+            ->with('createItem')
+            ->get()
+        );
     }
 
 public function setLimit(Request $request, $id)

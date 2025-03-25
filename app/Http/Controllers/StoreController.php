@@ -26,12 +26,16 @@ class StoreController extends Controller
 
     public function mystore(Request $request): StoreCollection
     {
-        //$store = Store::all();
-        $query = Store::query();
         $user = auth()->user();
-        $query = ProcessDelination::partitionUserData($query,  $user->branch_id, ["Can See All Stores","Can See Regional Stores", "Can See Branch Stores"]);
-        $store = $query->get();
-        return new StoreCollection($store);
+        $query = Store::query();
+        
+        $query = ProcessDelination::partitionUserData(
+            $query, 
+            $user->branch_id, 
+            ["Can See All Stores", "Can See Regional Stores", "Can See Branch Stores"]
+        );
+
+        return new StoreCollection($query->get());
     }
 
     public function mystorewithitems(Request $request): StoreCollection

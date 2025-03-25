@@ -176,8 +176,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('my-stores-inventory', [App\Http\Controllers\StoreItemController::class, "myStoreItemsSetLimit"]);
 
 
-
-
     Route::get('my-store-items-inventory', [App\Http\Controllers\StoreItemController::class, 'myStoreItems2']);
 
     Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);

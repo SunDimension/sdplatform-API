@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+
 // use Illuminate\Database\Eloquent\SoftDeletes;
 
 
@@ -147,6 +149,12 @@ private static function generateBatchNumber()
     {
         return $this->belongsTo(Store::class);
     }
+
+    public function storeItems(): HasMany
+    {
+        return $this->hasMany(StoreItem::class);
+    }
+
        public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
