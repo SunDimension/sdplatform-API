@@ -5,6 +5,7 @@ namespace App\Classes;
 use App\Models\ItemSold;
 use App\Models\ReceiveItem;
 use App\Models\ReleaseDetails;
+use App\Models\ReturnDetails;
 use App\Models\StoreItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -40,7 +41,7 @@ class StockUtil
 
         // Additional stock adjustments (if needed)
         $stockTransfered = 0; // Example: Transfers to other stores
-        $stockReturned = 0;  // Example: Returned items
+        $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
     }
@@ -77,7 +78,7 @@ class StockUtil
 
         // Additional stock adjustments (if needed)
         $stockTransfered = 0; // Example: Transfers to other stores
-        $stockReturned = 0;  // Example: Returned items
+        $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
     }
@@ -117,6 +118,26 @@ class StockUtil
             ->where('release_details.product_id', $item_id)
             ->where('releases.store_id', $store_id)
             ->groupBy('release_details.product_id')
+            ->first();
+
+        return $result ? $result->total_quantity : 0;
+    }
+
+    /**
+     * Get the total released quantity for an item in a store.
+     *
+     * @param int $item_id
+     * @param int $store_id
+     * @return float
+     */
+    private static function getTotalReturnQuantity($item_id, $store_id)
+    {
+        $result = ReturnDetails::query()
+            ->join('return_items', 'return_details.return_id', '=', 'return_items.id')
+            ->select('return_details.product_id', DB::raw('SUM(return_details.return_quantity_pieces) as total_quantity'))
+            ->where('return_details.product_id', $item_id)
+            ->where('return_items.store_id', $store_id)
+            ->groupBy('return_details.product_id')
             ->first();
 
         return $result ? $result->total_quantity : 0;

@@ -122,6 +122,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-cashier-remittance', [App\Http\Controllers\CashierRemittanceController::class,'index']);
      Route::post('search-bank-remittance', [App\Http\Controllers\BankRemittanceController::class,'index']);
     Route::post('search-cashier-expense', [App\Http\Controllers\CashierExpenseController::class,'index']);
+    
     ///////////// Sales Routes /////////////////
     // Route::post('sales-orders', [SalesOrderController::class,'store']);
     // Route::get('/sales-orders/{id}/edit', [SalesOrderController::class, 'edit']);

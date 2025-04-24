@@ -7,6 +7,7 @@ use App\Http\Requests\ReturnItemStoreRequest;
 use App\Http\Requests\ReturnItemUpdateRequest;
 use App\Http\Resources\ReturnItemCollection;
 use App\Http\Resources\ReturnItemResource;
+use App\Models\PostInflow;
 use App\Models\ReturnItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -34,6 +35,39 @@ class ReturnItemController extends Controller
     public function update(ReturnItemUpdateRequest $request, ReturnItem $returnItem): ReturnItemResource
     {
         $returnItem->update($request->validated());
+
+        return new ReturnItemResource($returnItem);
+    }
+
+    public function approve(Request $request, $id)
+    {
+        $validated = $request->validate([
+            'comment' => ['nullable'],
+            'status' => ['required', 'string'],
+            'id'=>['required']
+        ]);
+
+        
+        $returnItem = ReturnItem::findOrFail($validated['id']);
+        $returnItem->approval_comment = $validated['comment'];
+        $returnItem->return_status = $validated['return_status'];
+        $returnItem->approved_by = auth()->user()->id;
+        $returnItem->approval_date = now();
+        $returnItem->save();
+
+        if($validated['return_status'] == 'approved'){
+            $data = new PostInflow();
+            $data->inflow_status = 3; // Unclaimed status
+            $data->customer_id = $returnItem->customer_id;
+            $data->amount = $returnItem->returnDetails->sum(function($detail) {
+                return $detail->return_quantity * $detail->unit_price;
+            });
+            $data->narration = "Return of items";
+            $data->inflow_date = now();
+            $data->save();
+            
+        }
+
 
         return new ReturnItemResource($returnItem);
     }

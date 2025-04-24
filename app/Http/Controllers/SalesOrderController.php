@@ -24,7 +24,10 @@ use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\Response as HttpResponse;
 use App\Classes\ProcessDelination;
 use App\Classes\StockUtil;
+use App\Http\Resources\ReturnItemResource;
 use App\Models\Measurement;
+use App\Models\ReturnDetails;
+use App\Models\ReturnItem;
 
 class SalesOrderController extends Controller
 {
@@ -469,6 +472,7 @@ class SalesOrderController extends Controller
                         'product_id' => $item->product_id,
                         'product_name' => $item->product->name ?? 'Unknown',
                         'quantity' => $item->quantity,
+                        'quantity_pieces' => $item->quantity_pieces,
                         'unit_price' => $item->unit_price,
                         'discount' => $item->discount ?? 0,
                         'store_id' => $item->store_id,
@@ -496,13 +500,13 @@ class SalesOrderController extends Controller
     {
         $validated = $request->validate([
             'sales_receipt_number' => 'required|exists:sales_receipts,sales_receipt_number',
-            'return_type_id' => 'required|exists:return_types,id',
-            'return_status_id' => 'required|exists:return_statuses,id',
+            'return_status' => 'required|in:Approved,Pending,Declined',
             'user_id' => 'required|exists:users,id',
             'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|exists:inventory_items,id',
-            'items.*.item_sold_id' => 'required|exists:item_sold,id',
+            'items.*.product_id' => 'required|exists:create_items,id',
+            'items.*.item_sold_id' => 'required|exists:item_solds,id',
             'items.*.quantity_returned' => 'required|integer|min:1',
+            'items.*.quantity_returned_pieces' => 'required|integer|min:1',
             'items.*.original_quantity' => 'required|integer|min:1',
             'items.*.unit_price' => 'required|numeric|min:0',
             'items.*.store_id' => 'required|exists:stores,id',
@@ -525,14 +529,16 @@ class SalesOrderController extends Controller
             // 3. Get the associated sales order
             $salesOrder = SalesOrder::findOrFail($salesReceipt->sales_order_id);
 
-            // 4. Update sales order with return information
-            $salesOrder->update([
-                'return_status_id' => $validated['return_status_id'],
-                'return_type_id' => $validated['return_type_id'],
-                'modified_by' => $validated['user_id'],
-                'modified_at' => now(),
-            ]);
-
+            $return = new ReturnItem();
+            $return->sales_receipt_id = $salesReceipt->id;
+            $return->branch_id = $salesOrder->branch_id;
+            $return->customer_id = $salesOrder->customer_id;
+            $return->store_id = $salesOrder->store_id;
+            $return->return_date = now();
+            $return->created_by = auth()->user()->id;      
+            $return->return_status = $validated['return_status'];
+            $return->notes = $validated['notes'] ?? null;
+            $return->save();
             // 5. Process each returned item
             $processedItems = [];
             $totalReturnAmount = 0;
@@ -558,35 +564,18 @@ class SalesOrderController extends Controller
                 $totalReturnAmount += $returnAmount;
 
                 // Update item_sold record
-                $itemSold->update([
-                    'quantity' => $itemData['original_quantity'] - $itemData['quantity_returned'],
-                    'modified_by' => $validated['user_id'],
-                    'modified_at' => now(),
-                ]);
+                $returnDetails = new ReturnDetails();
+                $returnDetails->return_id = $return->id;
+                $returnDetails->product_id = $itemData['product_id'];
+                $returnDetails->return_quantity = $itemData['quantity_returned'];
+                $returnDetails->item_sold_id = $itemData['item_sold_id'];
+                $returnDetails->unit_price = $itemData['unit_price'];
+                $returnDetails->store_id = $itemData['store_id'];
+                $returnDetails->return_quantity_pieces = $itemData['quantity_returned_pieces'];
+                $returnDetails->unit_measurement = $itemData['unit_measurement'];
+                $returnDetails->save();
 
-                // Restore stock to inventory
-                $this->restoreStock(
-                    $itemData['product_id'],
-                    $itemData['store_id'],
-                    $itemData['quantity_returned'],
-                    $itemData['unit_measurement']
-                );
-
-                $processedItems[] = [
-                    'product_id' => $itemData['product_id'],
-                    'quantity_returned' => $itemData['quantity_returned'],
-                    'amount' => $returnAmount
-                ];
             }
-
-            // 6. Update sales receipt with return information
-            $salesReceipt->update([
-                'is_returned' => true,
-                'return_amount' => $totalReturnAmount,
-                'return_processed_by' => $validated['user_id'],
-                'return_processed_at' => now(),
-                'return_notes' => $validated['notes'] ?? null,
-            ]);
 
             DB::commit();
 
@@ -596,8 +585,8 @@ class SalesOrderController extends Controller
                 'data' => [
                     'receipt_number' => $salesReceipt->sales_receipt_number,
                     'order_id' => $salesOrder->id,
-                    'return_type' => $salesOrder->return_type_id,
-                    'return_status' => $salesOrder->return_status_id,
+                    // 'return_type' => $salesOrder->return_type_id,
+                    'return' => new ReturnItemResource($return),
                     'total_return_amount' => $totalReturnAmount,
                     'items_returned' => count($processedItems),
                     'processed_items' => $processedItems,

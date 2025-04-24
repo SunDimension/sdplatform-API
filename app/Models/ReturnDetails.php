@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReturnDetails extends Model
 {
-    use HasFactory,SoftDeletes ;
+    use HasFactory, SoftDeletes ;
 
 
     protected $fillable = [
@@ -17,6 +17,12 @@ class ReturnDetails extends Model
         'return_id',
         'product_id',
         'return_quantity',
+        'return_quantity_pieces',
+        'item_sold_id' ,
+        'unit_price',
+        'store_id',
+        'unit_measurement',      
+        'notes' 
     ];
 
     protected $cast = [
@@ -24,6 +30,9 @@ class ReturnDetails extends Model
         'id'=>'integer',
         'return_id'=>'integer',
         'product_id'=>'integer',
+        'item_sold_id'=>'integer',
+        'store_id'=>'integer',
+        'unit_measurement'=>'integer',
 
     ];
 
