@@ -389,25 +389,7 @@ class SalesOrderController extends Controller
         //     );
         // }
 
-        // Update Sales Receipt if payment is made
-        // if (!empty($validated['payment'])) {
-        //     SalesReceipt::updateOrCreate(
-        //         [
-        //             'sales_order_id' => $salesOrder->id,
-        //             'sales_receipt_number' => $validated['payment']['sales_receipt_number'], // Ensuring uniqueness
-        //         ],
-        //         [
-        //             'sales_invoice_id' => $validated['payment']['sales_invoice_id'],
-        //             'customer_id' => $validated['customer_id'],
-        //             'branch_id' => $validated['branch_id'],
-        //             'store_id' => $validated['store_id'],
-        //             'total_amount' => $validated['payment']['total_amount'],
-        //             'amount_paid' => $validated['payment']['amount_paid'],
-        //             'payment_mode_id' => $validated['payment']['payment_mode_id'],
-        //             'receipt_date' => now(),
-        //         ]
-        //     );
-        // }
+   
 
         return response()->json(['message' => 'Sales Order Updated Successfully', 'sales_order' => $salesOrder], 200);
     }
@@ -443,11 +425,7 @@ class SalesOrderController extends Controller
                 }
             }
 
-            // Update the sales order status to "Canceled"
-            // $salesOrder->status = 'Cancelled';
-            // $salesOrder->canceled_at = now(); // Optional: Record the cancellation time
-            // $salesOrder->save();
-
+         
             $salesOrder->delete();
             // Commit the transaction
             DB::commit();
@@ -463,5 +441,203 @@ class SalesOrderController extends Controller
             // Return a response with error message
             return response()->json(['message' => 'An error occurred while canceling the order.'], 500);
         }
+    }
+
+    public function searchReceipt(Request $request)
+{
+    $validated = $request->validate([
+        'sales_receipt_number' => 'required|string|exists:sales_receipts,sales_receipt_number'
+    ]);
+
+    try {
+        $receipt = SalesReceipt::with([
+            'salesOrder' => function($query) {
+                $query->with(['customer', 'branch', 'store', 'itemSold' => function($q) {
+                    $q->with(['product', 'store']);
+                }]);
+            }
+        ])->where('sales_receipt_number', $validated['sales_receipt_number'])->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'receipt' => $receipt,
+                'order' => $receipt->salesOrder,
+                'customer' => $receipt->salesOrder->customer,
+                'items' => $receipt->salesOrder->itemSold->map(function($item) {
+                    return [
+                        'product_id' => $item->product_id,
+                        'product_name' => $item->product->name ?? 'Unknown',
+                        'quantity' => $item->quantity,
+                        'unit_price' => $item->unit_price,
+                        'discount' => $item->discount ?? 0,
+                        'store_id' => $item->store_id,
+                        'store_name' => $item->store->name ?? 'Unknown',
+                        'unit_measurement' => $item->unit_measurement,
+                        'item_sold_id' => $item->id // Important for returns
+                    ];
+                })
+            ]
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Receipt not found',
+            'error' => $e->getMessage()
+        ], 404);
+    }
+}
+
+    /**
+     * Process a return request
+     */
+    public function processReturn(Request $request)
+    {
+        $validated = $request->validate([
+            'sales_receipt_number' => 'required|exists:sales_receipts,sales_receipt_number',
+            'return_type_id' => 'required|exists:return_types,id',
+            'return_status_id' => 'required|exists:return_statuses,id',
+            'user_id' => 'required|exists:users,id',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:inventory_items,id',
+            'items.*.item_sold_id' => 'required|exists:item_sold,id',
+            'items.*.quantity_returned' => 'required|integer|min:1',
+            'items.*.original_quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.store_id' => 'required|exists:stores,id',
+            'items.*.unit_measurement' => 'required|exists:measurements,id',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // 1. Find the sales receipt
+            $salesReceipt = SalesReceipt::where('sales_receipt_number', $validated['sales_receipt_number'])
+                ->firstOrFail();
+
+            // 2. Verify receipt hasn't already been returned
+            if ($salesReceipt->is_returned) {
+                throw new \Exception("This receipt has already been processed for returns");
+            }
+
+            // 3. Get the associated sales order
+            $salesOrder = SalesOrder::findOrFail($salesReceipt->sales_order_id);
+
+            // 4. Update sales order with return information
+            $salesOrder->update([
+                'return_status_id' => $validated['return_status_id'],
+                'return_type_id' => $validated['return_type_id'],
+                'modified_by' => $validated['user_id'],
+                'modified_at' => now(),
+            ]);
+
+            // 5. Process each returned item
+            $processedItems = [];
+            $totalReturnAmount = 0;
+
+            foreach ($validated['items'] as $itemData) {
+                // Find the original sold item
+                $itemSold = ItemSold::findOrFail($itemData['item_sold_id']);
+
+                // Validate item belongs to this order
+                if ($itemSold->sales_order_id != $salesOrder->id) {
+                    throw new \Exception("Item does not belong to this sales order");
+                }
+
+                // Validate return quantity
+                if ($itemData['quantity_returned'] > $itemData['original_quantity']) {
+                    throw new \Exception(
+                        "Return quantity for product ID {$itemData['product_id']} exceeds original quantity"
+                    );
+                }
+
+                // Calculate return amount
+                $returnAmount = $itemData['quantity_returned'] * $itemData['unit_price'];
+                $totalReturnAmount += $returnAmount;
+
+                // Update item_sold record
+                $itemSold->update([
+                    'quantity' => $itemData['original_quantity'] - $itemData['quantity_returned'],
+                    'modified_by' => $validated['user_id'],
+                    'modified_at' => now(),
+                ]);
+
+                // Restore stock to inventory
+                $this->restoreStock(
+                    $itemData['product_id'],
+                    $itemData['store_id'],
+                    $itemData['quantity_returned'],
+                    $itemData['unit_measurement']
+                );
+
+                $processedItems[] = [
+                    'product_id' => $itemData['product_id'],
+                    'quantity_returned' => $itemData['quantity_returned'],
+                    'amount' => $returnAmount
+                ];
+            }
+
+            // 6. Update sales receipt with return information
+            $salesReceipt->update([
+                'is_returned' => true,
+                'return_amount' => $totalReturnAmount,
+                'return_processed_by' => $validated['user_id'],
+                'return_processed_at' => now(),
+                'return_notes' => $validated['notes'] ?? null,
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Return processed successfully',
+                'data' => [
+                    'receipt_number' => $salesReceipt->sales_receipt_number,
+                    'order_id' => $salesOrder->id,
+                    'return_type' => $salesOrder->return_type_id,
+                    'return_status' => $salesOrder->return_status_id,
+                    'total_return_amount' => $totalReturnAmount,
+                    'items_returned' => count($processedItems),
+                    'processed_items' => $processedItems,
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Return processing failed',
+                'error' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    /**
+     * Restore stock to inventory after return
+     */
+    protected function restoreStock($productId, $storeId, $quantityReturned, $measurementId)
+    {
+        $storeItem = StoreItem::where('create_item_id', $productId)
+            ->where('store_id', $storeId)
+            ->firstOrFail();
+
+        // Get measurement unit
+        $measurement = Measurement::findOrFail($measurementId);
+        $unit = $measurement->name;
+
+        // Convert returned quantity to pieces
+        $quantityInPieces = StockUtil::getPieceQuivalent(
+            $unit,
+            $storeItem->quantity_in_package,
+            $quantityReturned
+        );
+
+        // Update inventory
+        $storeItem->increment('quantity_available', $quantityInPieces);
+        $storeItem->increment('quantity_request', $quantityInPieces);
+        
+        return $quantityInPieces;
     }
 }
