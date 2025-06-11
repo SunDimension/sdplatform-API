@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesReceipt extends Model
@@ -75,7 +76,7 @@ protected static function boot()
         return $this->belongsTo(Branch::class);
     }
 
-    public function salesorder()
+    public function salesOrder()
     {
         return $this->belongsTo(SalesOrder::class, "sales_order_id");
     }
@@ -102,7 +103,10 @@ protected static function boot()
     {
         return $this->belongsTo(Store::class, 'store_id');
     }
-
+ public function returnItems(): HasMany
+    {
+        return $this->hasMany(ReturnItem::class, 'sales_receipt_id');
+    }
     // public function itemSold()
     // {
     //     return $this->hasMany(ItemSold::class);

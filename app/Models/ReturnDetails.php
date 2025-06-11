@@ -9,42 +9,40 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReturnDetails extends Model
 {
-    use HasFactory, SoftDeletes ;
-
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
-
         'return_id',
         'product_id',
         'return_quantity',
         'return_quantity_pieces',
-        'item_sold_id' ,
+        'item_sold_id',
         'unit_price',
         'store_id',
         'unit_measurement',      
-        'notes' 
     ];
 
-    protected $cast = [
-
-        'id'=>'integer',
-        'return_id'=>'integer',
-        'product_id'=>'integer',
-        'item_sold_id'=>'integer',
-        'store_id'=>'integer',
-        'unit_measurement'=>'integer',
-
+    protected $casts = [ // Changed from 'cast' to 'casts'
+        'id' => 'integer',
+        'return_id' => 'integer',
+        'product_id' => 'integer',
+        'item_sold_id' => 'integer',
+        'store_id' => 'integer',
+        'unit_measurement' => 'integer',
     ];
 
-    public function product():BelongsTo
+    public function product(): BelongsTo
     {
-        return $this->belongTo(CreateItem::class);
+        return $this->belongsTo(CreateItem::class); // Fixed typo here
     }
 
-     public function returnitem():BelongsTo
+    public function returnItem(): BelongsTo // Changed method name to camelCase
     {
-        return $this->belongTo(ReturnItem::class);
+        return $this->belongsTo(ReturnItem::class); // Fixed typo here
     }
 
-
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
 }

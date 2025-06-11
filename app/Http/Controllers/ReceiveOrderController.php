@@ -20,13 +20,14 @@ class ReceiveOrderController extends Controller
 {
     public function index(Request $request)
     {
-        $receiveOrders = ReceiveOrder::all();
+        $receiveOrders = ReceiveOrder::where('status', 'Approved')
+            ->get();
         return new ReceiveOrderCollection($receiveOrders);
     }
 
     public function pending(Request $request)
     {
-        $receiveOrders = ReceiveOrder::where('status','Pending')->where('store_id',auth()->user()->store_id)->get();
+        $receiveOrders = ReceiveOrder::where('status', 'Pending')->where('store_id', auth()->user()->store_id)->get();
         // $receiveOrders = ReceiveOrder::where('status','Pending')->get();
         return new ReceiveOrderCollection($receiveOrders);
     }
@@ -35,11 +36,11 @@ class ReceiveOrderController extends Controller
     {
         $validated = $request->validated();
         //Log::debug($validated);
-            
+
         $receiveOrder = ReceiveOrder::create($validated);
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
-        //Log::debug($item);
+            //Log::debug($item);
 
             $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
             $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
@@ -53,7 +54,6 @@ class ReceiveOrderController extends Controller
                 'unit_measurement' => $item['unit_measurement'],
                 'created_by' => auth()->user()->id
             ]);
-            
         }
         return new ReceiveOrderResource($receiveOrder);
     }
@@ -63,7 +63,7 @@ class ReceiveOrderController extends Controller
         $validated = $request->validate([
             'comment' => ['nullable'],
             'status' => ['required', 'string'],
-            'id'=>['required', 'string']
+            'id' => ['required', 'string']
         ]);
         $receiveOrder = ReceiveOrder::findOrFail($validated['id']);
         $receiveOrder->approval_comment = $validated['comment'];

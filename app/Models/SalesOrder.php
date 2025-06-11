@@ -34,18 +34,18 @@ class SalesOrder extends Model
         'status'
     ];
     protected static function boot()
-{
-    parent::boot();
+    {
+        parent::boot();
 
-    static::creating(function ($salesOrder) {
-        do {
-            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
-            $salesOrderNumber = 'HGV-SO-' . $randomNumber;
-        } while (static::where('sales_order_number', $salesOrderNumber)->exists());
+        static::creating(function ($salesOrder) {
+            do {
+                $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+                $salesOrderNumber = 'HGV-SO-' . $randomNumber;
+            } while (static::where('sales_order_number', $salesOrderNumber)->exists());
 
-        $salesOrder->sales_order_number = $salesOrderNumber;
-    });
-}
+            $salesOrder->sales_order_number = $salesOrderNumber;
+        });
+    }
 
 
     public function itemsold(): hasMany
@@ -56,10 +56,10 @@ class SalesOrder extends Model
 
 
 
-    public function salesInvoices()
-    {
-        return $this->hasMany(SalesInvoice::class);
-    }
+    // public function salesInvoices()
+    // {
+    //     return $this->hasMany(SalesInvoice::class);
+    // }
 
     public function salesReceipts()
     {
@@ -70,7 +70,7 @@ class SalesOrder extends Model
     {
         return $this->belongsTo(Store::class, 'store_id');
     }
-    
+
     public function branch()
     {
         return $this->belongsTo(Branch::class, 'branch_id');
@@ -86,8 +86,14 @@ class SalesOrder extends Model
         return $this->belongsTo(Customer::class, "customer_id");
     }
 
-     public function measurement()
+    public function measurement()
     {
-        return $this->belongsTo(Measurement::class,"unit_measurement");
+        return $this->belongsTo(Measurement::class, "unit_measurement");
+    }
+
+    public function creditTransaction()
+    {
+        return $this->hasOne(CreditTransaction::class, 'sales_order_id')
+            ->where('type', 'Credit');
     }
 }

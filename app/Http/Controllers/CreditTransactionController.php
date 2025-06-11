@@ -106,4 +106,50 @@ class CreditTransactionController extends Controller
 
         return response()->noContent();
     }
+
+    public function searchCredit(Request $request)
+    {
+        $validated = $request->validate([
+            'credit_order_number' => 'required|string|exists:credit_transactions,credit_order_number'
+        ]);
+
+        try {
+            $receipt = CreditTransaction::with([
+                'salesOrder' => function ($query) {
+                    $query->with(['customer', 'branch', 'store', 'itemSold' => function ($q) {
+                        $q->with(['product', 'store']);
+                    }]);
+                }
+            ])->where('credit_order_number', $validated['credit_order_number'])->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'receipt' => $receipt,
+                    'order' => $receipt->salesOrder,
+                    'customer' => $receipt->salesOrder->customer,
+                    'items' => $receipt->salesOrder->itemSold->map(function ($item) {
+                        return [
+                            'product_id' => $item->product_id,
+                            'product_name' => $item->product->name ?? 'Unknown',
+                            'quantity' => $item->quantity,
+                            'quantity_pieces' => $item->quantity_pieces,
+                            'unit_price' => $item->unit_price,
+                            'discount' => $item->discount ?? 0,
+                            'store_id' => $item->store_id,
+                            'store_name' => $item->store->name ?? 'Unknown',
+                            'unit_measurement' => $item->unit_measurement,
+                            'item_sold_id' => $item->id // Important for returns
+                        ];
+                    })
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Receipt not found',
+                'error' => $e->getMessage()
+            ], 404);
+        }
+    }
 }

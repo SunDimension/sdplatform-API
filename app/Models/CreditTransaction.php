@@ -25,10 +25,14 @@ class CreditTransaction extends Model
         'amount',
         'credit_limit',
         'credit_balance_before',
+        'credit_balance_after',
         'type',
         'created_by',
         'modified_by',
         'deleted_by',
+        'transaction_date',
+        'notes',
+
     ];
 
     /**
@@ -47,6 +51,21 @@ class CreditTransaction extends Model
         'deleted_by' => 'integer',
     ];
 
+
+        protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($creditOrder) {
+        do {
+            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+            $creditOrderNumber = 'HGV-CR-' . $randomNumber;
+        } while (static::where('credit_order_number', $creditOrderNumber)->exists());
+
+        $creditOrder->credit_order_number = $creditOrderNumber;
+    });
+}
+
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
@@ -54,7 +73,7 @@ class CreditTransaction extends Model
 
     public function customer(): BelongsTo
     {
-        return $this->belongsTo(Customer::class,"customer_id");
+        return $this->belongsTo(Customer::class, "customer_id");
     }
 
     public function salesOrder(): BelongsTo

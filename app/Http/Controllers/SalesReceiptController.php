@@ -11,11 +11,13 @@ use App\Models\CreditTransaction;
 use App\Models\Customer;
 use App\Models\PostOutflow;
 use App\Models\SalesOrder;
+use App\Models\PostInflow;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class SalesReceiptController extends Controller
@@ -28,9 +30,10 @@ public function index(Request $request)
     // Validate and retrieve query parameters from the request
     $validated = $request->validate([
         'store_id' => 'nullable|integer|exists:stores,id',
-        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+        'branch_id' => 'nullable|integer|exists:stores,branch_id',
         'from_date' => 'nullable|date',
         'to_date' => 'nullable|date',
+        'with_returns' => 'nullable|boolean' // Add this parameter
     ]);
 
     // Extract validated parameters
@@ -38,12 +41,20 @@ public function index(Request $request)
     $branchId = $validated['branch_id'] ?? null;
     $fromDate = $validated['from_date'] ?? null;
     $toDate = $validated['to_date'] ?? null;
+    $withReturns = $validated['with_returns'] ?? false;
 
     // Get the authenticated user
     $user = auth()->user();
 
     // Start building the query
-    $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
+       $query = SalesReceipt::with([
+        'customer', 
+        'store', 
+        'user', 
+        'branch', 
+        'salesorder',
+        'returnItems.returnDetails.product' // Eager load all necessary relationships
+    ])
         ->when($storeId, function ($query, $storeId) {
             return $query->where('store_id', $storeId);
         })
@@ -53,24 +64,23 @@ public function index(Request $request)
 
     // Handle date filtering with branch filtering
     if ($fromDate || $toDate) {
-     $user = auth()->user();
-        // Convert from_date and to_date to Carbon instances only if provided
         $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
         $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
         if ($fromDate && $toDate) {
-            // Both from_date and to_date are provided
             $query->whereBetween('created_at', [$fromDate, $toDate]);
         } elseif ($fromDate) {
-            // Only from_date is provided
             $query->where('created_at', '>=', $fromDate);
         } elseif ($toDate) {
-            // Only to_date is provided
             $query->where('created_at', '<=', $toDate);
         }
 
-        // Add the user's branch filter directly
         $query->where('branch_id', $user->branch_id);
+    }
+
+    // If with_returns is true, load the return items and their details
+    if ($withReturns) {
+        $query->with(['returnItems.returnDetails']);
     }
 
     // Fetch the results
@@ -232,40 +242,80 @@ public function pendingReleaseStore($storeId, Request $request)
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
     }
 
-    public function store(SalesReceiptStoreRequest $request)
-    {
+  // In your SalesReceiptController's store method
+public function store(SalesReceiptStoreRequest $request)
+{
+    DB::beginTransaction();
+    
+    try {
         $data = $request->validated();
         $salesreceipt = SalesReceipt::create($data);
+        
+        // Update the sales order status
         $order = SalesOrder::where('id', $salesreceipt->sales_order_id)->first();
         $order->status = 'Paid';
         $order->save();
 
         $payments = $data['payment_detail'];
+        $customerId = $salesreceipt->customer_id;
 
-        $filteredPayments = array_filter($payments, function ($payment) {
-            return $payment['payment_type']  == 'Deposit';
+        // Process deposit payments
+        $depositPayments = array_filter($payments, function ($payment) {
+            return $payment['payment_type'] == 'Deposit';
         });
 
-        $filteredPayments = array_filter($payments, function ($payment) {
-            return $payment['payment_type']  == 'Deposit';
-        });
+        foreach ($depositPayments as $payment) {
+            $amountUsed = $payment['amount'];
+            
+            // Get available deposits (FIFO order)
+            $postInflows = PostInflow::where('customer_id', $customerId)
+                ->where('inflow_status', 3) // Assigned status
+                ->where('amount', '>', 0)
+                ->orderBy('inflow_date', 'asc')
+                ->lockForUpdate() // Prevent concurrent updates
+                ->get();
 
-        $filteredPayments1 = array_filter($payments, function ($payment) {
-            return $payment['payment_type']  == 'Credit';
-        });
+            foreach ($postInflows as $inflow) {
+                if ($amountUsed <= 0) break;
 
-        if (count($filteredPayments) == 1) {
-            $filteredPayments = array_values($filteredPayments);
-            Log::debug($filteredPayments);
-            $outflow = ["customer_id" => $salesreceipt->customer_id, "sales_receipt_id" => $salesreceipt->id, "amount" => $filteredPayments[0]['amount'], 'outflow_mode' => 7, 'outflow_date' => now()];
+                $available = $inflow->amount;
+                $used = min($available, $amountUsed);
+                
+                // Update the inflow record
+                $inflow->amount -= $used;
+                $inflow->amount_used += $used;
+                
+                // Update status if fully used
+                if ($inflow->amount <= 0) {
+                    $inflow->inflow_status = 12; // Fully Used status
+                }
+                
+                $inflow->save();
+                $amountUsed -= $used;
+            }
+
+            if ($amountUsed > 0) {
+                throw new \Exception("Customer $customerId used more deposit ($amountUsed) than available");
+            }
+
+            // Create outflow record
+            $outflow = [
+                "customer_id" => $customerId,
+                "sales_receipt_id" => $salesreceipt->id,
+                "amount" => $payment['amount'],
+                'outflow_mode' => 7,
+                'outflow_date' => now()
+            ];
             PostOutflow::create($outflow);
         }
 
-        if ($order->payment_type == "Credit" && count($filteredPayments1) == 0) {
-            $customer = Customer::findOrFail($salesreceipt->customer_id);
+        // Process credit payments (existing code)
+        if ($order->payment_type == "Credit" && 
+            !array_filter($payments, fn($p) => $p['payment_type'] == 'Credit')) {
+            $customer = Customer::findOrFail($customerId);
             $data1 = [
                 'branch_id' => $salesreceipt->branch_id,
-                'customer_id' => $salesreceipt->customer_id,
+                'customer_id' => $customerId,
                 'sales_receipt_id' => $salesreceipt->id,
                 'amount' => $salesreceipt->amount_paid,
                 'credit_limit' => $customer->credit_limit,
@@ -274,13 +324,26 @@ public function pendingReleaseStore($storeId, Request $request)
                 'created_by' => auth()->user()->id
             ];
             $creditTransaction = CreditTransaction::create($data1);
-            $customer->credit_balance = $customer->credit_balance + $creditTransaction->amount;
+            $customer->credit_balance += $creditTransaction->amount;
             $customer->save();
         }
 
-        //return new SalesReceiptResource($salesreceipt);
-        return response()->json(['message' => 'Sales Receipt Created Successfully', 'data' => $salesreceipt], 200);
+        DB::commit();
+        
+        return response()->json([
+            'message' => 'Sales Receipt Created Successfully', 
+            'data' => $salesreceipt
+        ], 200);
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error("Sales receipt creation failed: " . $e->getMessage());
+        return response()->json([
+            'message' => 'Failed to create sales receipt',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function show(Request $request, SalesReceipt $salesreceipt): SalesReceiptResource
     {
@@ -351,4 +414,6 @@ public function pendingReleaseStore($storeId, Request $request)
     // Return the results as a collection
     return new SalesReceiptCollection($salesReceipts);
 }
+
+
 }

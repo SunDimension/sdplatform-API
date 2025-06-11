@@ -48,10 +48,10 @@ class ReturnItem extends Model
     {
         return $this->belongsTo(Store::class);
     }
-    public function salesreceipt(): BelongsTo
-    {
-        return $this->belongsTo(SalesReceipt::class);
-    }
+   public function salesReceipt(): BelongsTo
+{
+    return $this->belongsTo(SalesReceipt::class, 'sales_receipt_id');
+}
 
     public function release(): BelongsTo
     {
@@ -62,4 +62,18 @@ class ReturnItem extends Model
     {
         return $this->hasMany(ReturnDetails::class, 'return_id');
     }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'created_by');
+    }
+    public function approvedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'approved_by');
+    }
+    
 }

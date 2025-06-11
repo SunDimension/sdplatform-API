@@ -10,7 +10,10 @@ use Illuminate\Http\Request;
 use App\Models\SalesOrder;
 use App\Models\ItemSold;
 use App\Models\PostInflow;
+
 use App\Models\PostOutflow;
+use App\Models\CreditTransaction;
+use App\Models\Customer;
 use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
 use App\Models\StoreItem;
@@ -173,7 +176,7 @@ class SalesOrderController extends Controller
 
     public function getbynumber($orderno)
     {
-        $salesOrders = SalesOrder::with('itemSold', 'customer')->where('sales_order_number', $orderno)->withSum('salesReceipts as total_paid', 'amount_paid')->first();
+        $salesOrders = SalesOrder::with('itemSold', 'customer', 'creditTransaction')->where('sales_order_number', $orderno)->withSum('salesReceipts as total_paid', 'amount_paid')->first();
 
         $customerId = $salesOrders->customer_id;
         $inflows = PostInflow::where('customer_id', $customerId)->where('inflow_status', 3)->sum('amount');;
@@ -282,7 +285,7 @@ class SalesOrderController extends Controller
         $itemSoldIds = [];
 
         foreach ($validated['items'] as $item) {
-         $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+            $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
             $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
             $itemSold = ItemSold::create([
                 'sales_order_id' => $salesOrder->id,
@@ -292,7 +295,7 @@ class SalesOrderController extends Controller
                 'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
                 'store_id' => $item['store_id'],
                 'discount' => $item['discount'],
-                    'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
+                'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
                 'unit_measurement' => $item['unit_measurement'],
                 'sales_date' => now(),
             ]);
@@ -376,23 +379,9 @@ class SalesOrderController extends Controller
             );
         }
 
-        // Update Sales Invoice if payment is deferred
-        // if (!empty($validated['invoice'])) {
-        //     SalesInvoice::updateOrCreate(
-        //         [
-        //             'sales_order_id' => $salesOrder->id,
-        //             'sales_invoice_number' => $validated['invoice']['sales_invoice_number'], // Ensuring uniqueness
-        //         ],
-        //         [
-        //             'product_id' => $validated['invoice']['product_id'],
-        //             'unit_price' => $validated['invoice']['unit_price'],
-        //             'amount' => $validated['invoice']['amount'],
-        //             'invoice_date' => now(),
-        //         ]
-        //     );
-        // }
 
-   
+
+
 
         return response()->json(['message' => 'Sales Order Updated Successfully', 'sales_order' => $salesOrder], 200);
     }
@@ -428,7 +417,7 @@ class SalesOrderController extends Controller
                 }
             }
 
-         
+
             $salesOrder->delete();
             // Commit the transaction
             DB::commit();
@@ -447,51 +436,50 @@ class SalesOrderController extends Controller
     }
 
     public function searchReceipt(Request $request)
-{
-    $validated = $request->validate([
-        'sales_receipt_number' => 'required|string|exists:sales_receipts,sales_receipt_number'
-    ]);
-
-    try {
-        $receipt = SalesReceipt::with([
-            'salesOrder' => function($query) {
-                $query->with(['customer', 'branch', 'store', 'itemSold' => function($q) {
-                    $q->with(['product', 'store']);
-                }]);
-            }
-        ])->where('sales_receipt_number', $validated['sales_receipt_number'])->firstOrFail();
-
-        return response()->json([
-            'success' => true,
-            'data' => [
-                'receipt' => $receipt,
-                'order' => $receipt->salesOrder,
-                'customer' => $receipt->salesOrder->customer,
-                'items' => $receipt->salesOrder->itemSold->map(function($item) {
-                    return [
-                        'product_id' => $item->product_id,
-                        'product_name' => $item->product->name ?? 'Unknown',
-                        'quantity' => $item->quantity,
-                        'quantity_pieces' => $item->quantity_pieces,
-                        'unit_price' => $item->unit_price,
-                        'discount' => $item->discount ?? 0,
-                        'store_id' => $item->store_id,
-                        'store_name' => $item->store->name ?? 'Unknown',
-                        'unit_measurement' => $item->unit_measurement,
-                        'item_sold_id' => $item->id // Important for returns
-                    ];
-                })
-            ]
+    {
+        $validated = $request->validate([
+            'sales_receipt_number' => 'required|string|exists:sales_receipts,sales_receipt_number'
         ]);
 
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Receipt not found',
-            'error' => $e->getMessage()
-        ], 404);
+        try {
+            $receipt = SalesReceipt::with([
+                'salesOrder' => function ($query) {
+                    $query->with(['customer', 'branch', 'store', 'itemSold' => function ($q) {
+                        $q->with(['product', 'store']);
+                    }]);
+                }
+            ])->where('sales_receipt_number', $validated['sales_receipt_number'])->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'receipt' => $receipt,
+                    'order' => $receipt->salesOrder,
+                    'customer' => $receipt->salesOrder->customer,
+                    'items' => $receipt->salesOrder->itemSold->map(function ($item) {
+                        return [
+                            'product_id' => $item->product_id,
+                            'product_name' => $item->product->name ?? 'Unknown',
+                            'quantity' => $item->quantity,
+                            'quantity_pieces' => $item->quantity_pieces,
+                            'unit_price' => $item->unit_price,
+                            'discount' => $item->discount ?? 0,
+                            'store_id' => $item->store_id,
+                            'store_name' => $item->store->name ?? 'Unknown',
+                            'unit_measurement' => $item->unit_measurement,
+                            'item_sold_id' => $item->id // Important for returns
+                        ];
+                    })
+                ]
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Receipt not found',
+                'error' => $e->getMessage()
+            ], 404);
+        }
     }
-}
 
     /**
      * Process a return request
@@ -535,7 +523,7 @@ class SalesOrderController extends Controller
             $return->customer_id = $salesOrder->customer_id;
             $return->store_id = $salesOrder->store_id;
             $return->return_date = now();
-            $return->created_by = auth()->user()->id;      
+            $return->created_by = auth()->user()->id;
             $return->return_status = $validated['return_status'];
             $return->notes = $validated['notes'] ?? null;
             $return->save();
@@ -574,7 +562,6 @@ class SalesOrderController extends Controller
                 $returnDetails->return_quantity_pieces = $itemData['quantity_returned_pieces'];
                 $returnDetails->unit_measurement = $itemData['unit_measurement'];
                 $returnDetails->save();
-
             }
 
             DB::commit();
@@ -592,7 +579,6 @@ class SalesOrderController extends Controller
                     'processed_items' => $processedItems,
                 ]
             ]);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -626,7 +612,131 @@ class SalesOrderController extends Controller
         // Update inventory
         $storeItem->increment('quantity_available', $quantityInPieces);
         $storeItem->increment('quantity_request', $quantityInPieces);
-        
+
         return $quantityInPieces;
+    }
+
+    public function processCreditReturn(Request $request)
+    {
+        $validated = $request->validate([
+            'credit_order_number' => 'required|exists:credit_transactions,credit_order_number',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:create_items,id',
+            'items.*.item_sold_id' => 'required|exists:item_solds,id',
+            'items.*.quantity_returned' => 'required|integer|min:1',
+            'items.*.quantity_returned_pieces' => 'required|integer|min:0',
+            'items.*.original_quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.store_id' => 'required|exists:stores,id',
+            'items.*.unit_measurement' => 'required|exists:measurements,id',
+            'notes' => 'nullable|string|max:500',
+        ]);
+
+        DB::beginTransaction();
+
+        try {
+            // 1. Find the credit transaction
+            $creditTransaction = CreditTransaction::where('credit_order_number', $validated['credit_order_number'])
+                ->where('type', 'credit')
+                ->firstOrFail();
+
+            // 2. Get the associated sales order
+            $salesOrder = SalesOrder::findOrFail($creditTransaction->sales_order_id);
+
+            // 3. Verify this is a credit purchase
+            if ($salesOrder->payment_type !== 'Credit') {
+                throw new \Exception("This order is not a credit purchase");
+            }
+
+            // 4. Create return record
+            $return = new ReturnItem();
+            $return->credit_transaction_id = $creditTransaction->id;
+            $return->branch_id = $salesOrder->branch_id;
+            $return->customer_id = $salesOrder->customer_id;
+            $return->store_id = $salesOrder->store_id;
+            $return->return_date = now();
+            $return->created_by = auth()->id();
+            $return->return_status = 'Approved'; // Auto-approve credit returns
+            $return->notes = $validated['notes'] ?? null;
+            $return->save();
+
+            // 5. Process each returned item and calculate total return amount
+            $totalReturnAmount = 0;
+            $processedItems = [];
+
+            foreach ($validated['items'] as $itemData) {
+                // Validate item belongs to this order
+                $itemSold = ItemSold::where('id', $itemData['item_sold_id'])
+                    ->where('sales_order_id', $salesOrder->id)
+                    ->firstOrFail();
+
+                // Validate return quantity
+                if ($itemData['quantity_returned'] > $itemData['original_quantity']) {
+                    throw new \Exception(
+                        "Return quantity for product ID {$itemData['product_id']} exceeds original quantity"
+                    );
+                }
+
+                $returnAmount = $itemData['quantity_returned'] * $itemData['unit_price'];
+                $totalReturnAmount += $returnAmount;
+
+                // Create return detail
+                $returnDetails = new ReturnDetails();
+                $returnDetails->return_id = $return->id;
+                $returnDetails->product_id = $itemData['product_id'];
+                $returnDetails->return_quantity = $itemData['quantity_returned'];
+                $returnDetails->item_sold_id = $itemData['item_sold_id'];
+                $returnDetails->unit_price = $itemData['unit_price'];
+                $returnDetails->store_id = $itemData['store_id'];
+                $returnDetails->return_quantity_pieces = $itemData['quantity_returned_pieces'];
+                $returnDetails->unit_measurement = $itemData['unit_measurement'];
+                $returnDetails->save();
+
+                $processedItems[] = $returnDetails;
+            }
+
+            // 6. Update customer's credit balance
+            $customer = Customer::findOrFail($salesOrder->customer_id);
+            $previousBalance = $customer->credit_balance;
+            $customer->credit_balance += $totalReturnAmount; // Increase balance since we're returning goods
+            $customer->save();
+
+            // 7. Create credit adjustment transaction
+            $adjustment = new CreditTransaction();
+            $adjustment->branch_id = $salesOrder->branch_id;
+            $adjustment->customer_id = $customer->id;
+            $adjustment->sales_order_id = $salesOrder->id;
+            $adjustment->amount = $totalReturnAmount;
+            $adjustment->credit_balance_before = $previousBalance;
+            $adjustment->credit_balance_after = $customer->credit_balance;
+            $adjustment->type = 'return_adjustment';
+            $adjustment->transaction_date = now();
+            $adjustment->created_by = auth()->id();
+            $adjustment->notes = "Credit adjustment for return #{$return->id}";
+            $adjustment->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Credit return processed successfully',
+                'data' => [
+                    'credit_order_number' => $creditTransaction->credit_order_number,
+                    'return_id' => $return->id,
+                    'customer_id' => $customer->id,
+                    'previous_credit_balance' => $previousBalance,
+                    'new_credit_balance' => $customer->credit_balance,
+                    'amount_credited' => $totalReturnAmount,
+                    'items_returned' => count($processedItems),
+                ]
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Credit return processing failed',
+                'error' => $e->getMessage()
+            ], 400);
+        }
     }
 }
