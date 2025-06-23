@@ -21,7 +21,8 @@ class JournalEntry extends Model
     protected $fillable = [
         'description',
         'payment_date',
-        'warehouse_id',
+        'store_id',
+        'branch_id',
         'vendor_id',
         'created_by',
         'modified_by',
@@ -36,8 +37,10 @@ class JournalEntry extends Model
      * @var array
      */
     protected $casts = [
-        'payment_date' => 'timestamp',
-        'warehouse_id' => 'integer',
+        'payment_date' => 'date',
+        'store_id' => 'integer',
+        'branch_id' => 'integer',
+        'vendor_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -45,28 +48,38 @@ class JournalEntry extends Model
         'approval_officer_id' => 'integer'
     ];
 
+    public function store(): BelongsTo
+    {
+        return $this->belongsTo(Store::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function vendor(): BelongsTo
+    {
+        return $this->belongsTo(Vendor::class);
+    }
+
     public function journalEntryDetails(): HasMany
     {
         return $this->hasMany(JournalEntryDetail::class);
     }
 
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
-    }
-
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'created_by');
+        return $this->belongsTo(User::class);
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'modified_by');
+        return $this->belongsTo(User::class);
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'deleted_by');
+        return $this->belongsTo(User::class);
     }
 }

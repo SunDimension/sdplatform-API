@@ -8,7 +8,7 @@ use App\Models\Account;
 use App\Models\FinancialPeriod;
 use App\Models\Transaction;
 use App\Models\User;
-use App\Models\Warehouse;
+use App\Models\Store;
 
 class TransactionFactory extends Factory
 {
@@ -33,7 +33,7 @@ class TransactionFactory extends Factory
             'debit' => $this->faker->randomFloat(0, 0, 9999999999.),
             'credit' => $this->faker->randomFloat(0, 0, 9999999999.),
             'amount' => $this->faker->randomFloat(0, 0, 9999999999.),
-            'warehouse_id' => Warehouse::factory(),
+            'store_id' => Store::factory(),
             'account_no' => $this->faker->word(),
             'account_id' => Account::factory(),
             'created_by' => User::factory(),

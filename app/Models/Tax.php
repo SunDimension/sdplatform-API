@@ -16,6 +16,10 @@ class Tax extends Model
      */
     protected $fillable = [
         'name',
+        'rate',
+        'type', // 'vat' or 'wht'
+        'is_active',
+        'description'
     ];
 
     /**
@@ -25,5 +29,7 @@ class Tax extends Model
      */
     protected $casts = [
         'id' => 'integer',
+        'rate' => 'decimal:2',
+        'is_active' => 'boolean'
     ];
 }

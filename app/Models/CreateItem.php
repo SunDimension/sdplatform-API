@@ -46,7 +46,10 @@ class CreateItem extends Model
         'image_url',
         'barcode',
         'store_id',
-        'user_id'
+        'user_id',
+        'tax_id',
+        'is_tax_inclusive',
+        'tax_amount'
     ];
 
     /**
@@ -70,6 +73,9 @@ class CreateItem extends Model
         'vendor_id' => 'integer',
         'store_id' => 'integer',
         'user_id' => 'integer',
+        'tax_id' => 'integer',
+        'is_tax_inclusive' => 'boolean',
+        'tax_amount' => 'float'
     ];
 
    protected static function boot()
@@ -81,6 +87,12 @@ class CreateItem extends Model
         // dd($createItem);
             $createItem->batch_number = static::generateBatchNumber();
         // }
+    });
+
+    static::saving(function($createItem) {
+        if ($createItem->isDirty('selling_price') || $createItem->isDirty('tax_id') || $createItem->isDirty('is_tax_inclusive')) {
+            $createItem->calculateTaxAmount();
+        }
     });
 }
 
@@ -94,6 +106,48 @@ private static function generateBatchNumber()
     return "{$prefix}-{$timestamp}-{$randomNumber}";
 }
 
+public function calculateTaxAmount()
+{
+    if (!$this->tax_id) {
+        $this->tax_amount = 0;
+        return;
+    }
+
+    $tax = Tax::find($this->tax_id);
+    if (!$tax) {
+        $this->tax_amount = 0;
+        return;
+    }
+
+    if ($this->is_tax_inclusive) {
+        // If price is tax inclusive, calculate tax amount from the total price
+        $this->tax_amount = $this->selling_price - ($this->selling_price / (1 + ($tax->rate / 100)));
+    } else {
+        // If price is tax exclusive, calculate tax amount from the base price
+        $this->tax_amount = $this->selling_price * ($tax->rate / 100);
+    }
+}
+
+public function getTaxInclusivePrice()
+{
+    if ($this->is_tax_inclusive) {
+        return $this->selling_price;
+    }
+    return $this->selling_price + $this->tax_amount;
+}
+
+public function getTaxExclusivePrice()
+{
+    if (!$this->is_tax_inclusive) {
+        return $this->selling_price;
+    }
+    return $this->selling_price - $this->tax_amount;
+}
+
+public function tax(): BelongsTo
+{
+    return $this->belongsTo(Tax::class);
+}
 
     public function itemCategory(): BelongsTo
     {

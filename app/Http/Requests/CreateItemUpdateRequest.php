@@ -29,7 +29,7 @@ class CreateItemUpdateRequest extends FormRequest
             'unit_id' => ['required', 'integer', 'exists:units,id'],
             'brand_id' => ['required', 'integer', 'exists:brands,id'],
             'cost_price' => ['numeric'],
-            'selling_price' => ['numeric'],
+            'selling_price' => ['numeric', 'min:0'],
             'reorder_level' => ['string'],
             'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
             'weight_id' => ['required', 'integer', 'exists:weights,id'],
@@ -39,7 +39,9 @@ class CreateItemUpdateRequest extends FormRequest
             'image_url' => ['string'],
             'barcode' => ['string','nullable'],
             'store_id' => ['required','integer', 'exists:stores,id'],
-            'user_id' => ['required', 'integer','exists:users,id']
+            'user_id' => ['required', 'integer','exists:users,id'],
+            'tax_id' => ['nullable', 'integer', 'exists:taxes,id'],
+            'is_tax_inclusive' => ['boolean']
         ];
     }
 }

@@ -16,7 +16,7 @@ class JournalEntryResource extends JsonResource
             'id' => $this->id,
             'description' => $this->description,
             'payment_date' => $this->payment_date,
-            'warehouse_id' => $this->warehouse_id,
+            'store_id' => $this->store_id,
             'vendor_id' => $this->vendor_id,
             'created_by' => $this->created_by,
             'modified_by' => $this->modified_by,

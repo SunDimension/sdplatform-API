@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 use App\Models\JournalEntry;
 use App\Models\User;
-use App\Models\Warehouse;
+use App\Models\Store;
 
 class JournalEntryFactory extends Factory
 {
@@ -25,7 +25,7 @@ class JournalEntryFactory extends Factory
         return [
             'description' => $this->faker->text(),
             'payment_date' => $this->faker->dateTime(),
-            'warehouse_id' => Warehouse::factory(),
+            'store_id' => Store::factory(),
             'vendor_id' => $this->faker->word(),
             'created_by' => User::factory(),
             'modified_by' => User::factory(),
