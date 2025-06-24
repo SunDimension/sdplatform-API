@@ -83,6 +83,36 @@ class StockUtil
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
     }
 
+    public static function getQuantityActual($item_id, $store_id)
+    {
+        // Get the opening stock quantity
+        $storeItem = StoreItem::where('create_item_id', $item_id)
+            ->where('store_id', $store_id)
+            ->first();
+
+        if (!$storeItem) {
+            Log::warning("StoreItem not found for item_id: $item_id and store_id: $store_id");
+            return 0;
+        }
+
+        $openStock = $storeItem->open_stock * $storeItem->quantity_in_package;
+
+        // Calculate total received quantity
+        $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
+
+        // Calculate total released quantity
+        $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
+
+        // Calculate pending sales quantity
+        //$stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
+
+        // Additional stock adjustments (if needed)
+        $stockTransfered = 0; // Example: Transfers to other stores
+        $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
+
+        return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned ;
+    }
+
     /**
      * Get the total received quantity for an item in a store.
      *
