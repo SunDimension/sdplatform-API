@@ -137,6 +137,7 @@ class StockUtil
             ->select('return_details.product_id', DB::raw('SUM(return_details.return_quantity_pieces) as total_quantity'))
             ->where('return_details.product_id', $item_id)
             ->where('return_items.store_id', $store_id)
+            ->where('return_items.status', 'Approved')
             ->groupBy('return_details.product_id')
             ->first();
 

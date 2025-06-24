@@ -76,15 +76,37 @@ class ReturnItemController extends Controller
         $returnItem->save();
 
         if ($validated['status'] == 'Approved') {
-            $data = new PostInflow();
-            $data->inflow_status = 3; // claimed status
-            $data->customer_id = $returnItem->customer_id;
-            $data->amount = $returnItem->returnDetails->sum(function ($detail) {
-                return $detail->return_quantity * $detail->unit_price;
-            });
-            $data->narration = "Return of items";
-            $data->inflow_date = now();
-            $data->save();
+            $salesReceipt = $returnItem->salesReceipt;
+            $salesOrder = $salesReceipt ? SalesOrder::find($salesReceipt->sales_order_id) : null;
+           
+            if($salesOrder && $salesOrder->payment_type === 'Credit'){
+                $data = new CreditTransaction();
+                $data->customer_id = $returnItem->customer_id;
+                $data->branch_id = $returnItem->branch_id;
+                $data->sales_order_id = $salesOrder->id;
+                $data->type = 'Return Adjustment';
+                $data->amount = $returnItem->returnDetails->sum(function ($detail) {
+                    return - $detail->return_quantity * $detail->unit_price;
+                });
+                $data->credit_balance_before = $salesOrder->credit_balance;
+                // $data->credit_balance_after = $salesOrder->credit_balance - $data->amount;
+                // $data->transaction_date = now();
+                $data->created_by = auth()->user()->id;
+                $data->notes = "Credit adjustment for return #{$returnItem->id}";
+                $data->save();
+            }
+            else{
+
+                $data = new PostInflow();
+                $data->inflow_status = 3; // claimed status
+                $data->customer_id = $returnItem->customer_id;
+                $data->amount = $returnItem->returnDetails->sum(function ($detail) {
+                    return $detail->return_quantity * $detail->unit_price;
+                });
+                $data->narration = "Return of items";
+                $data->inflow_date = now();
+                $data->save();
+            }
         }
 
 
