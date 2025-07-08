@@ -40,7 +40,7 @@ class StockUtil
         $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
-        $stockTransfered = 0; // Example: Transfers to other stores
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
@@ -77,12 +77,99 @@ class StockUtil
         $stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
-        $stockTransfered = 0; // Example: Transfers to other stores
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
     }
 
+    /**
+     * Get the total transferred quantity for an item from a store (outgoing transfers).
+     *
+     * @param int $item_id
+     * @param int $store_id
+     * @return float
+     */
+    public static function getTotalTransferredQuantity($item_id, $store_id)
+    {
+        // Outgoing transfers: items sent from this store to another store
+        $result = \App\Models\StoreTransferItem::query()
+            ->join('store_transfer_orders', 'store_transfer_items.transfer_order_id', '=', 'store_transfer_orders.id')
+            ->select('store_transfer_items.product_id', \DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
+            ->where('store_transfer_items.product_id', $item_id)
+            ->where('store_transfer_orders.source_store_id', $store_id)
+            ->whereIn('store_transfer_orders.source_status', ['approved']) // Only count approved/outgoing
+            ->groupBy('store_transfer_items.product_id')
+            ->first();
+
+        return $result ? $result->total_quantity : 0;
+    }
+
+    /**
+     * Get the total received via transfer quantity for an item into a store (incoming transfers).
+     *
+     * @param int $item_id
+     * @param int $store_id
+     * @return float
+     */
+    public static function getTotalReceivedViaTransferQuantity($item_id, $store_id)
+    {
+        // Incoming transfers: items received into this store from another store
+        $result = \App\Models\StoreTransferItem::query()
+            ->join('store_transfer_orders', 'store_transfer_items.transfer_order_id', '=', 'store_transfer_orders.id')
+            ->select('store_transfer_items.product_id', \DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
+            ->where('store_transfer_items.product_id', $item_id)
+            ->where('store_transfer_orders.destination_store_id', $store_id)
+            ->whereIn('store_transfer_orders.destination_status', ['approved']) // Only count approved/incoming
+            ->groupBy('store_transfer_items.product_id')
+            ->first();
+
+        return $result ? $result->total_quantity : 0;
+    }
+
+    /**
+     * Get the total transferred quantity for an item from a store (outgoing transfers).
+     *
+     * @param int $item_id
+     * @param int $store_id
+     * @return float
+     */
+    public static function getTotalTransferredQuantityRequest($item_id, $store_id)
+    {
+        // Outgoing transfers: items sent from this store to another store
+        $result = \App\Models\StoreTransferItem::query()
+            ->join('store_transfer_orders', 'store_transfer_items.transfer_order_id', '=', 'store_transfer_orders.id')
+            ->select('store_transfer_items.product_id', \DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
+            ->where('store_transfer_items.product_id', $item_id)
+            ->where('store_transfer_orders.source_store_id', $store_id)
+            ->whereIn('store_transfer_orders.source_status', ['approved', 'outgoing','pending']) // Only count approved/outgoing
+            ->groupBy('store_transfer_items.product_id')
+            ->first();
+
+        return $result ? $result->total_quantity : 0;
+    }
+
+    /**
+     * Get the total received via transfer quantity for an item into a store (incoming transfers).
+     *
+     * @param int $item_id
+     * @param int $store_id
+     * @return float
+     */
+    public static function getTotalReceivedViaTransferQuantityRequest($item_id, $store_id)
+    {
+        // Incoming transfers: items received into this store from another store
+        $result = \App\Models\StoreTransferItem::query()
+            ->join('store_transfer_orders', 'store_transfer_items.transfer_order_id', '=', 'store_transfer_orders.id')
+            ->select('store_transfer_items.product_id', \DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
+            ->where('store_transfer_items.product_id', $item_id)
+            ->where('store_transfer_orders.destination_store_id', $store_id)
+            ->whereIn('store_transfer_orders.destination_status', ['approved', 'incoming','pending']) // Only count approved/incoming
+            ->groupBy('store_transfer_items.product_id')
+            ->first();
+
+        return $result ? $result->total_quantity : 0;
+    }
     public static function getQuantityActual($item_id, $store_id)
     {
         // Get the opening stock quantity
@@ -167,7 +254,7 @@ class StockUtil
             ->select('return_details.product_id', DB::raw('SUM(return_details.return_quantity_pieces) as total_quantity'))
             ->where('return_details.product_id', $item_id)
             ->where('return_items.store_id', $store_id)
-            ->where('return_items.status', 'Approved')
+            ->where('return_items.return_status', 'Approved')
             ->groupBy('return_details.product_id')
             ->first();
 

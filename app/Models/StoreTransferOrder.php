@@ -27,9 +27,13 @@ class StoreTransferOrder extends Model
         'destination_store_id',
         'approval_stage_id',
         'source_status',
-        'source_date_approved',
+        'source_approved_by',
+        'source_approval_date',
         'destination_status',
-        'destination_date_approved',
+        'destination_approved_by',
+        'destination_approval_date',
+        'branch_approved_by',
+        'branch_approval_date',
         'created_by',
         'modified_by',
         'deleted_by',
@@ -47,16 +51,29 @@ class StoreTransferOrder extends Model
         'destination_branch_id' => 'integer',
         'destination_store_id' => 'integer',
         'approval_stage_id' => 'integer',
-        'source_date_approved' => 'timestamp',
-        'destination_date_approved' => 'timestamp',
+        'source_approval_date' => 'timestamp',
+        'destination_approval_date' => 'timestamp',
+        'branch_approval_date' => 'timestamp',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
     ];
 
-    public function receiveItems(): HasMany
+    protected static function boot()
     {
-        return $this->hasMany(ReceiveItem::class);
+        parent::boot();
+        static::creating(function ($order) {
+            do {
+                $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+                $OrderNumber = 'HGV-ST-' . $randomNumber;
+            } while (static::where('order_number', $OrderNumber)->exists());
+            $order->order_number = $OrderNumber;
+        });
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(StoreTransferItem::class, 'transfer_order_id');
     }
 
     public function sourceBranch(): BelongsTo
