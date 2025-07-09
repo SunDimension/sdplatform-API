@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use App\Http\Resources\SalesOrderResource;
 use App\Http\Resources\SalesOrderCollection;
+use App\Http\Resources\ItemSoldResource;
 use App\Http\Resources\StoreCollection;
 use App\Models\Branch;
 use Illuminate\Http\Request;
 use App\Models\SalesOrder;
 use App\Models\ItemSold;
 use App\Models\PostInflow;
-
+use App\Models\ProductAudit;
 use App\Models\PostOutflow;
 use App\Models\CreditTransaction;
 use App\Models\Customer;
@@ -22,6 +23,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Carbon\Carbon;
+
 use GuzzleHttp\Psr7\Response;
 
 use Illuminate\Http\Response as HttpResponse;
@@ -35,52 +37,7 @@ use App\Models\ReturnItem;
 class SalesOrderController extends Controller
 {
 
-    // public function index(Request $request): SalesOrderCollection
-    // {
-    //     $validated = $request->validate([
-    //         'store_id'  => 'nullable|integer|exists:stores,id',
-    //         'branch_id' => 'nullable|integer|exists:branches,id',
-    //         'from_date' => 'nullable|date',
-    //         'to_date'   => 'nullable|date',
-    //     ]);
 
-    //     $user = auth()->user(); // Get authenticated user
-
-    //     // Extract validated parameters
-    //     $storeId  = $validated['store_id'] ?? null;
-    //     $branchId = $validated['branch_id'] ?? null;
-    //     $fromDate = $validated['from_date'] ? Carbon::parse($validated['from_date'])->startOfDay() : null;
-    //     $toDate   = $validated['to_date'] ? Carbon::parse($validated['to_date'])->endOfDay() : null;
-
-    //     // Start building query
-    //     $query = SalesOrder::with(['customer', 'store', 'user', 'branch', 'itemsold']);
-
-    //     // Apply user-specific data partitioning
-    //     $query = ProcessDelination::partitionUserData($query, $user->branch_id, [
-    //         "Can view All Sales Order",
-    //         "Can view Regional Sales Order",
-    //         "Can see branch Sales order"
-    //     ]);
-
-    //     // Apply filters if provided
-    //     if ($storeId) {
-    //         $query->where('store_id', $storeId);
-    //     }
-
-    //     if ($branchId) {
-    //         $query->where('branch_id', $branchId);
-    //     }
-
-    //     if ($fromDate && $toDate) {
-    //         $query->whereBetween('created_at', [$fromDate, $toDate]);
-    //     } elseif ($fromDate) {
-    //         $query->where('created_at', '>=', $fromDate);
-    //     } elseif ($toDate) {
-    //         $query->where('created_at', '<=', $toDate);
-    //     }
-
-    //     return new SalesOrderCollection($query->get());
-    // }
 
 
 
@@ -322,70 +279,161 @@ class SalesOrderController extends Controller
     //     return new SalesOrderResource($salesOrder);
     // }
     // Method to fetch the Sales Order for editing
+    // public function edit($id)
+    // {
+    //     $salesOrder = SalesOrder::with('itemSold', 'salesInvoices', 'salesReceipts')->findOrFail($id);
+
+    //     return response()->json($salesOrder);
+    // }
+
+    // // Method to update an existing Sales Order
+    // public function update(Request $request, $id)
+    // {
+    //     // Validate incoming request data excluding the auto-generated fields
+    //     $validated = $request->validate([
+    //         'customer_id' => 'required|exists:customers,id',
+    //         'branch_id' => 'required|exists:branches,id',
+    //         'store_id' => 'exists:stores,id',
+    //         'credit_limit' => 'nullable|numeric',
+    //         'items' => 'required|array',
+    //         'items.*.product_id' => 'required|exists:create_items,id',
+    //         'items.*.quantity' => 'required|integer',
+    //         'items.*.unit_price' => 'required|numeric',
+    //         // 'invoice' => 'nullable|array',
+    //         'total_amount' => 'required|numeric',
+    //         // 'invoice' => 'nullable|array',
+    //         'payment' => 'nullable|array',
+    //         // 'payment.total_amount' => 'required|numeric',
+    //         // 'payment.amount_paid' => 'required|numeric',
+    //         'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit',
+    //     ]);
+
+    //     // Find and update the Sales Order
+    //     $salesOrder = SalesOrder::findOrFail($id);
+    //     $salesOrder->update([
+    //         'customer_id' => $validated['customer_id'],
+    //         'branch_id' => $validated['branch_id'],
+    //         'store_id' => $validated['store_id'],
+    //         'credit_limit' => $validated['credit_limit'] ?? null,
+    //         'total_amount' => $validated['total_amount'] ?? null,
+    //         'payment_type' => $validated['payment']['payment_type'],
+
+    //     ]);
+
+    //     // Update Items Sold
+    //     foreach ($validated['items'] as $item) {
+    //         ItemSold::updateOrCreate(
+    //             [
+    //                 'sales_order_id' => $salesOrder->id,
+    //                 'product_id' => $item['product_id'],
+    //             ],
+    //             [
+    //                 'quantity' => $item['quantity'],
+    //                 'unit_price' => $item['unit_price'],
+    //                 'amount' => $item['quantity'] * $item['unit_price'],
+    //                 'sales_date' => now(),
+    //             ]
+    //         );
+    //     }
+
+
+
+
+
+    //     return response()->json(['message' => 'Sales Order Updated Successfully', 'sales_order' => $salesOrder], 200);
+    // }
+
     public function edit($id)
     {
-        $salesOrder = SalesOrder::with('itemSold', 'salesInvoices', 'salesReceipts')->findOrFail($id);
+        // Retrieve the sales order with all related data needed for editing
+        $salesOrder = SalesOrder::with([
+            'customer',
+            'branch',
+            'store',
+            'itemSold' => function ($query) {
+                $query->with(['product', 'store', 'measurement']);
+            }
+        ])->findOrFail($id);
 
-        return response()->json($salesOrder);
+        return response()->json([
+            'data' => new SalesOrderResource($salesOrder)
+        ]);
     }
 
-    // Method to update an existing Sales Order
     public function update(Request $request, $id)
     {
-        // Validate incoming request data excluding the auto-generated fields
+        // Validate incoming request data
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'branch_id' => 'required|exists:branches,id',
-            'store_id' => 'exists:stores,id',
-            'credit_limit' => 'nullable|numeric',
+            'store_id' => 'required|exists:stores,id',
             'items' => 'required|array',
+            'items.*.id' => 'nullable|exists:item_solds,id', // For existing items
             'items.*.product_id' => 'required|exists:create_items,id',
-            'items.*.quantity' => 'required|integer',
-            'items.*.unit_price' => 'required|numeric',
-            // 'invoice' => 'nullable|array',
-            'total_amount' => 'required|numeric',
-            // 'invoice' => 'nullable|array',
-            'payment' => 'nullable|array',
-            // 'payment.total_amount' => 'required|numeric',
-            // 'payment.amount_paid' => 'required|numeric',
-            'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.store_id' => 'required|exists:stores,id',
+            'items.*.discount' => 'nullable|numeric|min:0',
+            'items.*.unit_measurement' => 'required|exists:measurements,id',
+            'payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit',
+            'total_amount' => 'required|numeric|min:0',
         ]);
 
-        // Find and update the Sales Order
-        $salesOrder = SalesOrder::findOrFail($id);
-        $salesOrder->update([
-            'customer_id' => $validated['customer_id'],
-            'branch_id' => $validated['branch_id'],
-            'store_id' => $validated['store_id'],
-            'credit_limit' => $validated['credit_limit'] ?? null,
-            'total_amount' => $validated['total_amount'] ?? null,
-            'payment_type' => $validated['payment']['payment_type'],
+        DB::beginTransaction();
 
-        ]);
+        try {
+            // Find the sales order
+            $salesOrder = SalesOrder::findOrFail($id);
 
-        // Update Items Sold
-        foreach ($validated['items'] as $item) {
-            ItemSold::updateOrCreate(
-                [
-                    'sales_order_id' => $salesOrder->id,
-                    'product_id' => $item['product_id'],
-                ],
-                [
-                    'quantity' => $item['quantity'],
-                    'unit_price' => $item['unit_price'],
-                    'amount' => $item['quantity'] * $item['unit_price'],
-                    'sales_date' => now(),
-                ]
-            );
+            // Update sales order details
+            $salesOrder->update([
+                'customer_id' => $validated['customer_id'],
+                'branch_id' => $validated['branch_id'],
+                'store_id' => $validated['store_id'],
+                'total_amount' => $validated['total_amount'],
+                'payment_type' => $validated['payment_type'],
+            ]);
+
+            // Process items
+            $currentItemIds = [];
+
+            foreach ($validated['items'] as $itemData) {
+                $itemData['amount'] = ($itemData['unit_price'] - ($itemData['discount'] ?? 0)) * $itemData['quantity'];
+
+                if (isset($itemData['id'])) {
+                    // Update existing item
+                    $item = ItemSold::find($itemData['id']);
+                    $item->update($itemData);
+                    $currentItemIds[] = $item->id;
+                } else {
+                    // Add new item
+                    $newItem = ItemSold::create(array_merge($itemData, [
+                        'sales_order_id' => $salesOrder->id,
+                        'sales_date' => now(),
+                    ]));
+                    $currentItemIds[] = $newItem->id;
+                }
+            }
+
+            // Delete items not in the current request
+            ItemSold::where('sales_order_id', $salesOrder->id)
+                ->whereNotIn('id', $currentItemIds)
+                ->delete();
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Sales Order Updated Successfully',
+                'data' => new SalesOrderResource($salesOrder)
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'message' => 'Error updating sales order',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-
-
-
-
-        return response()->json(['message' => 'Sales Order Updated Successfully', 'sales_order' => $salesOrder], 200);
     }
-
     public function cancel($id)
     {
         // Start a database transaction
@@ -435,6 +483,9 @@ class SalesOrderController extends Controller
         }
     }
 
+
+
+
     public function searchReceipt(Request $request)
     {
         $validated = $request->validate([
@@ -449,6 +500,18 @@ class SalesOrderController extends Controller
                     }]);
                 }
             ])->where('sales_receipt_number', $validated['sales_receipt_number'])->firstOrFail();
+
+            // Check if the sales receipt has a corresponding record in the releases table
+            $releaseExists = DB::table('releases')
+                ->where('sales_receipt_id', $receipt->id)
+                ->exists();
+
+            if (!$releaseExists) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Cannot process return: No release record found for this receipt'
+                ], 400);
+            }
 
             return response()->json([
                 'success' => true,
@@ -579,6 +642,15 @@ class SalesOrderController extends Controller
                     'processed_items' => $processedItems,
                 ]
             ]);
+            ProductAudit::create([
+                'action_type' => 'returned',
+                'product_id' => $itemData['product_id'],
+                'user_id' => auth()->id(),
+                'quantity_change' => $itemData['quantity_returned'],
+                'reference_type' => 'ReturnItem',
+                'reference_id' => $return->id,
+                'notes' => 'Product returned'
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -587,7 +659,12 @@ class SalesOrderController extends Controller
                 'error' => $e->getMessage()
             ], 400);
         }
+        // In SalesOrderController (processReturn method)
+
     }
+
+
+
 
     /**
      * Restore stock to inventory after return
@@ -738,5 +815,380 @@ class SalesOrderController extends Controller
                 'error' => $e->getMessage()
             ], 400);
         }
+    }
+
+    // Add this method to your SalesOrderController
+
+    /**
+     * Generate a product availability report
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function productAvailabilityReport(Request $request)
+    {
+        // Validate request parameters     
+        $validated = $request->validate([
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+            'store_id' => 'required|exists:stores,id',
+            'product_id' => 'nullable|exists:create_items,id',
+        ]);
+
+        // Extract validated parameters     
+        $storeId = $validated['store_id'];
+        $productId = $validated['product_id'] ?? null;
+        $fromDate = $validated['from_date'] ? Carbon::parse($validated['from_date'])->startOfDay() : null;
+        $toDate = $validated['to_date'] ? Carbon::parse($validated['to_date'])->endOfDay() : null;
+
+        // If product_id is provided, return specific product availability     
+        if ($productId) {
+            $quantityAvailable = StockUtil::getQuantityForRequest($productId, $storeId);
+
+            $product = StoreItem::with('createItem')
+                ->where('create_item_id', $productId)
+                ->where('store_id', $storeId)
+                ->first();
+
+            if (!$product) {
+                return response()->json([
+                    'message' => 'Product not found in the selected store',
+                    'data' => []
+                ], 404);
+            }
+
+            return response()->json([
+                'data' => [
+                    'item_id' => $product->create_item_id,
+                    'item_name' => $product->createItem->name,
+                    'available_quantity' => $quantityAvailable,
+                ]
+            ]);
+        }
+
+        // If no product_id, return all products in the store with their availability
+        $storeItems = StoreItem::with('createItem')
+            ->where('store_id', $storeId)
+            ->when($fromDate && $toDate, function ($query) use ($fromDate, $toDate) {
+
+                $query->whereBetween('created_at', [$fromDate, $toDate]);
+            })
+            ->get();
+
+        $reportData = $storeItems->map(function ($item) use ($storeId) {
+            return [
+                'item_id' => $item->create_item_id,
+                'item_name' => $item->createItem->name,
+                'available_quantity' => StockUtil::getQuantityForRequest($item->create_item_id, $storeId),
+            ];
+        });
+
+        return response()->json([
+            'data' => $reportData
+        ]);
+    }
+
+    //     public function salesReport(Request $request)
+    // {
+    //     try {
+    //         $validated = $request->validate([
+    //             'from_date' => 'nullable|date',
+    //             'to_date' => 'nullable|date',
+    //             'store_id' => 'nullable|exists:stores,id',
+    //             'product_id' => 'nullable|exists:create_items,id',
+    //         ]);
+
+    //         $storeId = $validated['store_id'] ?? null;
+    //         $productId = $validated['product_id'] ?? null;
+    //         $fromDate = array_key_exists('from_date', $validated) && $validated['from_date']
+    //             ? Carbon::parse($validated['from_date'])->startOfDay()
+    //             : now()->startOfMonth();
+    //         $toDate = array_key_exists('to_date', $validated) && $validated['to_date']
+    //             ? Carbon::parse($validated['to_date'])->endOfDay()
+    //             : now()->endOfDay();
+
+    //         Log::info('Sales Report Parameters:', [
+    //             'store_id' => $storeId,
+    //             'product_id' => $productId,
+    //             'from_date' => $fromDate->toDateTimeString(),
+    //             'to_date' => $toDate->toDateTimeString(),
+    //             'raw_request' => $request->all()
+    //         ]);
+
+    //         $query = ItemSold::with(['product', 'store', 'measurement', 'salesOrder.customer'])
+    //             ->whereBetween('sales_date', [$fromDate, $toDate]);
+
+    //         if ($storeId) {
+    //             $query->where('store_id', $storeId);
+    //         }
+    //         if ($productId) {
+    //             $query->where('product_id', $productId);
+    //         }
+
+    //         $user = auth()->user();
+    //         if ($user && $user->branch_id) {
+    //             Log::info('Applying branch restriction', ['branch_id' => $user->branch_id]);
+    //             $query->whereHas('salesOrder', function ($q) use ($user) {
+    //                 $q->where('branch_id', $user->branch_id);
+    //             });
+    //         }
+
+    //         $itemsSold = $query->orderBy('sales_date', 'desc')->get();
+    //         Log::info('Query Results:', ['count' => $itemsSold->count(), 'data' => $itemsSold->toArray()]);
+
+    //         $totalQuantity = $itemsSold->sum('quantity');
+    //         $totalQuantityPieces = $itemsSold->sum('quantity_pieces');
+    //         $totalAmount = $itemsSold->sum('amount');
+    //         $totalDiscount = $itemsSold->sum('discount');
+    //         $recordCount = $itemsSold->count();
+
+    //         $reportData = $itemsSold->map(function ($item) {
+    //             return [
+    //                 'id' => $item->id,
+    //                 'sales_order_id' => $item->sales_order_id,
+    //                 'sales_order_number' => $item->salesOrder->sales_order_number ?? null,
+    //                 'product_id' => $item->product_id,
+    //                 'product_name' => $item->product->name ?? 'Unknown Product',
+    //                 'quantity' => $item->quantity,
+    //                 'quantity_pieces' => $item->quantity_pieces,
+    //                 'unit_measurement' => $item->measurement->name ?? 'Unknown Unit',
+    //                 'unit_price' => $item->unit_price,
+    //                 'amount' => $item->amount,
+    //                 'discount' => $item->discount,
+    //                 'store_id' => $item->store_id,
+    //                 'store_name' => $item->store->name ?? 'Unknown Store',
+    //                 'sales_date' => $item->sales_date,
+    //                 'customer_name' => $item->salesOrder->customer->name ?? 'Unknown Customer',
+    //                 'return_quantity' => $item->return_quantity,
+    //                 'return_quantity_pieces' => $item->return_quantity_pieces,
+    //                 'status' => $item->status,
+    //             ];
+    //         });
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Sales report generated successfully',
+    //             'data' => $reportData,
+    //             'summary' => [
+    //                 'total_records' => $recordCount,
+    //                 'total_quantity' => $totalQuantity,
+    //                 'total_quantity_pieces' => $totalQuantityPieces,
+    //                 'total_amount' => $totalAmount,
+    //                 'total_discount' => $totalDiscount,
+    //                 'net_amount' => $totalAmount,
+    //                 'date_range' => [
+    //                     'from' => $fromDate->format('Y-m-d'),
+    //                     'to' => $toDate->format('Y-m-d')
+    //                 ],
+    //                 'filters' => [
+    //                     'store_id' => $storeId,
+    //                     'product_id' => $productId,
+    //                 ]
+    //             ]
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Sales Report Error:', [
+    //             'message' => $e->getMessage(),
+    //             'file' => $e->getFile(),
+    //             'line' => $e->getLine(),
+    //             'trace' => $e->getTraceAsString(),
+    //             'request_data' => $request->all()
+    //         ]);
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'An error occurred while generating the sales report',
+    //             'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+    //         ], 500);
+    //     }
+    // }
+
+    // public function salesReport(Request $request)
+    // {
+    //     try {
+    //         // Validate and retrieve query parameters from the request
+    //         $validated = $request->validate([
+    //             'from_date' => 'nullable|date',
+    //             'to_date' => 'nullable|date',
+    //             'store_id' => 'nullable|integer|exists:stores,id',
+
+    //             'product_id' => 'nullable|integer|exists:create_items,id',
+    //         ]);
+
+    //         // Extract validated parameters
+    //         $fromDate = $validated['from_date'] ?? null;
+    //         $toDate = $validated['to_date'] ?? null;
+    //         $storeId = $validated['store_id'] ?? null;
+
+    //         $productId = $validated['product_id'] ?? null;
+
+    //         // Get the authenticated user
+    //         $user = auth()->user();
+
+    //         // Build the ItemSold query
+    //         $query = ItemSold::with([
+    //             'product',
+    //             'store',
+    //             'measurement',
+    //             'salesOrder.customer',
+    //         ])
+    //             ->when($storeId, function ($query, $storeId) {
+    //                 return $query->where('store_id', $storeId);
+    //             })
+
+    //             ->when($productId, function ($query, $productId) {
+    //                 return $query->where('product_id', $productId);
+    //             });
+
+    //         // Handle date filtering
+    //         if ($fromDate || $toDate) {
+    //             $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+    //             $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+
+    //             if ($fromDate && $toDate) {
+    //                 $query->whereBetween('created_at', [$fromDate, $toDate]);
+    //             } elseif ($fromDate) {
+    //                 $query->where('created_at', '>=', $fromDate);
+    //             } elseif ($toDate) {
+    //                 $query->where('created_at', '<=', $toDate);
+    //             }
+    //         }
+
+    //         // Execute query
+    //         $itemsSold = $query->orderBy('sales_date', 'desc')->get();
+
+    //         Log::info('Query Results Count:', ['count' => $itemsSold->count()]);
+    //         if ($itemsSold->count() > 0) {
+    //             Log::debug('First item sample:', $itemsSold->first()->toArray());
+    //         }
+
+    //         // Transform data
+    //         $reportData = $itemsSold->map(function ($item) {
+    //             return [
+    //                 'id' => $item->id,
+
+    //                 'product_id' => $item->product_id,
+    //                 'product_name' => $item->product->name ?? 'Unknown Product',
+    //                 'quantity' => $item->quantity,
+    //                 'quantity_pieces' => $item->quantity_pieces,
+
+
+    //                 'store_id' => $item->store_id,
+    //                 'store_name' => $item->store->name ?? 'Unknown Store',
+
+    //                 'return_quantity' => $item->return_quantity,
+    //                 'return_quantity_pieces' => $item->return_quantity_pieces,
+    //                 'status' => $item->status,
+    //             ];
+    //         });
+
+    //         // Calculate summary
+    //         $summary = [
+    //             'total_records' => $itemsSold->count(),
+    //             'total_quantity' => $itemsSold->sum('quantity'),
+    //             'total_quantity_pieces' => $itemsSold->sum('quantity_pieces'),
+    //             'total_amount' => $itemsSold->sum('amount'),
+    //             'total_discount' => $itemsSold->sum('discount'),
+    //             'net_amount' => $itemsSold->sum('amount'),
+    //             'date_range' => [
+    //                 'from' => $fromDate ? $fromDate->format('Y-m-d') : null,
+    //                 'to' => $toDate ? $toDate->format('Y-m-d') : null
+    //             ],
+    //             'filters' => [
+    //                 'store_id' => $storeId,
+
+    //                 'product_id' => $productId,
+    //             ]
+    //         ];
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Sales report generated successfully',
+    //             'data' => $reportData,
+    //             'summary' => $summary
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         Log::error('Sales Report Error:', [
+    //             'message' => $e->getMessage(),
+    //             'file' => $e->getFile(),
+    //             'line' => $e->getLine(),
+    //             'trace' => $e->getTraceAsString(),
+    //             'request_data' => $request->all()
+    //         ]);
+
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'An error occurred while generating the sales report',
+    //             'error' => config('app.debug') ? $e->getMessage() : 'Internal server error'
+    //         ], 500);
+    //     }
+    // }
+
+    public function salesReport(Request $request)
+    {
+        $validated = $request->validate([
+            'store_id' => 'nullable|integer|exists:stores,id',
+            'product_id' => 'nullable|integer|exists:create_items,product_id',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+            'page' => 'nullable|integer|min:1',
+            'per_page' => 'nullable|integer|min:1|max:100',
+        ]);
+
+        $storeId = $validated['store_id'] ?? null;
+        $productId = $validated['product_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+        $perPage = $validated['per_page'] ?? 10;
+
+        $query = ItemSold::with(['store', 'product', 'salesOrder']);
+
+        if ($storeId) {
+            $query->where('store_id', $storeId);
+        }
+
+        if ($productId) {
+            $query->where('product_id', $productId);
+        }
+
+        if ($fromDate || $toDate) {
+            $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+            $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+
+            if ($fromDate && $toDate) {
+                $query->whereBetween('created_at', [$fromDate, $toDate]);
+            } elseif ($fromDate) {
+                $query->where('created_at', '>=', $fromDate);
+            } elseif ($toDate) {
+                $query->where('created_at', '<=', $toDate);
+            }
+        }
+
+        $results = $query->paginate($perPage);
+
+        // Calculate summary data
+        $summary = [
+            'total_records' => $results->total(),
+            'total_quantity' => $results->sum('quantity'),
+            'total_quantity_pieces' => $results->sum('quantity_pieces'), // adjust if your field is different
+            'total_amount' => $results->sum('amount'),
+            'total_discount' => $results->sum('discount'),
+            'net_amount' => $results->sum('amount') - $results->sum('discount'),
+            'date_range' => [
+                'from' => $fromDate ? $fromDate->format('Y-m-d') : null,
+                'to' => $toDate ? $toDate->format('Y-m-d') : null,
+            ],
+            'filters' => [
+                'store_id' => $storeId,
+                'product_id' => $productId,
+            ]
+        ];
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Sales report generated successfully',
+            'data' => ItemSoldResource::collection($results),
+            'summary' => $summary
+        ]);
     }
 }

@@ -25,70 +25,109 @@ class SalesReceiptController extends Controller
 
 
 
-public function index(Request $request)
-{
-    // Validate and retrieve query parameters from the request
-    $validated = $request->validate([
-        'store_id' => 'nullable|integer|exists:stores,id',
-        'branch_id' => 'nullable|integer|exists:stores,branch_id',
-        'from_date' => 'nullable|date',
-        'to_date' => 'nullable|date',
-        'with_returns' => 'nullable|boolean' // Add this parameter
-    ]);
+    public function index(Request $request)
+    {
+        // Validate and retrieve query parameters from the request
+        $validated = $request->validate([
+            'store_id' => 'nullable|integer|exists:stores,id',
+            'branch_id' => 'nullable|integer|exists:stores,branch_id',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+            'with_returns' => 'nullable|boolean'
+        ]);
 
-    // Extract validated parameters
-    $storeId = $validated['store_id'] ?? null;
-    $branchId = $validated['branch_id'] ?? null;
-    $fromDate = $validated['from_date'] ?? null;
-    $toDate = $validated['to_date'] ?? null;
-    $withReturns = $validated['with_returns'] ?? false;
+        // Extract validated parameters
+        $storeId = $validated['store_id'] ?? null;
+        $branchId = $validated['branch_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+        $withReturns = $validated['with_returns'] ?? false;
 
-    // Get the authenticated user
-    $user = auth()->user();
+        // Get the authenticated user
+        $user = auth()->user();
 
-    // Start building the query
-       $query = SalesReceipt::with([
-        'customer', 
-        'store', 
-        'user', 
-        'branch', 
-        'salesorder',
-        'returnItems.returnDetails.product' // Eager load all necessary relationships
-    ])
-        ->when($storeId, function ($query, $storeId) {
-            return $query->where('store_id', $storeId);
-        })
-        ->when($branchId, function ($query, $branchId) {
-            return $query->where('branch_id', $branchId);
-        });
+        // Build the SalesReceipt query
+        $receiptQuery = SalesReceipt::with([
+            'customer',
+            'store',
+            'user',
+            'branch',
+            'salesorder',
+            'returnItems.returnDetails.product'
+        ])
+            ->when($storeId, function ($query, $storeId) {
+                return $query->where('store_id', $storeId);
+            })
+            ->when($branchId, function ($query, $branchId) {
+                return $query->where('branch_id', $branchId);
+            });
 
-    // Handle date filtering with branch filtering
-    if ($fromDate || $toDate) {
-        $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
-        $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+        // Handle date filtering
+            if ($fromDate || $toDate) {
+                $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+                $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
-        if ($fromDate && $toDate) {
-            $query->whereBetween('created_at', [$fromDate, $toDate]);
-        } elseif ($fromDate) {
-            $query->where('created_at', '>=', $fromDate);
-        } elseif ($toDate) {
-            $query->where('created_at', '<=', $toDate);
+                if ($fromDate && $toDate) {
+                    $receiptQuery->whereBetween('created_at', [$fromDate, $toDate]);
+                } elseif ($fromDate) {
+                    $receiptQuery->where('created_at', '>=', $fromDate);
+                } elseif ($toDate) {
+                    $receiptQuery->where('created_at', '<=', $toDate);
+                }
+
+                $receiptQuery->where('branch_id', $user->branch_id);
+            }
+
+        // If with_returns is true, load return items
+        if ($withReturns) {
+            $receiptQuery->with(['returnItems.returnDetails']);
         }
 
-        $query->where('branch_id', $user->branch_id);
+        // Fetch SalesReceipts
+        $salesReceipts = $receiptQuery->get();
+
+        // Calculate total sales receipt amount
+        $totalReceiptAmount = $salesReceipts->sum('total_amount');
+
+        // Build the SalesOrder query based on the same filters
+        $orderQuery = SalesOrder::query()
+            ->when($storeId, function ($query, $storeId) {
+                return $query->where('store_id', $storeId);
+            })
+            ->when($branchId, function ($query, $branchId) {
+                return $query->where('branch_id', $branchId);
+            });
+
+        // Apply the same date filtering to SalesOrder
+        if ($fromDate || $toDate) {
+            if ($fromDate && $toDate) {
+                $orderQuery->whereBetween('created_at', [$fromDate, $toDate]);
+            } elseif ($fromDate) {
+                $orderQuery->where('created_at', '>=', $fromDate);
+            } elseif ($toDate) {
+                $orderQuery->where('created_at', '<=', $toDate);
+            }
+
+            $orderQuery->where('branch_id', $user->branch_id);
+        }
+
+        // Fetch SalesOrders and calculate total amount
+        $salesOrders = $orderQuery->get();
+        $totalOrderAmount = $salesOrders->sum('total_amount');
+
+        // Calculate the difference
+        // $difference = $totalOrderAmount - $totalReceiptAmount;
+        $difference = $totalReceiptAmount - $totalOrderAmount;
+
+        // Return the response
+        return response()->json([
+            'sales_receipts' => new SalesReceiptCollection($salesReceipts),
+            'total_sales_receipt_amount' => $totalReceiptAmount,
+            'total_sales_order_amount' => $totalOrderAmount,
+            'difference' => $difference,
+        ]);
     }
 
-    // If with_returns is true, load the return items and their details
-    if ($withReturns) {
-        $query->with(['returnItems.returnDetails']);
-    }
-
-    // Fetch the results
-    $salesReceipts = $query->get();
-
-    // Return the results as a collection
-    return new SalesReceiptCollection($salesReceipts);
-}
 
 
 
@@ -153,53 +192,53 @@ public function index(Request $request)
         return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
     }
 
-    
 
 
-public function pendingReleaseStore($storeId, Request $request)
-{
-    // Get today's date
-    $today = now()->format('Y-m-d');
 
-    // Initialize the query
-    $query = SalesReceipt::with('salesOrder')
-        ->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
-            $query->where('store_id', $storeId)->where('status', 'pending');
-        });
+    public function pendingReleaseStore($storeId, Request $request)
+    {
+        // Get today's date
+        $today = now()->format('Y-m-d');
 
-    // Check if start_date and end_date are provided
-    if ($request->has('start_date') && $request->has('end_date')) {
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        // Initialize the query
+        $query = SalesReceipt::with('salesOrder')
+            ->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
+                $query->where('store_id', $storeId)->where('status', 'pending');
+            });
 
-        // If both dates are the same, filter for just that day
-        if ($startDate === $endDate) {
-            $query->whereDate('created_at', $startDate);
+        // Check if start_date and end_date are provided
+        if ($request->has('start_date') && $request->has('end_date')) {
+            $startDate = $request->input('start_date');
+            $endDate = $request->input('end_date');
+
+            // If both dates are the same, filter for just that day
+            if ($startDate === $endDate) {
+                $query->whereDate('created_at', $startDate);
+            } else {
+                // Otherwise, apply date range
+                $query->whereBetween('created_at', ["$startDate 00:00:00", "$endDate 23:59:59"]);
+            }
         } else {
-            // Otherwise, apply date range
-            $query->whereBetween('created_at', ["$startDate 00:00:00", "$endDate 23:59:59"]);
+            // Default to today's data if no date range is provided
+            $query->whereDate('created_at', $today);
         }
-    } else {
-        // Default to today's data if no date range is provided
-        $query->whereDate('created_at', $today);
+
+        // Execute the query
+        $salesReceipts = $query->get();
+
+        return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
     }
-
-    // Execute the query
-    $salesReceipts = $query->get();
-
-    return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
-}
 
 
     // public function pendingReleaseStore($storeId)
     // {
-        
+
 
     //     $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
     //         // Add your specific criteria for ItemSold here
     //         $query->where('store_id', $storeId)->where('status', 'pending'); // Example condition
     //     })->get();
-    
+
     //     return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
     // }
 
@@ -242,108 +281,109 @@ public function pendingReleaseStore($storeId, Request $request)
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
     }
 
-  // In your SalesReceiptController's store method
-public function store(SalesReceiptStoreRequest $request)
-{
-    DB::beginTransaction();
-    
-    try {
-        $data = $request->validated();
-        $salesreceipt = SalesReceipt::create($data);
-        
-        // Update the sales order status
-        $order = SalesOrder::where('id', $salesreceipt->sales_order_id)->first();
-        $order->status = 'Paid';
-        $order->save();
+    // In your SalesReceiptController's store method
+    public function store(SalesReceiptStoreRequest $request)
+    {
+        DB::beginTransaction();
 
-        $payments = $data['payment_detail'];
-        $customerId = $salesreceipt->customer_id;
+        try {
+            $data = $request->validated();
+            $salesreceipt = SalesReceipt::create($data);
 
-        // Process deposit payments
-        $depositPayments = array_filter($payments, function ($payment) {
-            return $payment['payment_type'] == 'Deposit';
-        });
+            // Update the sales order status
+            $order = SalesOrder::where('id', $salesreceipt->sales_order_id)->first();
+            $order->status = 'Paid';
+            $order->save();
 
-        foreach ($depositPayments as $payment) {
-            $amountUsed = $payment['amount'];
-            
-            // Get available deposits (FIFO order)
-            $postInflows = PostInflow::where('customer_id', $customerId)
-                ->where('inflow_status', 3) // Assigned status
-                ->where('amount', '>', 0)
-                ->orderBy('inflow_date', 'asc')
-                ->lockForUpdate() // Prevent concurrent updates
-                ->get();
+            $payments = $data['payment_detail'];
+            $customerId = $salesreceipt->customer_id;
 
-            foreach ($postInflows as $inflow) {
-                if ($amountUsed <= 0) break;
+            // Process deposit payments
+            $depositPayments = array_filter($payments, function ($payment) {
+                return $payment['payment_type'] == 'Deposit';
+            });
 
-                $available = $inflow->amount;
-                $used = min($available, $amountUsed);
-                
-                // Update the inflow record
-                $inflow->amount -= $used;
-                $inflow->amount_used += $used;
-                
-                // Update status if fully used
-                if ($inflow->amount <= 0) {
-                    $inflow->inflow_status = 12; // Fully Used status
+            foreach ($depositPayments as $payment) {
+                $amountUsed = $payment['amount'];
+
+                // Get available deposits (FIFO order)
+                $postInflows = PostInflow::where('customer_id', $customerId)
+                    ->where('inflow_status', 3) // Assigned status
+                    ->where('amount', '>', 0)
+                    ->orderBy('inflow_date', 'asc')
+                    ->lockForUpdate() // Prevent concurrent updates
+                    ->get();
+
+                foreach ($postInflows as $inflow) {
+                    if ($amountUsed <= 0) break;
+
+                    $available = $inflow->amount;
+                    $used = min($available, $amountUsed);
+
+                    // Update the inflow record
+                    $inflow->amount -= $used;
+                    $inflow->amount_used += $used;
+
+                    // Update status if fully used
+                    if ($inflow->amount <= 0) {
+                        $inflow->inflow_status = 12; // Fully Used status
+                    }
+
+                    $inflow->save();
+                    $amountUsed -= $used;
                 }
-                
-                $inflow->save();
-                $amountUsed -= $used;
+
+                if ($amountUsed > 0) {
+                    throw new \Exception("Customer $customerId used more deposit ($amountUsed) than available");
+                }
+
+                // Create outflow record
+                $outflow = [
+                    "customer_id" => $customerId,
+                    "sales_receipt_id" => $salesreceipt->id,
+                    "amount" => $payment['amount'],
+                    'outflow_mode' => 7,
+                    'outflow_date' => now()
+                ];
+                PostOutflow::create($outflow);
             }
 
-            if ($amountUsed > 0) {
-                throw new \Exception("Customer $customerId used more deposit ($amountUsed) than available");
+            // Process credit payments (existing code)
+            if (
+                $order->payment_type == "Credit" &&
+                !array_filter($payments, fn($p) => $p['payment_type'] == 'Credit')
+            ) {
+                $customer = Customer::findOrFail($customerId);
+                $data1 = [
+                    'branch_id' => $salesreceipt->branch_id,
+                    'customer_id' => $customerId,
+                    'sales_receipt_id' => $salesreceipt->id,
+                    'amount' => $salesreceipt->amount_paid,
+                    'credit_limit' => $customer->credit_limit,
+                    'credit_balance_before' => $customer->credit_balance,
+                    'type' => 'payment',
+                    'created_by' => auth()->user()->id
+                ];
+                $creditTransaction = CreditTransaction::create($data1);
+                $customer->credit_balance += $creditTransaction->amount;
+                $customer->save();
             }
 
-            // Create outflow record
-            $outflow = [
-                "customer_id" => $customerId,
-                "sales_receipt_id" => $salesreceipt->id,
-                "amount" => $payment['amount'],
-                'outflow_mode' => 7,
-                'outflow_date' => now()
-            ];
-            PostOutflow::create($outflow);
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Sales Receipt Created Successfully',
+                'data' => $salesreceipt
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Sales receipt creation failed: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to create sales receipt',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        // Process credit payments (existing code)
-        if ($order->payment_type == "Credit" && 
-            !array_filter($payments, fn($p) => $p['payment_type'] == 'Credit')) {
-            $customer = Customer::findOrFail($customerId);
-            $data1 = [
-                'branch_id' => $salesreceipt->branch_id,
-                'customer_id' => $customerId,
-                'sales_receipt_id' => $salesreceipt->id,
-                'amount' => $salesreceipt->amount_paid,
-                'credit_limit' => $customer->credit_limit,
-                'credit_balance_before' => $customer->credit_balance,
-                'type' => 'payment',
-                'created_by' => auth()->user()->id
-            ];
-            $creditTransaction = CreditTransaction::create($data1);
-            $customer->credit_balance += $creditTransaction->amount;
-            $customer->save();
-        }
-
-        DB::commit();
-        
-        return response()->json([
-            'message' => 'Sales Receipt Created Successfully', 
-            'data' => $salesreceipt
-        ], 200);
-
-    } catch (\Exception $e) {
-        DB::rollBack();
-        Log::error("Sales receipt creation failed: " . $e->getMessage());
-        return response()->json([
-            'message' => 'Failed to create sales receipt',
-            'error' => $e->getMessage()
-        ], 500);
     }
-}
 
     public function show(Request $request, SalesReceipt $salesreceipt): SalesReceiptResource
     {
@@ -363,57 +403,55 @@ public function store(SalesReceiptStoreRequest $request)
         return response(null, Response::HTTP_NO_CONTENT);
     }
     public function CustomerAndDate(Request $request)
-{
-    // Validate and retrieve query parameters from the request
-    $validated = $request->validate([
-        'customer_id' => 'nullable|integer|exists:customers,id', // Ensure customer_id exists in customers table
-        'from_date' => 'nullable|date',
-        'to_date' => 'nullable|date',
-    ]);
+    {
+        // Validate and retrieve query parameters from the request
+        $validated = $request->validate([
+            'customer_id' => 'nullable|integer|exists:customers,id', // Ensure customer_id exists in customers table
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+        ]);
 
-    // Extract validated parameters
-    $customerId = $validated['customer_id'] ?? null;
-    $fromDate = $validated['from_date'] ?? null;
-    $toDate = $validated['to_date'] ?? null;
+        // Extract validated parameters
+        $customerId = $validated['customer_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
 
-    // Get the authenticated user
-    $user = auth()->user();
+        // Get the authenticated user
+        $user = auth()->user();
 
-    // Start building the query
-    $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
-        ->when($customerId, function ($query, $customerId) {
-            return $query->where('customer_id', $customerId);
-        });
+        // Start building the query
+        $query = SalesReceipt::with(['customer', 'store', 'user', 'branch', 'salesorder'])
+            ->when($customerId, function ($query, $customerId) {
+                return $query->where('customer_id', $customerId);
+            });
 
-    // Handle date filtering
-    if ($fromDate || $toDate) {
-        // Convert from_date and to_date to Carbon instances only if provided
-        $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
-        $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+        // Handle date filtering
+        if ($fromDate || $toDate) {
+            // Convert from_date and to_date to Carbon instances only if provided
+            $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+            $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
-        if ($fromDate && $toDate) {
-            // Both from_date and to_date are provided
-            $query->whereBetween('created_at', [$fromDate, $toDate]);
-        } elseif ($fromDate) {
-            // Only from_date is provided
-            $query->where('created_at', '>=', $fromDate);
-        } elseif ($toDate) {
-            // Only to_date is provided
-            $query->where('created_at', '<=', $toDate);
+            if ($fromDate && $toDate) {
+                // Both from_date and to_date are provided
+                $query->whereBetween('created_at', [$fromDate, $toDate]);
+            } elseif ($fromDate) {
+                // Only from_date is provided
+                $query->where('created_at', '>=', $fromDate);
+            } elseif ($toDate) {
+                // Only to_date is provided
+                $query->where('created_at', '<=', $toDate);
+            }
         }
+
+        // Optionally, filter by the user's branch if needed
+        if ($user->branch_id) {
+            $query->where('branch_id', $user->branch_id);
+        }
+
+        // Fetch the results
+        $salesReceipts = $query->get();
+
+        // Return the results as a collection
+        return new SalesReceiptCollection($salesReceipts);
     }
-
-    // Optionally, filter by the user's branch if needed
-    if ($user->branch_id) {
-        $query->where('branch_id', $user->branch_id);
-    }
-
-    // Fetch the results
-    $salesReceipts = $query->get();
-
-    // Return the results as a collection
-    return new SalesReceiptCollection($salesReceipts);
-}
-
-
 }

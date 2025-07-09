@@ -44,6 +44,12 @@ class CreditTransactionController extends Controller
     {
         $data = $request->validated();
         $data["created_by"] = auth()->user()->id;
+        $customer = Customer::findOrFail($data['customer_id']);
+        $creditSum = CreditTransaction::where('customer_id', $data['customer_id'])->sum('amount');
+        $data['credit_balance_before'] = $customer->credit_limit - $creditSum;
+        $data['credit_balance_after'] = $customer->credit_limit - $creditSum - $data['amount'];
+        //$data->credit_limit = $customer->credit_limit;
+
         $creditTransaction = CreditTransaction::create($data);
         if ($creditTransaction->type == 'credit') {
             $salesOrder = SalesOrder::findOrFail($creditTransaction->sales_order_id);
@@ -56,14 +62,16 @@ class CreditTransactionController extends Controller
             $salesOrder->save();
 
             $customer = Customer::findOrFail($creditTransaction->customer_id);
-            $customer->credit_balance = ($customer->credit_balance != null) ? $customer->credit_balance - $creditTransaction->amount : $customer->credit_limit - $creditTransaction->amount;
+            $customer->credit_balance = $data['credit_balance_after'];
             $customer->save();
+
 
             if ($salesOrder->status == "Approved") {
                 $data = [
                     'sales_order_id' => $creditTransaction->sales_order_id,
                     'branch_id' => $creditTransaction->branch_id,
                     'payment_type' => 'Cash',
+                    'credit_order_number' => $creditTransaction->credit_order_number,
                     'customer_id' => $creditTransaction->customer_id,
                     'store_id' => $salesOrder->store_id,
                     'user_id' => $creditTransaction->branch_id,
@@ -78,7 +86,8 @@ class CreditTransactionController extends Controller
         } elseif ($creditTransaction->type == 'payment') {
             $creditTransaction->type == 'credit';
             $customer = Customer::findOrFail($creditTransaction->customer_id);
-            $customer->credit_balance = $customer->credit_balance + $creditTransaction->amount;
+            $customer->credit_balance = $data['credit_balance_after'];
+            //$customer->credit_balance + $creditTransaction->amount;
             $customer->save();
         }
 
@@ -86,6 +95,33 @@ class CreditTransactionController extends Controller
 
 
         return new CreditTransactionResource($creditTransaction);
+    }
+
+
+    public function getForOrder($salesOrderId)
+    {
+        $transaction = CreditTransaction::where('sales_order_id', $salesOrderId)
+            ->where('type', 'credit')
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        if (!$transaction) {
+            return response()->json(['message' => 'Credit transaction not found'], 404);
+        }
+
+        return new CreditTransactionResource($transaction);
+    }
+
+    public function returnAdjustments(Request $request, $customerId = null)
+    {
+        $query = CreditTransaction::where('type', 'return_adjustment')
+            ->with(['customer', 'branch', 'salesOrder']);
+
+        if ($customerId) {
+            $query->where('customer_id', $customerId);
+        }
+
+        return new CreditTransactionCollection($query->get());
     }
 
     public function show(Request $request, CreditTransaction $creditTransaction)

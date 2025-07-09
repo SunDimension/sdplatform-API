@@ -96,4 +96,10 @@ class SalesOrder extends Model
         return $this->hasOne(CreditTransaction::class, 'sales_order_id')
             ->where('type', 'Credit');
     }
+
+    public function productAudit(): HasMany
+    {
+        return $this->hasMany(ProductAudit::class, 'reference_id')
+            ->where('reference_type', 'SalesOrder');
+    }
 }

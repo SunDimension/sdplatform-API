@@ -11,19 +11,96 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Customer;
 use App\Models\CreditTransaction;
+use App\Models\ItemSold;
 use App\Models\SalesOrder;
 use App\Models\PostInflow;
 use App\Models\ReturnItem;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
+use Carbon\Carbon;
 
 class ReturnItemController extends Controller
 {
-    public function index(Request $request): ReturnItemCollection
+    public function index(Request $request): JsonResponse
     {
-        $returnItem = ReturnItem::all();
+        // Validate and retrieve query parameters from the request
+        $validated = $request->validate([
+            'store_id' => 'nullable|integer|exists:stores,id',
+            'branch_id' => 'nullable|integer|exists:stores,branch_id',
+            'from_date' => 'nullable|date',
+            'to_date' => 'nullable|date',
+            'product_id' => 'nullable|integer|exists:create_items,id',
+            'return_status' => 'nullable|string|in:approved,pending,rejected', // Changed from return_status to status
+        ]);
 
-        return new ReturnItemCollection($returnItem);
+        // Extract validated parameters
+        $storeId = $validated['store_id'] ?? null;
+        $branchId = $validated['branch_id'] ?? null;
+        $fromDate = $validated['from_date'] ?? null;
+        $toDate = $validated['to_date'] ?? null;
+        $productId = $validated['product_id'] ?? null;
+        $status = $validated['status'] ?? 'approved'; // Default to approved
+
+        // Start building the query with all returns
+        $query = ReturnItem::with([
+            'customer',
+            'store',
+            'user',
+            'branch',
+            'approvedBy',
+            'returnDetails.product',
+            'returnDetails.measurement',
+        ]);
+
+        // Apply store filter if provided
+        if ($storeId) {
+            $query->where('store_id', $storeId);
+        }
+
+        // Apply branch filter if provided
+        if ($branchId) {
+            $query->whereHas('store', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId);
+            });
+        }
+
+        // Apply product filter if provided
+        if ($productId) {
+            $query->whereHas('returnDetails', function ($query) use ($productId) {
+                $query->where('product_id', $productId);
+            });
+        }
+
+        // Apply status filter - only if status is provided
+        $query->where('return_status', $status);
+
+        // Apply date range filters if provided (using return_date instead of created_at)
+        if ($fromDate || $toDate) {
+            // Convert from_date and to_date to Carbon instances only if provided
+            $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+            $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+
+            // Apply date filter for the selected range
+            if ($fromDate && $toDate) {
+                // Both from_date and to_date are provided
+                $query->whereBetween('return_date', [$fromDate, $toDate]);
+            } elseif ($fromDate) {
+                // Only from_date is provided
+                $query->where('return_date', '>=', $fromDate);
+            } elseif ($toDate) {
+                // Only to_date is provided
+                $query->where('return_date', '<=', $toDate);
+            }
+        }
+
+        // Order by recent first
+        $query->orderBy('created_at', 'desc');
+
+        // Fetch the results and format them
+        $returns = $query->get();
+
+        return response()->json($returns);
     }
     public function store(ReturnItemStoreRequest $request): ReturnItemResource
     {
@@ -76,15 +153,68 @@ class ReturnItemController extends Controller
         $returnItem->save();
 
         if ($validated['status'] == 'Approved') {
-            $data = new PostInflow();
-            $data->inflow_status = 3; // claimed status
-            $data->customer_id = $returnItem->customer_id;
-            $data->amount = $returnItem->returnDetails->sum(function ($detail) {
-                return $detail->return_quantity * $detail->unit_price;
-            });
-            $data->narration = "Return of items";
-            $data->inflow_date = now();
-            $data->save();
+
+            $salesReceipt = $returnItem->salesReceipt;
+            $salesOrder = $salesReceipt ? SalesOrder::find($salesReceipt->sales_order_id) : null;
+
+
+            if ($salesOrder && $salesOrder->payment_type === 'Credit') {
+                $data = new CreditTransaction();
+                $data->customer_id = $returnItem->customer_id;
+                $data->branch_id = $returnItem->branch_id;
+                $data->sales_order_id = $salesOrder->id;
+
+                foreach ($returnItem->returnDetails as $returnDetail) {
+                    // Find the ItemSold record matching product_id and store_id
+                    $itemSold = ItemSold::where('product_id', $returnDetail->product_id)
+                        ->where('store_id', $returnItem->store_id)
+                        ->where('sales_order_id', $salesOrder->id)
+                        ->first();
+                    if ($itemSold) {
+                        // Reduce quantity_sold or update returned_quantity as needed
+                        $itemSold->return_quantity = max(0, $itemSold->quantity - $returnDetail->return_quantity);
+                        $itemSold->return_quantity_pieces = max(0, $itemSold->quantity_pieces - $returnDetail->return_quantity_pieces);
+                        // Optionally, track returned_quantity if your schema supports it:
+                        // $itemSold->returned_quantity = ($itemSold->returned_quantity ?? 0) + $returnDetail->return_quantity;
+                        $itemSold->save();
+                    }
+                }
+
+                $data->type = 'Return Adjustment';
+                $totalamount = $salesOrder->itemSold->sum(function ($detail) {
+                    return ($detail->quantity - $detail->return_quantity) * ($detail->unit_price - $detail->discount);
+                });
+
+                $data->amount = $returnItem->returnDetails->sum(function ($detail) {
+                    return -$detail->return_quantity * $detail->unit_price;
+                });
+                $salesOrder->total_amount = $totalamount;
+                $salesOrder->save();
+
+                // (price.value - discount.value) * quantity.value,
+                $customer = Customer::findOrFail($returnItem->customer_id);
+                $creditSum = CreditTransaction::where('customer_id', $returnItem->customer_id)->sum('amount');
+                $data->credit_balance_before = $customer->credit_limit - $creditSum;
+                $data->credit_balance_after = $customer->credit_limit - $creditSum - $data->amount;
+                $data->credit_limit = $customer->credit_limit;
+
+                // $data->credit_balance_after = $salesOrder->credit_balance - $data->amount;
+                // $data->transaction_date = now();
+                $data->created_by = auth()->user()->id;
+                $data->notes = "Credit adjustment for return #{$returnItem->id}";
+                $data->save();
+            } else {
+
+                $data = new PostInflow();
+                $data->inflow_status = 3; // claimed status
+                $data->customer_id = $returnItem->customer_id;
+                $data->amount = $returnItem->returnDetails->sum(function ($detail) {
+                    return $detail->return_quantity * $detail->unit_price;
+                });
+                $data->narration = "Return of items";
+                $data->inflow_date = now();
+                $data->save();
+            }
         }
 
 
@@ -93,194 +223,7 @@ class ReturnItemController extends Controller
 
 
 
-    // public function approve(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'comment' => ['nullable'],
-    //         'status' => ['required', 'string'],
-    //         'id' => ['required']
-    //     ]);
 
-    //     $returnItem = ReturnItem::findOrFail($validated['id']);
-    //     $returnItem->approval_comment = $validated['comment'];
-    //     $returnItem->return_status = $validated['status'];
-    //     $returnItem->approved_by = auth()->user()->id;
-    //     $returnItem->approved_at = now();
-    //     $returnItem->save();
-
-    //     if ($validated['status'] == 'Approved') {
-    //         // Get the original sales order to check payment type
-    //         $salesReceipt = $returnItem->salesReceipt;
-    //         $salesOrder = $salesReceipt ? SalesOrder::find($salesReceipt->sales_order_id) : null;
-
-    //         $returnAmount = $returnItem->returnDetails->sum(function ($detail) {
-    //             return $detail->return_quantity * $detail->unit_price;
-    //         });
-
-    //         if ($salesOrder && $salesOrder->payment_type === 'Credit') {
-    //             // For credit purchases, reduce customer's credit balance
-    //             $customer = Customer::find($returnItem->customer_id);
-    //             if ($customer) {
-    //                 $previousBalance = $customer->credit_balance;
-    //                 $customer->credit_balance = max(0, $customer->credit_balance - $returnAmount);
-    //                 $customer->save();
-
-    //                 // Find the original credit transaction
-    //                 $creditTransaction = CreditTransaction::where('sales_order_id', $salesOrder->id)
-    //                     ->where('type', 'credit')
-    //                     ->first();
-
-    //                 if ($creditTransaction) {
-    //                     // Update the existing credit transaction
-    //                     $creditTransaction->update([
-    //                         'amount' => $creditTransaction->amount - $returnAmount,
-    //                         'credit_balance_before' => $creditTransaction->credit_balance_before - $returnAmount,
-    //                         'notes' => $creditTransaction->notes . "\nAdjusted by -{$returnAmount} for return #{$returnItem->id}"
-    //                     ]);
-
-    //                     // Link the return item to the credit transaction
-    //                     $returnItem->credit_transaction_id = $creditTransaction->id;
-    //                     $returnItem->save();
-    //                 } else {
-    //                     // Fallback: Create new adjustment if original not found
-    //                     $creditTransaction = new CreditTransaction();
-    //                     $creditTransaction->customer_id = $returnItem->customer_id;
-    //                     $creditTransaction->branch_id = $returnItem->branch_id;
-    //                     $creditTransaction->sales_order_id = $salesOrder->id;
-    //                     $creditTransaction->type = 'return_adjustment';
-    //                     $creditTransaction->amount = $returnAmount;
-    //                     $creditTransaction->credit_balance_before = $previousBalance;
-    //                     $creditTransaction->credit_balance_after = $previousBalance - $returnAmount;
-    //                     $creditTransaction->transaction_date = now();
-    //                     $creditTransaction->created_by = auth()->user()->id;
-    //                     $creditTransaction->notes = "Credit adjustment for return #{$returnItem->id}";
-    //                     $creditTransaction->save();
-
-    //                     $returnItem->credit_transaction_id = $creditTransaction->id;
-    //                     $returnItem->save();
-    //                 }
-    //             }
-    //         } else {
-    //             // For cash purchases, create a normal PostInflow (cash refund)
-    //             $data = new PostInflow();
-    //             $data->inflow_status = 3; // claimed status
-    //             $data->customer_id = $returnItem->customer_id;
-    //             $data->amount = $returnAmount;
-    //             $data->narration = "Return of items";
-    //             $data->inflow_date = now();
-    //             $data->save();
-
-    //             $returnItem->post_inflow_id = $data->id;
-    //             $returnItem->save();
-    //         }
-    //     }
-
-    //     return new ReturnItemResource($returnItem);
-    // }
-
-    //     public function approve(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'comment' => ['nullable'],
-    //         'status' => ['required', 'string'],
-    //         'id' => ['required']
-    //     ]);
-
-    //     $returnItem = ReturnItem::findOrFail($validated['id']);
-    //     $returnItem->approval_comment = $validated['comment'];
-    //     $returnItem->return_status = $validated['status'];
-    //     $returnItem->approved_by = auth()->user()->id;
-    //     $returnItem->approved_at = now();
-    //     $returnItem->save();
-
-    //     if ($validated['status'] == 'Approved') {
-    //         // Get the original sales order to check payment type
-    //         $salesReceipt = $returnItem->salesReceipt;
-    //         $salesOrder = $salesReceipt ? SalesOrder::find($salesReceipt->sales_order_id) : null;
-
-    //         $returnAmount = $returnItem->returnDetails->sum(function ($detail) {
-    //             return $detail->return_quantity * $detail->unit_price;
-    //         });
-
-    //         if ($salesOrder && $salesOrder->payment_type === 'Credit') {
-    //             // For credit purchases, handle the return
-    //             $customer = Customer::find($returnItem->customer_id);
-    //             if ($customer) {
-    //                 $previousBalance = $customer->credit_balance;
-    //                 $creditPortion = min($returnAmount, $previousBalance);
-    //                 $cashPortion = max(0, $returnAmount - $previousBalance);
-
-    //                 // Handle credit portion
-    //                 if ($creditPortion > 0) {
-    //                     $customer->credit_balance = max(0, $previousBalance - $creditPortion);
-    //                     $customer->save();
-
-    //                     // Find the original credit transaction
-    //                     $creditTransaction = CreditTransaction::where('sales_order_id', $salesOrder->id)
-    //                         ->where('type', 'credit')
-    //                         ->first();
-
-    //                     if ($creditTransaction) {
-    //                         // Update the existing credit transaction
-    //                         $creditTransaction->update([
-    //                             'amount' => $creditTransaction->amount - $creditPortion,
-    //                             'credit_balance_after' => $customer->credit_balance,
-    //                             'notes' => $creditTransaction->notes . "\nAdjusted by -{$creditPortion} for return #{$returnItem->id}"
-    //                         ]);
-
-    //                         // Link the return item to the credit transaction
-    //                         $returnItem->credit_transaction_id = $creditTransaction->id;
-    //                     } else {
-    //                         // Fallback: Create new adjustment if original not found
-    //                         $creditTransaction = new CreditTransaction();
-    //                         $creditTransaction->customer_id = $returnItem->customer_id;
-    //                         $creditTransaction->branch_id = $returnItem->branch_id;
-    //                         $creditTransaction->sales_order_id = $salesOrder->id;
-    //                         $creditTransaction->type = 'return_adjustment';
-    //                         $creditTransaction->amount = $creditPortion;
-    //                         $creditTransaction->credit_balance_before = $previousBalance;
-    //                         $creditTransaction->credit_balance_after = $customer->credit_balance;
-    //                         $creditTransaction->transaction_date = now();
-    //                         $creditTransaction->created_by = auth()->user()->id;
-    //                         $creditTransaction->notes = "Credit adjustment for return #{$returnItem->id}";
-    //                         $creditTransaction->save();
-
-    //                         $returnItem->credit_transaction_id = $creditTransaction->id;
-    //                     }
-    //                 }
-
-    //                 // Handle cash portion (if any)
-    //                 if ($cashPortion > 0) {
-    //                     $data = new PostInflow();
-    //                     $data->inflow_status = 3; // claimed status
-    //                     $data->customer_id = $returnItem->customer_id;
-    //                     $data->amount = $cashPortion;
-    //                     $data->narration = "Cash refund from return #{$returnItem->id} (excess over credit)";
-    //                     $data->inflow_date = now();
-    //                     $data->save();
-
-    //                     $returnItem->post_inflow_id = $data->id;
-    //                 }
-
-    //                 $returnItem->save();
-    //             }
-    //         } else {
-    //             // For cash purchases, create a normal PostInflow (cash refund)
-    //             $data = new PostInflow();
-    //             $data->inflow_status = 3; // claimed status
-    //             $data->customer_id = $returnItem->customer_id;
-    //             $data->amount = $returnAmount;
-    //             $data->narration = "Return of items";
-    //             $data->inflow_date = now();
-    //             $data->save();
-
-    //             $returnItem->post_inflow_id = $data->id;
-    //             $returnItem->save();
-    //         }
-    //     }
-
-    //     return new ReturnItemResource($returnItem);
-    // }
 
     // In your ReturnItemController's get method
     public function get($id): ReturnItemResource

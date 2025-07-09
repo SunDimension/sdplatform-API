@@ -21,20 +21,23 @@ class ReturnItemResource extends JsonResource
             'branch_name' => $this->branch->name,
             'return_date' => $this->return_date,
             'customer_id' => $this->customer_id,
+            'store_id' => $this->store_id,
+            'store_name' => $this->store->name ?? null, // Safe access
             'customer_name' => $this->customer->name,
             'notes' => $this->notes,
             'created_by' => $this->created_by,
             'created_by_name' => $this->user->name,
             'approved_by' => $this->approved_by,
+            'approved_by_name' => $this->when($this->approvedBy, function () {
+                return $this->approvedBy->name;
+            }),
             'approved_at' => $this->approved_at,
             'return_status' => $this->return_status,
             'approval_comment' => $this->approval_comment,
             'items' => ReturnDetailsResource::collection($this->returnDetails),
-            
-            // Include the full sales receipt details
-'sales_receipt' => $this->whenLoaded('salesReceipt', function () {
-    return new SalesReceiptResource($this->salesReceipt);
-}),
+            'sales_receipt' => $this->whenLoaded('salesReceipt', function () {
+                return new SalesReceiptResource($this->salesReceipt);
+            }),
         ];
     }
 }

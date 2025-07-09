@@ -18,6 +18,7 @@ class ReturnItem extends Model
         'sales_receipt_id',
         'customer_id',
         'branch_id',
+        'store_id',
         'return_date',
         'notes',
         'created_by',
@@ -44,20 +45,20 @@ class ReturnItem extends Model
     {
         return $this->belongsTo(Branch::class);
     }
-    public function stores(): BelongsTo
+    public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
     }
-   public function salesReceipt(): BelongsTo
-{
-    return $this->belongsTo(SalesReceipt::class, 'sales_receipt_id');
-}
+    public function salesReceipt(): BelongsTo
+    {
+        return $this->belongsTo(SalesReceipt::class, 'sales_receipt_id');
+    }
 
     public function release(): BelongsTo
     {
         return $this->belongsTo(Release::class);
     }
-    
+
     public function returnDetails(): HasMany
     {
         return $this->hasMany(ReturnDetails::class, 'return_id');
@@ -75,5 +76,4 @@ class ReturnItem extends Model
     {
         return $this->belongsTo(User::class, 'approved_by');
     }
-    
 }

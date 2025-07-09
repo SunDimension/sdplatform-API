@@ -83,6 +83,36 @@ class StockUtil
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
     }
 
+    public static function getQuantityActual($item_id, $store_id)
+    {
+        // Get the opening stock quantity
+        $storeItem = StoreItem::where('create_item_id', $item_id)
+            ->where('store_id', $store_id)
+            ->first();
+
+        if (!$storeItem) {
+            Log::warning("StoreItem not found for item_id: $item_id and store_id: $store_id");
+            return 0;
+        }
+
+        $openStock = $storeItem->open_stock * $storeItem->quantity_in_package;
+
+        // Calculate total received quantity
+        $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
+
+        // Calculate total released quantity
+        $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
+
+        // Calculate pending sales quantity
+        //$stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
+
+        // Additional stock adjustments (if needed)
+        $stockTransfered = 0; // Example: Transfers to other stores
+        $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
+
+        return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
+    }
+
     /**
      * Get the total received quantity for an item in a store.
      *
@@ -137,6 +167,7 @@ class StockUtil
             ->select('return_details.product_id', DB::raw('SUM(return_details.return_quantity_pieces) as total_quantity'))
             ->where('return_details.product_id', $item_id)
             ->where('return_items.store_id', $store_id)
+            ->where('return_items.return_status', 'Approved')
             ->groupBy('return_details.product_id')
             ->first();
 
@@ -158,24 +189,33 @@ class StockUtil
             ->where('item_solds.product_id', $item_id)
             ->where('item_solds.store_id', $store_id)
             ->where('item_solds.status', 'pending')
-            ->whereIn('sales_orders.status', ['Pending','Approved','Paid'])
+            ->whereIn('sales_orders.status', ['Pending', 'Approved', 'Paid'])
             ->groupBy('item_solds.product_id')
             ->first();
 
         return $result ? $result->total_quantity : 0;
     }
 
-    public static function getPieceQuivalent($unit, $package_size,$quantity)
+    public static function getPieceQuivalent($unit, $package_size, $quantity)
     {
-           // Log::alert($unit);
+        // Log::alert($unit);
 
-        if($unit=='Full'){
-            $quantity = $quantity*$package_size;
+        if ($unit == 'Full') {
+            $quantity = $quantity * $package_size;
             //Log::alert('f');
+        } elseif ($unit == 'Half') {
+            // Log::alert('h');
+            $quantity = $quantity * $package_size / 2.0;
         }
-        elseif($unit=='Half'){
-           // Log::alert('h');
-            $quantity = $quantity*$package_size/2.0;
+
+        return $quantity;
+    }
+    public static function getPieceEquivalentForRequest($unit, $package_size, $quantity)
+    {
+        if ($unit == 'Full') {
+            $quantity = $quantity * $package_size;
+        } elseif ($unit == 'Half') {
+            $quantity = $quantity * $package_size / 2.0;
         }
 
         return $quantity;

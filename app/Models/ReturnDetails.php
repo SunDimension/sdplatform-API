@@ -19,7 +19,7 @@ class ReturnDetails extends Model
         'item_sold_id',
         'unit_price',
         'store_id',
-        'unit_measurement',      
+        'unit_measurement',
     ];
 
     protected $casts = [ // Changed from 'cast' to 'casts'
@@ -44,5 +44,10 @@ class ReturnDetails extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function measurement()
+    {
+        return $this->belongsTo(Measurement::class, 'unit_measurement', 'id'); // Fixed typo here
     }
 }

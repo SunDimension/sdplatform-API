@@ -144,6 +144,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
 
+
+
+    Route::get('return-transactions', [App\Http\Controllers\ReturnItemController::class, 'index']);
+
+
     Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
 
     Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
@@ -165,6 +170,8 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::post('sales-order', App\Http\Controllers\SalesOrderController::class);
 
     Route::post('/sales-orders/{id}/cancel', [SalesOrderController::class, 'cancel']);
+
+    Route::get('/sales-order/{id}/edit', [SalesOrderController::class, 'edit']);
     Route::get('credit-transactions/for-order/{salesOrderId}', [CreditTransactionController::class, 'getForOrder']);
 
 
@@ -397,6 +404,10 @@ Route::middleware('auth:sanctum')->group(function () {
         ->name('credit.returns.process');
 
     Route::post('/credits/search', [CreditTransactionController::class, 'searchCredit']);
+
+    Route::get('/sales-report', [SalesOrderController::class, 'salesReport']);
+
+    Route::get('/reports/product-availability', [SalesOrderController::class, 'productAvailabilityReport']);
 
     // Return Item Routes
     Route::get('returns/{id}/with-receipt', [ReturnItemController::class, 'getReturnWithReceipt']);

@@ -12,12 +12,12 @@ class ItemSoldResource extends JsonResource
      *
      * @return array<string, mixed>
      */
-        public function toArray(Request $request): array
+    public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
             'product_id' => $this->product_id,
-       'product_name' => $this->product ? $this->product->name : null,
+            'product_name' => $this->product ? $this->product->name : null,
             'sales_order_id' => $this->sales_order_id,
             'unit_price' => $this->unit_price ?? 0,
             'amount' => $this->amount ?? 0,
@@ -27,11 +27,12 @@ class ItemSoldResource extends JsonResource
             'quantity' => $this->quantity,
             'quantity_pieces' => $this->quantity_pieces,
             'unit_measurement' => $this->unit_measurement,
-            'unit_measurement_name' => $this->whenLoaded('measurement', function() {
+            'return_quantity' => $this->return_quantity ?? 0,
+            'return_quantity_pieces' => $this->return_quantity_pieces ?? 0,
+            'unit_measurement_name' => $this->whenLoaded('measurement', function () {
                 return $this->measurement->name;
             }),
             'discount' => $this->discount ?? 0,
         ];
     }
-   
 }
