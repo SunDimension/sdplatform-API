@@ -11,6 +11,7 @@ use App\Models\StoreTransferOrder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StoreTransferOrderController extends Controller
 {
@@ -47,8 +48,8 @@ class StoreTransferOrderController extends Controller
     public function store(StoreTransferOrderStoreRequest $request)
     {
         $validated = $request->validated();
-        $validated['source_status'] = 'Pending';
-        $validated['destination_status'] = 'Pending';   
+        $validated['source_status'] ='outgoing';
+        $validated['destination_status'] = 'incoming';   
         $validated['created_by'] = auth()->user()->id;
         // $validated['transfer_date'] = now();
         $storeTransferOrder = StoreTransferOrder::create($validated);
@@ -101,6 +102,8 @@ class StoreTransferOrderController extends Controller
                 $storeTransferOrder->destination_store_approval_date = now();
                 if( $storeTransferOrder->destination_branch_id == $storeTransferOrder->source_branch_id && $validated['status']=='pending'){
                     $storeTransferOrder->destination_status = 'approved';
+                    Log::info('Store Transfer Order Approved');
+                    Log::info($storeTransferOrder);
                 }
             }
             if($validated['stage'] == 'branch'){
