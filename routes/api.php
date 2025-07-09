@@ -421,8 +421,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('approve-receive-order', [App\Http\Controllers\ReceiveOrderController::class, 'approve']);
 
     Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
-
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
+    
+    Route::get('pending-transfer-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'pending']);
+    Route::get('pending-transfer-branch-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'branch_pending']);
+    Route::post('approve-transfer-order', [App\Http\Controllers\StoreTransferOrderController::class, 'approve']);
+
 
     Route::apiResource('store-transfer-items', App\Http\Controllers\StoreTransferItemController::class);
     Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class);
