@@ -20,6 +20,7 @@ class StoreTransferItem extends Model
     protected $fillable = [
         'transfer_order_id',
         'quantity',
+        'quantity_pieces',
         'unit_price',
         'product_id',
         'created_by',
@@ -36,6 +37,7 @@ class StoreTransferItem extends Model
         'unit_price' => 'double',
         'product_id' => 'integer',
         'quantity' => 'integer',
+        'quantity_pieces' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',

@@ -40,7 +40,7 @@ class StockUtil
         $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
-        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantity($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
@@ -77,42 +77,13 @@ class StockUtil
         $stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
-        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
+        $stockTransfered = self::getTotalReceivedViaTransferQuantityRequest($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
     }
 
-    public static function getQuantityActual($item_id, $store_id)
-    {
-        // Get the opening stock quantity
-        $storeItem = StoreItem::where('create_item_id', $item_id)
-            ->where('store_id', $store_id)
-            ->first();
-
-        if (!$storeItem) {
-            Log::warning("StoreItem not found for item_id: $item_id and store_id: $store_id");
-            return 0;
-        }
-
-        $openStock = $storeItem->open_stock * $storeItem->quantity_in_package;
-
-        // Calculate total received quantity
-        $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
-
-        // Calculate total released quantity
-        $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
-
-        // Calculate pending sales quantity
-        //$stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
-
-        // Additional stock adjustments (if needed)
-        $stockTransfered = 0; // Example: Transfers to other stores
-        $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
-
-        return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
-    }
-
+    
     /**
      * Get the total transferred quantity for an item from a store (outgoing transfers).
      *
@@ -172,7 +143,8 @@ class StockUtil
             ->select('store_transfer_items.product_id', \DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
             ->where('store_transfer_items.product_id', $item_id)
             ->where('store_transfer_orders.source_store_id', $store_id)
-            ->whereIn('store_transfer_orders.source_status', ['approved', 'outgoing','pending']) // Only count approved/outgoing
+            ->whereIn('store_transfer_orders.source_status', ['approved', 'outgoing','pe
+            nding']) // Only count approved/outgoing
             ->groupBy('store_transfer_items.product_id')
             ->first();
 
@@ -224,8 +196,11 @@ class StockUtil
         //$stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
-        $stockTransfered = 0; // Example: Transfers to other stores
+        //$stockTransfered = 0; // Example: Transfers to other stores
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantity($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
+
+        //$stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned ;
     }
@@ -237,7 +212,7 @@ class StockUtil
      * @param int $store_id
      * @return float
      */
-    private static function getTotalReceivedQuantity($item_id, $store_id)
+    public static function getTotalReceivedQuantity($item_id, $store_id)
     {
         $result = ReceiveItem::query()
             ->join('receive_orders', 'receive_items.receive_order_id', '=', 'receive_orders.id')
@@ -257,7 +232,7 @@ class StockUtil
      * @param int $store_id
      * @return float
      */
-    private static function getTotalReleasedQuantity($item_id, $store_id)
+    public static function getTotalReleasedQuantity($item_id, $store_id)
     {
         $result = ReleaseDetails::query()
             ->join('releases', 'release_details.release_id', '=', 'releases.id')
@@ -277,7 +252,7 @@ class StockUtil
      * @param int $store_id
      * @return float
      */
-    private static function getTotalReturnQuantity($item_id, $store_id)
+    public static function getTotalReturnQuantity($item_id, $store_id)
     {
         $result = ReturnDetails::query()
             ->join('return_items', 'return_details.return_id', '=', 'return_items.id')
@@ -298,7 +273,7 @@ class StockUtil
      * @param int $store_id
      * @return float
      */
-    private static function getTotalPendingSalesQuantity($item_id, $store_id)
+    public static function getTotalPendingSalesQuantity($item_id, $store_id)
     {
         $result = ItemSold::query()
             ->join('sales_orders', 'item_solds.sales_order_id', '=', 'sales_orders.id')
