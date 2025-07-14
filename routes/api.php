@@ -9,6 +9,7 @@ use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PostOutflowController;
 use App\Http\Controllers\ReturnItemController;
 use App\Http\Controllers\SalesReceiptController;
+use App\Http\Controllers\StoreTransferItemController;
 use App\Http\Controllers\CreditTransactionController;
 use App\Models\CreditTransaction;
 use Illuminate\Support\Facades\Route;
@@ -154,6 +155,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
     Route::post('my-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'myReceipts']);
 
+
+    Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
+
+
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
 
     Route::get('/post-outflow/customer-inflow-details', [PostOutflowController::class, 'getCustomerInflowDetails']);
@@ -185,6 +190,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
 
     Route::get('my-store-items', [App\Http\Controllers\StoreItemController::class, "myStoreItems"]);
+
+    Route::get('my-store-itemsold', [App\Http\Controllers\SalesOrderController::class, "mystoreItemSold"]);
+
 
     Route::get('my-stores-inventory', [App\Http\Controllers\StoreItemController::class, "myStoreItemsSetLimit"]);
 

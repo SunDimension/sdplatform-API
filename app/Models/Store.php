@@ -45,4 +45,8 @@ class Store extends Model
         return $this->hasMany(StoreItem::class);
     }
 
+    public function itemSolds()
+    {
+        return $this->hasMany(ItemSold::class);
+    }
 }

@@ -22,11 +22,15 @@ class UserResource extends JsonResource
             'name' => $this->name,
             'email' => $this->email,
             'created_at' => (new DateTime($this->created_at))->format('Y-m-d H:i:s'),
-            'branch' => $this->branch->name,
+            'branch' => $this->branch ? $this->branch->name : null,
+            'warehouse_id' => $this->warehouse_id,
+            'warehouse' => $this->warehouse ? $this->warehouse->name : null,
+            'status' => $this->status ? $this->status->name : null,
+            'status_id' => $this->status_id,
             'branch_id' => $this->branch_id,
             'store_id' => $this->store_id,
-            'store' => $this->store->name,
-            "roles"=> RoleResource::collection($this->whenLoaded("roles"))
+            'store' => $this->store ? $this->store->name : null,
+            "roles" => RoleResource::collection($this->whenLoaded("roles"))
         ];
     }
 }
