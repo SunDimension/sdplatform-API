@@ -32,6 +32,7 @@ class StockUtil
         }
 
         $openStock = $storeItem->open_stock;
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantity($item_id, $store_id); // Example: Transfers to other stores
 
         // Calculate total received quantity
         $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
@@ -235,7 +236,7 @@ class StockUtil
     {
         $result = ReleaseDetails::query()
             ->join('releases', 'release_details.release_id', '=', 'releases.id')
-            ->select('release_details.product_id', DB::raw('SUM(release_details.quantity_pieces) as total_quantity'))
+            ->select('release_details.product_id', DB::raw('SUM(IFNULL(release_details.quantity_pieces, release_details.quantity_pieces)) as total_quantity'))
             ->where('release_details.product_id', $item_id)
             ->where('releases.store_id', $store_id)
             ->groupBy('release_details.product_id')

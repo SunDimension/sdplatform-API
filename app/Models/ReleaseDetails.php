@@ -18,6 +18,8 @@ class ReleaseDetails extends Model
         'release_id',
         'product_id',
         'release_quantity',
+        'quantity_pieces',
+        'unit_measurement',
         'amount'
     ];
 
