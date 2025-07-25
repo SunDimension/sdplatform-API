@@ -7,6 +7,11 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PostOutflowController;
+use App\Http\Controllers\ReturnItemController;
+use App\Http\Controllers\SalesReceiptController;
+use App\Http\Controllers\StoreTransferItemController;
+use App\Http\Controllers\CreditTransactionController;
+use App\Models\CreditTransaction;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -95,34 +100,34 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
     Route::apiResource('cash-discrepancies', App\Http\Controllers\CashDiscrepancyController::class);
     Route::apiResource('expense-lines', App\Http\Controllers\ExpenseLineController::class);
-    
-     Route::apiResource('regions', App\Http\Controllers\RegionController::class);
+
+    Route::apiResource('regions', App\Http\Controllers\RegionController::class);
 
 
     Route::apiResource('measurements', App\Http\Controllers\MeasurementController::class);
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
-    
-    
+
+
     Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
-    Route::get('get-cashier-remittance/{id}', [App\Http\Controllers\CashierRemittanceController::class,'get']);
-    Route::get('get-bank-remittance/{id}', [App\Http\Controllers\BankRemittanceController::class,'get']);
-    
+    Route::get('get-cashier-remittance/{id}', [App\Http\Controllers\CashierRemittanceController::class, 'get']);
+    Route::get('get-bank-remittance/{id}', [App\Http\Controllers\BankRemittanceController::class, 'get']);
+
     // Route::get('cashier-remit', App\Http\Controllers\CashierRemittanceController::class,'newGet');
-    
+
     // Route::get('cashier-remittances-get', [App\Http\Controllers\CashierRemittanceController::class,'index']);
-    Route::get('cashier-expense-pending', [App\Http\Controllers\CashierExpenseController::class,'pending']);
-    Route::get('bank-remittance-pending', [App\Http\Controllers\BankRemittanceController::class,'pending']);
-    Route::get('cashier-remittance-pending', [App\Http\Controllers\CashierRemittanceController::class,'pending']);
+    Route::get('cashier-expense-pending', [App\Http\Controllers\CashierExpenseController::class, 'pending']);
+    Route::get('bank-remittance-pending', [App\Http\Controllers\BankRemittanceController::class, 'pending']);
+    Route::get('cashier-remittance-pending', [App\Http\Controllers\CashierRemittanceController::class, 'pending']);
 
-    Route::post('cashier-expense-approve', [App\Http\Controllers\CashierExpenseController::class,'approve']);
-    Route::post('bank-remittance-approve', [App\Http\Controllers\BankRemittanceController::class,'approve']);
-    Route::post('cashier-remittance-approve', [App\Http\Controllers\CashierRemittanceController::class,'approve']);
+    Route::post('cashier-expense-approve', [App\Http\Controllers\CashierExpenseController::class, 'approve']);
+    Route::post('bank-remittance-approve', [App\Http\Controllers\BankRemittanceController::class, 'approve']);
+    Route::post('cashier-remittance-approve', [App\Http\Controllers\CashierRemittanceController::class, 'approve']);
 
-    Route::post('search-cashier-remittance', [App\Http\Controllers\CashierRemittanceController::class,'index']);
-     Route::post('search-bank-remittance', [App\Http\Controllers\BankRemittanceController::class,'index']);
-    Route::post('search-cashier-expense', [App\Http\Controllers\CashierExpenseController::class,'index']);
-    
+    Route::post('search-cashier-remittance', [App\Http\Controllers\CashierRemittanceController::class, 'index']);
+    Route::post('search-bank-remittance', [App\Http\Controllers\BankRemittanceController::class, 'index']);
+    Route::post('search-cashier-expense', [App\Http\Controllers\CashierExpenseController::class, 'index']);
+
     ///////////// Sales Routes /////////////////
     // Route::post('sales-orders', [SalesOrderController::class,'store']);
     // Route::get('/sales-orders/{id}/edit', [SalesOrderController::class, 'edit']);
@@ -131,19 +136,28 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('sales-orders', App\Http\Controllers\SalesOrderController::class);
 
-    Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class,'index']);
+    Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class, 'index']);
 
-    Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class,'index']);
+    Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class, 'index']);
 
-    Route::post('search-sales-orders', [App\Http\Controllers\SalesOrderController::class,'index']);
+    Route::post('search-sales-orders', [App\Http\Controllers\SalesOrderController::class, 'index']);
 
 
-    Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class,'index']);
+    Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
 
-    Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class,'index']);
+
+
+    Route::get('return-transactions', [App\Http\Controllers\ReturnItemController::class, 'index']);
+
+
+    Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
 
     Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
     Route::post('my-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'myReceipts']);
+
+
+    Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
+
 
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
 
@@ -162,6 +176,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/sales-orders/{id}/cancel', [SalesOrderController::class, 'cancel']);
 
+    Route::get('/sales-order/{id}/edit', [SalesOrderController::class, 'edit']);
+    Route::get('credit-transactions/for-order/{salesOrderId}', [CreditTransactionController::class, 'getForOrder']);
+
 
     // Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
 
@@ -171,10 +188,17 @@ Route::middleware('auth:sanctum')->group(function () {
     /////////// StoreItem////////////////////////////////////////
 
     Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
-    
+
     Route::get('my-store-items', [App\Http\Controllers\StoreItemController::class, "myStoreItems"]);
 
+    Route::get('my-store-itemsold', [App\Http\Controllers\SalesOrderController::class, "mystoreItemSold"]);
+
+
     Route::get('my-stores-inventory', [App\Http\Controllers\StoreItemController::class, "myStoreItemsSetLimit"]);
+
+
+
+    Route::get('/returns/{returnId}/with-receipt', [ReturnItemController::class, 'getReturnWithReceipt']);
 
 
     Route::get('my-store-items-inventory', [App\Http\Controllers\StoreItemController::class, 'myStoreItems2']);
@@ -190,6 +214,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('release', App\Http\Controllers\ReleaseController::class);
 
     Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::class);
+
+    Route::post('return-approve', [App\Http\Controllers\ReturnItemController::class, 'approve']);
+
+    Route::get('return-pending', [App\Http\Controllers\ReturnItemController::class, 'pending']);
+    Route::get('return-pending-credit', [App\Http\Controllers\ReturnItemController::class, 'pendingCredit']);
+
+    Route::get('get-return/{id}', [App\Http\Controllers\ReturnItemController::class, 'get']);
 
     Route::apiResource('return-details', App\Http\Controllers\ReturnDetailsController::class);
 
@@ -372,24 +403,43 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
 
-Route::post('/receipts/search', [SalesOrderController::class, 'searchReceipt'])
-            ->name('sales.receipts.search');
+    Route::post('/receipts/search', [SalesOrderController::class, 'searchReceipt'])
+        ->name('sales.receipts.search');
     Route::post('/returns/process', [SalesOrderController::class, 'processReturn'])
-            ->name('sales.returns.process');
+        ->name('sales.returns.process');
+
+    Route::post('/credit-returns/process', [SalesOrderController::class, 'processCreditReturn'])
+        ->name('credit.returns.process');
+
+    Route::post('/credits/search', [CreditTransactionController::class, 'searchCredit']);
+
+    Route::get('/sales-report', [SalesOrderController::class, 'salesReport']);
+
+    Route::get('/reports/product-availability', [SalesOrderController::class, 'productAvailabilityReport']);
+
+    // Return Item Routes
+    Route::get('returns/{id}/with-receipt', [ReturnItemController::class, 'getReturnWithReceipt']);
+    Route::get('returns/by-receipt/{receiptNumber}', [ReturnItemController::class, 'getByReceiptNumber']);
+
+    // Sales Receipt Routes (if not already there)
+    Route::get('sales-receipts/{id}/with-returns', [SalesReceiptController::class, 'showWithReturns']);
 
     Route::apiResource('receive-orders', App\Http\Controllers\ReceiveOrderController::class);
-    Route::get('pending-receive-orders', [App\Http\Controllers\ReceiveOrderController::class,'pending']);
-    Route::post('approve-receive-order', [App\Http\Controllers\ReceiveOrderController::class,'approve']);
-    
-    Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
+    Route::get('pending-receive-orders', [App\Http\Controllers\ReceiveOrderController::class, 'pending']);
+    Route::post('approve-receive-order', [App\Http\Controllers\ReceiveOrderController::class, 'approve']);
 
+    Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
+    
+    Route::get('pending-transfer-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'pending']);
+    Route::get('pending-transfer-branch-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'branch_pending']);
+    Route::post('approve-transfer-order', [App\Http\Controllers\StoreTransferOrderController::class, 'approve']);
+
 
     Route::apiResource('store-transfer-items', App\Http\Controllers\StoreTransferItemController::class);
-    Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class); 
+    Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class);
     Route::apiResource('price-changes', App\Http\Controllers\PriceChangeController::class);
     Route::apiResource('change-reasons', App\Http\Controllers\ChangeReasonController::class);
-    Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class,'pending']);
-    Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class,'approve']);
-    
+    Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class, 'pending']);
+    Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class, 'approve']);
 });

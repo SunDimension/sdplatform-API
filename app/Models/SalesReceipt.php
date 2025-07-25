@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesReceipt extends Model
@@ -35,7 +36,7 @@ class SalesReceipt extends Model
      * The attributes that should be cast to native types.
      *
      * @var array
-    **/
+     **/
 
     protected $casts = [
         'id' => 'integer',
@@ -46,23 +47,23 @@ class SalesReceipt extends Model
         'sales_order_id' => 'integer',
         'payment_detail' => 'array',
     ];
-protected static function boot()
-{
-    parent::boot();
+    protected static function boot()
+    {
+        parent::boot();
 
-    // Automatically generate sales_receipt_number when a new SalesReceipt is created
-    static::creating(function ($salesReceipt) {
-        do {
-            // Generate a random 7-digit number
-            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
-            // Prefix the random number with 'HGV-SR-'
-            $salesReceiptNumber = 'HGV-SR-' . $randomNumber;
-        } while (static::where('sales_receipt_number', $salesReceiptNumber)->exists()); // Check uniqueness in the database
+        // Automatically generate sales_receipt_number when a new SalesReceipt is created
+        static::creating(function ($salesReceipt) {
+            do {
+                // Generate a random 7-digit number
+                $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+                // Prefix the random number with 'HGV-SR-'
+                $salesReceiptNumber = 'HGV-SR-' . $randomNumber;
+            } while (static::where('sales_receipt_number', $salesReceiptNumber)->exists()); // Check uniqueness in the database
 
-        // Assign the unique sales_receipt_number
-        $salesReceipt->sales_receipt_number = $salesReceiptNumber;
-    });
-}
+            // Assign the unique sales_receipt_number
+            $salesReceipt->sales_receipt_number = $salesReceiptNumber;
+        });
+    }
 
 
     public function customer(): BelongsTo
@@ -75,16 +76,16 @@ protected static function boot()
         return $this->belongsTo(Branch::class);
     }
 
-    public function salesorder()
+    public function salesOrder()
     {
         return $this->belongsTo(SalesOrder::class, "sales_order_id");
     }
-     public function cashier()
+    public function cashier()
     {
         return $this->belongsTo(User::class, 'cashier_id');
     }
 
-      public function user()
+    public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
     }
@@ -98,11 +99,14 @@ protected static function boot()
         return $this->belongsTo(PaymentMode::class);
     }
 
-  public function store()
+    public function store()
     {
         return $this->belongsTo(Store::class, 'store_id');
     }
-
+    public function returnItems(): HasMany
+    {
+        return $this->hasMany(ReturnItem::class, 'sales_receipt_id');
+    }
     // public function itemSold()
     // {
     //     return $this->hasMany(ItemSold::class);

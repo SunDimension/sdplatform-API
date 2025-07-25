@@ -11,6 +11,7 @@ use App\Models\StoreTransferOrder;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StoreTransferOrderController extends Controller
 {
@@ -23,32 +24,44 @@ class StoreTransferOrderController extends Controller
 
     public function pending(Request $request)
     {
-        $receiveOrders = StoreTransferOrder::where('source_status','Pending')->where('store_id',auth()->user()->store_id)->get();
-        $receiveOrders2 = StoreTransferOrder::where('destination_status','Pending')->where('store_id',auth()->user()->store_id)->get();
+        $receiveOrders = StoreTransferOrder::where('source_status','outgoing')->where('source_store_id',auth()->user()->store_id)->get();
+        $receiveOrders2 = StoreTransferOrder::where('destination_status','incoming')->where('source_status','approved')->where('destination_store_id',auth()->user()->store_id)->get();
         // $receiveOrders = ReceiveOrder::where('status','Pending')->get();
-        return new StoreTransferOrderCollection($receiveOrders);
+        return response()->json(['data' => [
+            'incoming' =>  StoreTransferOrderResource::collection($receiveOrders),
+            'outgoing' => StoreTransferOrderResource::collection($receiveOrders2)
+        ]]);
     }
 
     public function branch_pending(Request $request)
     {
-        $receiveOrders = StoreTransferOrder::where('source_status','Pending')->where('branch_id',auth()->user()->branch_id)->get();
-        $receiveOrders2 = StoreTransferOrder::where('destination_status','Pending')->where('branch_id',auth()->user()->branch_id)->get();
+        $receiveOrders = StoreTransferOrder::where('source_status','Pending')->where('source_branch_id',auth()->user()->branch_id)->get();
+        $receiveOrders2 = StoreTransferOrder::where('destination_status','Pending')->where('destination_branch_id',auth()->user()->branch_id)->get();
         // $receiveOrders = ReceiveOrder::where('status','Pending')->get();
-        return new StoreTransferOrderCollection($receiveOrders);
+        // return new StoreTransferOrderCollection($receiveOrders);
+        return response()->json(['data' => [
+            'incoming' =>  StoreTransferOrderResource::collection($receiveOrders),
+            'outgoing' => StoreTransferOrderResource::collection($receiveOrders2)
+        ]]);
     }
 
     public function store(StoreTransferOrderStoreRequest $request)
     {
         $validated = $request->validated();
+        $validated['source_status'] ='outgoing';
+        $validated['destination_status'] = 'incoming';   
+        $validated['created_by'] = auth()->user()->id;
+        // $validated['transfer_date'] = now();
         $storeTransferOrder = StoreTransferOrder::create($validated);
-        
+
         foreach ($validated['items'] as $item) {
             StoreTransferItem::create([
                 'transfer_order_id' => $storeTransferOrder->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $item['quantity'],
+                'quantity_pieces' => $item['quantity_pieces'],
                 'unit_price' => $item['unit_price'],
-                // 'description' => $item['description'],
+                'description' => $item['description'],
                 'created_by' => auth()->user()->id
             ]);
         }
@@ -61,34 +74,53 @@ class StoreTransferOrderController extends Controller
         $validated = $request->validate([
             'comment' => ['nullable'],
             'status' => ['required', 'string'],
-            'id'=>['required', 'string']
+            'id'=>['required', 'string'],
+            'source'=>['required', 'string'],
+            'stage'=>['required', 'string']
         ]);
-        // $receiveOrder = StoreTransferOrder::findOrFail($validated['id']);
-        // $receiveOrder->approval_comment = $validated['comment'];
-        // $receiveOrder->status = $validated['status'];
-        // $receiveOrder->approved_by = auth()->user()->id;
-        // $receiveOrder->approval_date = now();
-        // $receiveOrder->save();
 
-        // if($receiveOrder->status == 'Approved')
-        // {
-        //     $sql = "UPDATE store_items si INNER JOIN (
-        //             SELECT sum(quantity) quantity, product_id, avg(quantity*unit_price)/sum(quantity) unit_price, ro.store_id  
-        //             from receive_items ri INNER JOIN receive_orders ro ON ro.id = ri.receive_order_id
-        //             WHERE receive_order_id = ?
-        //             group BY product_id) A ON si.store_id = A.store_id  and si.create_item_id = A.product_id
-        //             SET si.quantity = si.quantity+A.quantity,
-        //             si.cost_price = A.unit_price ";
+        if($validated['source'] == 'source'){
+            $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('source_status','outgoing')->first();
+            if($validated['stage'] == 'store'){
+                $storeTransferOrder->source_status = $validated['status'];
+                $storeTransferOrder->source_store_approval_by = auth()->user()->id;
+                $storeTransferOrder->source_store_approval_date = now();
+            }
+            if($validated['stage'] == 'branch'){
+                $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('source_status','pending')->first();
+                $storeTransferOrder->source_status = $validated['status'];
+                $storeTransferOrder->source_branch_approval_by = auth()->user()->id;
+                $storeTransferOrder->source_branch_approval_date = now();
+            }
+            $storeTransferOrder->save();
+        }elseif($validated['source'] == 'destination'){
 
-        //     DB::update($sql, [$validated['id']]);
-        // }
-
-        return new ReceiveOrderResource($receiveOrder);
+            $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('destination_status','incoming')->first();
+            if($validated['stage'] == 'store'){ 
+                $storeTransferOrder->destination_status = $validated['status'];
+                $storeTransferOrder->destination_store_approval_by = auth()->user()->id;
+                $storeTransferOrder->destination_store_approval_date = now();
+                if( $storeTransferOrder->destination_branch_id == $storeTransferOrder->source_branch_id && $validated['status']=='pending'){
+                    $storeTransferOrder->destination_status = 'approved';
+                    Log::info('Store Transfer Order Approved');
+                    Log::info($storeTransferOrder);
+                }
+            }
+            if($validated['stage'] == 'branch'){
+                $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('destination_status','pending')->first();
+                $storeTransferOrder->destination_status = $validated['status'];
+                $storeTransferOrder->destination_branch_approval_by = auth()->user()->id;
+                $storeTransferOrder->destination_branch_approval_date = now();
+            }
+            $storeTransferOrder->save();
+        }
+        
+        return new StoreTransferOrderResource($storeTransferOrder);
     }
 
     public function show(Request $request, StoreTransferOrder $storeTransferOrder)
     {
-        return new StoreTransferOrderResource($storeTransferOrder);
+        return new StoreTransferOrderResource($storeTransferOrder->load('items'));
     }
 
     public function update(StoreTransferOrderUpdateRequest $request, StoreTransferOrder $storeTransferOrder)

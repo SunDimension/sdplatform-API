@@ -12,22 +12,22 @@ use Spatie\Permission\Traits\HasRoles;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
-class User extends Authenticatable 
+class User extends Authenticatable
 {
-    use HasFactory, HasApiTokens,HasRoles ;
+    use HasFactory, HasApiTokens, HasRoles;
 
     /**
      * The attributes that are mass assignable.
      *
      * @var array
      */
-    
-     
+
+
     protected $fillable = [
         'name',
         'email',
         'password',
-       
+
     ];
 
     /**
@@ -52,25 +52,30 @@ class User extends Authenticatable
         // 'store_id' => 'integer'
     ];
 
-     public function roles(): BelongsToMany
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user');
     }
 
-    // public function status(): BelongsTo
+    // public function store()
     // {
-    //     return $this->belongsTo(Status::class);
+    //     return $this->belongsTo(Store::class);
     // }
+
+    public function status(): BelongsTo
+    {
+        return $this->belongsTo(Status::class);
+    }
 
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
-    // public function warehouse(): BelongsTo
-    // {
-    //     return $this->belongsTo(Warehouse::class);
-    // }
+    public function warehouse(): BelongsTo
+    {
+        return $this->belongsTo(Warehouse::class);
+    }
 
     public function store(): BelongsTo
     {
@@ -86,7 +91,5 @@ class User extends Authenticatable
         }
         return false;
     }
-//
-    }
-  
-
+    //
+}

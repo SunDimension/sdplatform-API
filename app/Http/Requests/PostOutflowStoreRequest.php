@@ -19,20 +19,18 @@ class PostOutflowStoreRequest extends FormRequest
      *
      * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
      */
-     public function rules(): array
-    
+    public function rules(): array
     {
         return [
-            'org_bank'    => 'required|exists:banks,id', // Ensure it exists
-            
-            'customer_id'    => 'required|exists:customers,id',      // Ensure it exists
-            'amount'            => 'nullable|numeric',         // Ensure it exists
-            'account_name'         => 'nullable|string',      // Ensure it exists
-            'account_number'        => 'nullable|numeric',                      // Must be a valid date
-            'bene_bank'      => 'required|exists:banks,id',   // Ensure it exists
-            'narration'   => 'nullable|string', 
-            'outflow_date'   => 'required|date',     
-            'outflow_mode'   => 'required|exists:banks,id',                // Must be a positive integer
+            'org_bank' => 'nullable|exists:banks,id', // Changed from required to nullable
+            'customer_id' => 'required|exists:customers,id',
+            'amount' => 'nullable|numeric',
+            'account_name' => 'nullable|string',
+            'account_number' => 'nullable|numeric', // Changed from required to nullable
+            'bene_bank' => 'nullable|exists:banks,id', // Changed from required to nullable
+            'narration' => 'nullable|string',
+            'outflow_date' => 'required|date',
+            'outflow_mode' => 'required|exists:banks,id',
         ];
     }
 }

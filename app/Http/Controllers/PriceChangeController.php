@@ -8,6 +8,8 @@ use App\Http\Resources\PriceChangeCollection;
 use App\Http\Resources\PriceChangeResource;
 use App\Models\PriceChange;
 use Illuminate\Http\Request;
+use App\Models\ProductAudit;
+use App\Models\StoreItem;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -74,7 +76,7 @@ class PriceChangeController extends Controller
                         seq.n < JSON_LENGTH(ri.details)
                     WHERE 
                         ri.id = ?;
-                ", [$validated['id'],$validated['id']]);
+                ", [$validated['id'], $validated['id']]);
 
                 Log::debug($data);
 
@@ -85,7 +87,7 @@ class PriceChangeController extends Controller
                         'new_selling_price' => $row->new_selling_price,
                     ]);
                 }
-        
+
                 // Step 3: Update the store_item table using the temporary table
                 DB::statement("
                     UPDATE store_items si
@@ -102,6 +104,26 @@ class PriceChangeController extends Controller
             } catch (\Exception $e) {
                 DB::rollBack();
                 return response()->json(['error' => $e->getMessage()], 500);
+            }
+        }
+
+        if ($priceChanges->status == 'Approved') {
+            foreach (json_decode($priceChanges->details) as $item) {
+                $storeItem = StoreItem::where('create_item_id', $item->product_id)
+                    ->where('store_id', $item->store_id)
+                    ->first();
+
+                ProductAudit::create([
+                    'action_type' => 'price_adjustment',
+                    'product_id' => $item->product_id,
+                    'user_id' => auth()->id(),
+                    'previous_price' => $storeItem->selling_price,
+                    'new_price' => $item->new_selling_price,
+                    'price_change' => $item->new_selling_price - $storeItem->selling_price,
+                    'reference_type' => 'PriceChange',
+                    'reference_id' => $priceChanges->id,
+                    'notes' => 'Price adjustment'
+                ]);
             }
         }
 

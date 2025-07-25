@@ -9,6 +9,7 @@ use App\Http\Resources\ReceiveOrderCollection;
 use App\Http\Resources\ReceiveOrderResource;
 use App\Models\Measurement;
 use App\Models\ReceiveItem;
+use App\Models\ProductAudit;
 use App\Models\ReceiveOrder;
 use App\Models\StoreItem;
 use Illuminate\Http\Request;
@@ -20,13 +21,14 @@ class ReceiveOrderController extends Controller
 {
     public function index(Request $request)
     {
-        $receiveOrders = ReceiveOrder::all();
+        $receiveOrders = ReceiveOrder::where('status', 'Approved')
+            ->get();
         return new ReceiveOrderCollection($receiveOrders);
     }
 
     public function pending(Request $request)
     {
-        $receiveOrders = ReceiveOrder::where('status','Pending')->where('store_id',auth()->user()->store_id)->get();
+        $receiveOrders = ReceiveOrder::where('status', 'Pending')->where('store_id', auth()->user()->store_id)->get();
         // $receiveOrders = ReceiveOrder::where('status','Pending')->get();
         return new ReceiveOrderCollection($receiveOrders);
     }
@@ -35,11 +37,11 @@ class ReceiveOrderController extends Controller
     {
         $validated = $request->validated();
         //Log::debug($validated);
-            
+
         $receiveOrder = ReceiveOrder::create($validated);
         $itemSoldIds = [];
         foreach ($validated['items'] as $item) {
-        //Log::debug($item);
+            //Log::debug($item);
 
             $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
             $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
@@ -53,41 +55,61 @@ class ReceiveOrderController extends Controller
                 'unit_measurement' => $item['unit_measurement'],
                 'created_by' => auth()->user()->id
             ]);
-            
         }
         return new ReceiveOrderResource($receiveOrder);
     }
 
-    public function approve(Request $request)
-    {
-        $validated = $request->validate([
-            'comment' => ['nullable'],
-            'status' => ['required', 'string'],
-            'id'=>['required', 'string']
-        ]);
-        $receiveOrder = ReceiveOrder::findOrFail($validated['id']);
-        $receiveOrder->approval_comment = $validated['comment'];
-        $receiveOrder->status = $validated['status'];
-        $receiveOrder->approved_by = auth()->user()->id;
-        $receiveOrder->approval_date = now();
-        $receiveOrder->save();
+public function approve(Request $request)
+{
+    $validated = $request->validate([
+        'comment' => ['nullable'],
+        'status' => ['required', 'string'],
+        'id' => ['required', 'string']
+    ]);
+    
+    $receiveOrder = ReceiveOrder::findOrFail($validated['id']);
+    $receiveOrder->approval_comment = $validated['comment'];
+    $receiveOrder->status = $validated['status'];
+    $receiveOrder->approved_by = auth()->user()->id;
+    $receiveOrder->approval_date = now();
+    $receiveOrder->save();
 
-        // if($receiveOrder->status == 'Approved')
-        // {
-        //     $sql = "UPDATE store_items si INNER JOIN (
-        //             SELECT sum(quantity) quantity, product_id, avg(quantity*unit_price)/sum(quantity) unit_price, ro.store_id  
-        //             from receive_items ri INNER JOIN receive_orders ro ON ro.id = ri.receive_order_id
-        //             WHERE receive_order_id = ?
-        //             group BY product_id) A ON si.store_id = A.store_id  and si.create_item_id = A.product_id
-        //             SET si.quantity = si.quantity+A.quantity,
-        //             si.cost_price = A.unit_price ";
-
-        //     DB::update($sql, [$validated['id']]);
-        // }
-
-        return new ReceiveOrderResource($receiveOrder);
+    if ($receiveOrder->status == 'Approved') {
+        foreach ($receiveOrder->receiveItems as $item) {
+            // Get the current store item record
+            $storeItem = StoreItem::where('create_item_id', $item->product_id)
+                ->where('store_id', $receiveOrder->store_id)
+                ->first();
+            
+            // If store item doesn't exist, create it (optional)
+            if (!$storeItem) {
+                $storeItem = StoreItem::create([
+                    'create_item_id' => $item->product_id,
+                    'store_id' => $receiveOrder->store_id,
+                    'branch_id' => $receiveOrder->branch_id,
+                    'quantity' => 0,
+                    'created_by' => auth()->id()
+                ]);
+            }
+            
+            // Log the audit trail
+            ProductAudit::create([
+                'action_type' => 'replenished',
+                'product_id' => $item->product_id,
+                'store_id' => $receiveOrder->store_id,
+                'user_id' => auth()->id(),
+                'quantity_change' => $item->quantity,
+                'previous_quantity' => $storeItem->quantity,
+                'new_quantity' => $storeItem->quantity + $item->quantity,
+                'reference_type' => 'ReceiveOrder',
+                'reference_id' => $receiveOrder->id,
+                'notes' => 'Stock replenishment'
+            ]);
+        }
     }
 
+    return new ReceiveOrderResource($receiveOrder);
+}
     public function show(Request $request, ReceiveOrder $receiveOrder)
     {
         return new ReceiveOrderResource($receiveOrder->load('receiveItems'));

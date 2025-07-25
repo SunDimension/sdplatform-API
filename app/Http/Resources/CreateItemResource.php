@@ -24,6 +24,7 @@ class CreateItemResource extends JsonResource
             // 'branch_id' => $this->branch_id,
             //  'branch_name' => $this->branch ? $this->branch->name : null,
             'vendor_id' => $this->vendor_id,
+            'storeItems' => StoreItemResource::collection($this->whenLoaded('storeItems'))
          
         ];
     }
