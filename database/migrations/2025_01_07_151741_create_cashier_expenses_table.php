@@ -14,10 +14,10 @@ return new class extends Migration
         Schema::create('cashier_expenses', function (Blueprint $table) {
             $table->id();
             $table->string('expense_name');
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->float('amount');
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('store_id')->constrained('stores');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
             $table->date('date');
             $table->timestamps();
         });

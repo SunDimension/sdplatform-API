@@ -2,8 +2,8 @@
 
 namespace App\Services;
 
-use App\Models\JournalEntry;
-use App\Models\JournalEntryDetail;
+use App\Models\TransactionJournalEntry;
+use App\Models\TransactionJournalEntryDetail;
 use App\Models\Transaction;
 use App\Models\Account;
 use App\Models\Tax;
@@ -21,7 +21,7 @@ class AccountingEntryService
     {
         return DB::transaction(function () use ($data) {
             // Create journal entry
-            $journalEntry = JournalEntry::create([
+            $journalEntry = TransactionJournalEntry::create([
                 'description' => $data['description'],
                 'payment_date' => $data['transaction_date'],
                 'store_id' => $data['store_id'],
@@ -31,8 +31,8 @@ class AccountingEntryService
 
             // Create journal entry details
             foreach ($data['entries'] as $entry) {
-                JournalEntryDetail::create([
-                    'journal_entry_id' => $journalEntry->id,
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
                     'journal_type_id' => $entry['journal_type_id'],
                     'amount' => $entry['amount'],
                     'description' => $entry['description'],
@@ -339,7 +339,7 @@ class AccountingEntryService
     {
         return DB::transaction(function () use ($salesOrder, $itemsSold) {
             // Create journal entry for the sales order
-            $journalEntry = JournalEntry::create([
+            $journalEntry = TransactionJournalEntry::create([
                 'description' => "Sales Order #{$salesOrder->sales_order_number}",
                 'payment_date' => $salesOrder->sales_date ?? now(),
                 'store_id' => $salesOrder->store_id,
@@ -365,8 +365,8 @@ class AccountingEntryService
                     $totalCost += $costAmount;
 
                     // Debit Cost of Goods Sold
-                    JournalEntryDetail::create([
-                        'journal_entry_id' => $journalEntry->id,
+                    TransactionJournalEntryDetail::create([
+                        'transaction_journal_entry_id' => $journalEntry->id,
                         'journal_type_id' => 1, // Assuming 1 is for debit
                         'amount' => $costAmount,
                         'description' => "COGS for {$itemSold->product->name}",
@@ -376,8 +376,8 @@ class AccountingEntryService
                     ]);
 
                     // Credit Inventory
-                    JournalEntryDetail::create([
-                        'journal_entry_id' => $journalEntry->id,
+                    TransactionJournalEntryDetail::create([
+                        'transaction_journal_entry_id' => $journalEntry->id,
                         'journal_type_id' => 2, // Assuming 2 is for credit
                         'amount' => $costAmount,
                         'description' => "Inventory reduction for {$itemSold->product->name}",
@@ -389,8 +389,8 @@ class AccountingEntryService
 
                 // Debit Accounts Receivable (if credit sale) or Cash/Bank (if cash sale)
                 if ($salesOrder->payment_type === 'Credit') {
-                    JournalEntryDetail::create([
-                        'journal_entry_id' => $journalEntry->id,
+                    TransactionJournalEntryDetail::create([
+                        'transaction_journal_entry_id' => $journalEntry->id,
                         'journal_type_id' => 1, // Debit
                         'amount' => $amount,
                         'description' => "Accounts Receivable for {$itemSold->product->name}",
@@ -399,8 +399,8 @@ class AccountingEntryService
                         'created_by' => auth()->id()
                     ]);
                 } else {
-                    JournalEntryDetail::create([
-                        'journal_entry_id' => $journalEntry->id,
+                    TransactionJournalEntryDetail::create([
+                        'transaction_journal_entry_id' => $journalEntry->id,
                         'journal_type_id' => 1, // Debit
                         'amount' => $amount,
                         'description' => "Cash/Bank for {$itemSold->product->name}",
@@ -411,8 +411,8 @@ class AccountingEntryService
                 }
 
                 // Credit Sales Revenue
-                JournalEntryDetail::create([
-                    'journal_entry_id' => $journalEntry->id,
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
                     'journal_type_id' => 2, // Credit
                     'amount' => $amount,
                     'description' => "Sales Revenue for {$itemSold->product->name}",
@@ -453,7 +453,7 @@ class AccountingEntryService
     {
         return DB::transaction(function () use ($salesReceipt) {
             // Create journal entry for the sales receipt
-            $journalEntry = JournalEntry::create([
+            $journalEntry = TransactionJournalEntry::create([
                 'description' => "Sales Receipt #{$salesReceipt->sales_receipt_number}",
                 'payment_date' => $salesReceipt->payment_date ?? now(),
                 'store_id' => $salesReceipt->store_id,
@@ -462,8 +462,8 @@ class AccountingEntryService
             ]);
 
             // Debit Cash/Bank
-            JournalEntryDetail::create([
-                'journal_entry_id' => $journalEntry->id,
+            TransactionJournalEntryDetail::create([
+                'transaction_journal_entry_id' => $journalEntry->id,
                 'journal_type_id' => 1, // Debit
                 'amount' => $salesReceipt->amount_paid,
                 'description' => "Payment received for Sales Receipt #{$salesReceipt->sales_receipt_number}",
@@ -473,8 +473,8 @@ class AccountingEntryService
             ]);
 
             // Credit Accounts Receivable
-            JournalEntryDetail::create([
-                'journal_entry_id' => $journalEntry->id,
+            TransactionJournalEntryDetail::create([
+                'transaction_journal_entry_id' => $journalEntry->id,
                 'journal_type_id' => 2, // Credit
                 'amount' => $salesReceipt->amount_paid,
                 'description' => "Accounts Receivable reduction for Sales Receipt #{$salesReceipt->sales_receipt_number}",

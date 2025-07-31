@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('bank_remittances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bank_id')->constrained('banks');
-            $table->foreignId('branch_id')->constrained('branches');
+            $table->unsignedBigInteger('bank_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->float('amount');
             $table->string('account_number');
-            $table->foreignId('store_id')->constrained('stores');
+            $table->unsignedBigInteger('store_id')->nullable();
             $table->date('date');
-            $table->foreignId('user_id')->constrained('users');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
         });
     }

@@ -12,6 +12,14 @@ class AccountGroupSeeder extends Seeder
      */
     public function run(): void
     {
-        AccountGroup::factory()->count(5)->create();
+        AccountGroup::create([
+            'name' => 'Balance Sheet',
+            // add other necessary fields here
+        ]);
+        AccountGroup::create([
+            'name' => 'Profit and Loss',
+            // add other necessary fields here
+        ]);
+    
     }
 }

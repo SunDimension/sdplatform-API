@@ -13,14 +13,13 @@ return new class extends Migration
     {
         Schema::create('return_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('sales_receipt_id')->nullable()->constrained('sales_receipts')->onDelete('cascade');
-            $table->foreignId('branch_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('store_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('customer_id')->nullable()->constrained('customers')->onDelete('cascade');
-            // $table->foreignId('return_date')->constrained('sales_receipt')->onDelete('cascade');
+            $table->unsignedBigInteger('sales_receipt_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
+            $table->unsignedBigInteger('customer_id')->nullable();
             $table->text('notes')->nullable();
-            $table->foreignId('created_by')->constrained('users')->onDelete('cascade');
-            $table->foreignId('approved_by')->nullable()->constrained('users')->onDelete('cascade');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('approved_by')->nullable();
             $table->timestamp('approved_at')->nullable();
             $table->enum('return_status', ['Approved', 'Pending', 'Declined']);
             $table->text('approval_comment')->nullable();

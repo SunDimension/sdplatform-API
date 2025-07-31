@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_order', function (Blueprint $table) {
+        Schema::create('sales_orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
-            $table->foreignId('store_id')->constrained()->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
+            $table->unsignedBigInteger('customer_id')->nullable();
             $table->string('sales_order_number')->unique();
-            $table->foreignId('credit_limit_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('credit_limit_id')->nullable();
             $table->string('total_amount');
             $table->string('credit_amount');
             $table->string('credit_balance');
@@ -30,6 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales_order');
+        Schema::dropIfExists('sales_orders');
     }
 };

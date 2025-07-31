@@ -15,19 +15,19 @@ return new class extends Migration
 
         Schema::create('sales', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id')->constrained('customers');
-            $table->foreignId('product_id')->constrained('create_items');
-            $table->foreignId('branch_id')->constrained();
-            $table->foreignId('warehouse_id')->constrained();
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('warehouse_id')->nullable();
             $table->float('quantity');
             $table->float('price');
-            $table->foreignId('discount_id')->constrained();
+            $table->unsignedBigInteger('discount_id')->nullable();
             $table->float('discount');
             $table->string('sales_order_number');
             $table->string('total_amount');
             $table->float('amount_paid');
             $table->float('balance_amount');
-            $table->foreignId('payment_mode')->constrained('payment_modes');
+            $table->unsignedBigInteger('payment_mode')->nullable();
             $table->timestamps();
         });
 

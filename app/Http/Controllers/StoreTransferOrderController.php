@@ -2,19 +2,34 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreTransferOrderApproveRequest;
 use App\Http\Requests\StoreTransferOrderStoreRequest;
 use App\Http\Requests\StoreTransferOrderUpdateRequest;
 use App\Http\Resources\StoreTransferOrderCollection;
 use App\Http\Resources\StoreTransferOrderResource;
 use App\Models\StoreTransferItem;
 use App\Models\StoreTransferOrder;
+use App\Services\AccountingEntryService;
+use App\Services\StoreTransferApprovalService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 class StoreTransferOrderController extends Controller
 {
+    protected $accountingService;
+    protected $approvalService;
+
+    public function __construct(
+        AccountingEntryService $accountingService,
+        StoreTransferApprovalService $approvalService
+    ) {
+        $this->accountingService = $accountingService;
+        $this->approvalService = $approvalService;
+    }
+
     public function index(Request $request)
     {
         $storeTransferOrders = StoreTransferOrder::all();
@@ -69,53 +84,49 @@ class StoreTransferOrderController extends Controller
         return new StoreTransferOrderResource($storeTransferOrder);
     }
 
-    public function approve(Request $request)
+    public function approve(StoreTransferOrderApproveRequest $request)
     {
-        $validated = $request->validate([
-            'comment' => ['nullable'],
-            'status' => ['required', 'string'],
-            'id'=>['required', 'string'],
-            'source'=>['required', 'string'],
-            'stage'=>['required', 'string']
-        ]);
-
-        if($validated['source'] == 'source'){
-            $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('source_status','outgoing')->first();
-            if($validated['stage'] == 'store'){
-                $storeTransferOrder->source_status = $validated['status'];
-                $storeTransferOrder->source_store_approval_by = auth()->user()->id;
-                $storeTransferOrder->source_store_approval_date = now();
-            }
-            if($validated['stage'] == 'branch'){
-                $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('source_status','pending')->first();
-                $storeTransferOrder->source_status = $validated['status'];
-                $storeTransferOrder->source_branch_approval_by = auth()->user()->id;
-                $storeTransferOrder->source_branch_approval_date = now();
-            }
-            $storeTransferOrder->save();
-        }elseif($validated['source'] == 'destination'){
-
-            $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('destination_status','incoming')->first();
-            if($validated['stage'] == 'store'){ 
-                $storeTransferOrder->destination_status = $validated['status'];
-                $storeTransferOrder->destination_store_approval_by = auth()->user()->id;
-                $storeTransferOrder->destination_store_approval_date = now();
-                if( $storeTransferOrder->destination_branch_id == $storeTransferOrder->source_branch_id && $validated['status']=='pending'){
-                    $storeTransferOrder->destination_status = 'approved';
-                    Log::info('Store Transfer Order Approved');
-                    Log::info($storeTransferOrder);
-                }
-            }
-            if($validated['stage'] == 'branch'){
-                $storeTransferOrder = StoreTransferOrder::where('id',$validated['id'])->where('destination_status','pending')->first();
-                $storeTransferOrder->destination_status = $validated['status'];
-                $storeTransferOrder->destination_branch_approval_by = auth()->user()->id;
-                $storeTransferOrder->destination_branch_approval_date = now();
-            }
-            $storeTransferOrder->save();
-        }
+        $validated = $request->validated();
         
-        return new StoreTransferOrderResource($storeTransferOrder);
+        try {
+            DB::beginTransaction();
+            
+            $storeTransferOrder = $this->approvalService->findTransferOrder($validated['id'], $validated['source']);
+            
+            if (!$storeTransferOrder) {
+                throw ValidationException::withMessages([
+                    'id' => 'Transfer order not found or not in correct status for approval.'
+                ]);
+            }
+
+            $this->approvalService->processApproval($storeTransferOrder, $validated);
+            
+            // Create accounting entries if transfer is being approved
+            if ($this->approvalService->shouldCreateAccountingEntries($storeTransferOrder, $validated)) {
+                $this->approvalService->createAccountingEntries($storeTransferOrder);
+            }
+            
+            DB::commit();
+            
+            Log::info('Store Transfer Order approved successfully', [
+                'order_id' => $storeTransferOrder->id,
+                'order_number' => $storeTransferOrder->order_number,
+                'approved_by' => auth()->id(),
+                'status' => $validated['status']
+            ]);
+            
+            return new StoreTransferOrderResource($storeTransferOrder);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Store Transfer Order approval failed', [
+                'order_id' => $validated['id'] ?? null,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            
+            throw $e;
+        }
     }
 
     public function show(Request $request, StoreTransferOrder $storeTransferOrder)
@@ -136,4 +147,8 @@ class StoreTransferOrderController extends Controller
 
         return response()->noContent();
     }
+
+
+
+
 }

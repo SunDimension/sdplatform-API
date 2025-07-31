@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('releases', function (Blueprint $table) {
             $table->id();
             // $table->foreignId('release_id')->constrained('release')->onDelete('cascade');
-            $table->foreignId('branch_id')->constrained()->onDelete('cascade');
-            $table->foreignId('store_id')->constrained()->onDelete('cascade');
-            $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sales_receipt_id')->constrained()->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
+            $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('sales_receipt_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->date('release_date');
             $table->timestamps();
         });

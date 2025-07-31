@@ -17,11 +17,11 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('order_number');
             $table->timestamp('transfer_date');
-            $table->foreignId('source_branch_id')->constrained('branches','id');
-            $table->foreignId('source_store_id')->constrained('stores','id');
-            $table->foreignId('destination_branch_id')->constrained('branches','id');
-            $table->foreignId('destination_store_id')->constrained('stores','id');
-            $table->foreignId('approval_stage_id')->nullable()->constrained('approval_stages');
+            $table->unsignedBigInteger('source_branch_id')->nullable();
+            $table->unsignedBigInteger('source_store_id')->nullable();
+            $table->unsignedBigInteger('destination_branch_id')->nullable();
+            $table->unsignedBigInteger('destination_store_id')->nullable();
+            // $table->unsignedBigInteger('approval_stage_id')->nullable();
             $table->enum('source_status', ['outgoing','pending', 'approved','declined', 'cancelled'])->default('outgoing');
             $table->timestamp('source_store_date_approved')->nullable();
             $table->timestamp('source_branch_date_approved')->nullable();
@@ -29,13 +29,13 @@ return new class extends Migration
             $table->timestamp('destination_store_date_approved')->nullable();
             $table->timestamp('destination_branch_date_approved')->nullable();
             
-            $table->foreignId('source_store_approval_by')->nullable()->constrained('users');
-            $table->foreignId('source_branch_approval_by')->nullable()->constrained('users');
-            $table->foreignId('destination_store_approval_by')->nullable()->constrained('users');
-            $table->foreignId('destination_branch_approval_by')->nullable()->constrained('users');
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('modified_by')->nullable()->constrained('users');
-            $table->foreignId('deleted_by')->nullable()->constrained('users');
+            $table->unsignedBigInteger('source_store_approval_by')->nullable();
+            $table->unsignedBigInteger('source_branch_approval_by')->nullable();
+            $table->unsignedBigInteger('destination_store_approval_by')->nullable();
+            $table->unsignedBigInteger('destination_branch_approval_by')->nullable();
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('modified_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

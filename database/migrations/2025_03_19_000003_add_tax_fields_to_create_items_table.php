@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('create_items', function (Blueprint $table) {
-            $table->foreignId('tax_id')->nullable()->constrained('taxes');
+            $table->unsignedBigInteger('tax_id')->nullable();
             $table->boolean('is_tax_inclusive')->default(false);
             $table->decimal('tax_amount', 10, 2)->default(0);
         });
@@ -24,7 +24,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('create_items', function (Blueprint $table) {
-            $table->dropForeign(['tax_id']);
             $table->dropColumn(['tax_id', 'is_tax_inclusive', 'tax_amount']);
         });
     }

@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('sales_receipt', function (Blueprint $table) {
+        Schema::create('sales_receipts', function (Blueprint $table) {
             $table->id();
-             $table->foreignId('sales_invoice_id')->constrained()->onDelete('cascade');
-             $table->foreignId('branch_id')->constrained()->onDelete('cascade');
-            $table->foreignId('store_id')->constrained()->onDelete('cascade');
-             $table->foreignId('customer_id')->constrained()->onDelete('cascade');
-            $table->foreignId('payment_mode_id')->constrained()->onDelete('cascade');
-            $table->foreignId('sales_order_id')->constrained()->onDelete('cascade');
+             $table->unsignedBigInteger('sales_invoice_id')->nullable();
+             $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
+             $table->unsignedBigInteger('customer_id')->nullable();
+            $table->unsignedBigInteger('payment_mode_id')->nullable();
+            $table->unsignedBigInteger('sales_order_id')->nullable();
             $table->string('sales_receipt_number')->unique();
             $table->date('receipt_date');
             $table->string('amount_paid');
@@ -32,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('sales_receipt');
+        Schema::dropIfExists('sales_receipts');
     }
 };

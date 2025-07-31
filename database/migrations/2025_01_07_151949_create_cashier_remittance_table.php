@@ -13,14 +13,14 @@ return new class extends Migration
     {
         Schema::create('cashier_remittance', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('branch_id')->constrained('branches');
-            $table->foreignId('cash_discrepancy_id')->constrained('cash_discrepancies');
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('cash_discrepancy_id')->nullable();
             $table->float('amount');
             $table->float('discrepancy_amount');
              $table->timestamp('approval_date');
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('approved_by')->constrained('users');
-            $table->foreignId('store_id')->constrained('stores');
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('approved_by')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
             $table->date('date');
             $table->timestamps();
         });

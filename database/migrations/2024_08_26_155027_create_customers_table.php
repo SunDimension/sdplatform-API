@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('customers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('title_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('title_id')->nullable();
             $table->string('surname')->nullable();
             $table->string('firstname')->nullable();
             $table->string('middlename')->nullable();
@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('email')->nullable();
             $table->string('phone_number')->nullable();
             $table->string('address')->nullable();
-            $table->foreignId('customer_type_id')->constrained()->onDelete('cascade');
-            $table->foreignId('credit_limit_id')->constrained()->onDelete('cascade');
+            $table->unsignedBigInteger('customer_type_id')->nullable();
+            $table->unsignedBigInteger('credit_limit_id')->nullable();
             $table->string('amount_paid');
             $table->string('total_amount');
             $table->timestamps();

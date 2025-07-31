@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('stores', function (Blueprint $table) {
             $table->id();
-             $table->string('name');
-            $table->foreignId('branch_id')->constrained();
-            $table->foreignId('store_type_id')->constrained();
+            $table->string('name');
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_type_id')->nullable();
             $table->timestamps();
         });
     }

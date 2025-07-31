@@ -15,14 +15,14 @@ class RoleSeeder extends Seeder
     {
           DB::table('roles')->insert([
 
-            ['name'=>'Admin'],
-            ['name'=>'Sales Rep',],
-            ['name'=>'Sales Supervisor'],
-            ['name'=>'Cashier'],
-            ['name'=>'Store Keeper'],
-            ['name'=>'Store Manager'],
-            ['name'=>'Branch Manager'],
-            ['name'=>'Regional Manager'],
+            ['id'=>1,'name'=>'Admin'],
+            ['id'=>2,'name'=>'Sales Rep'],
+            ['id'=>3,'name'=>'Sales Supervisor'],
+            ['id'=>4,'name'=>'Cashier'],
+            ['id'=>5,'name'=>'Store Keeper'],
+            ['id'=>6,'name'=>'Store Manager'],
+            ['id'=>7,'name'=>'Branch Manager'],
+            ['id'=>8,'name'=>'Regional Manager'],
        ]);
     }
 }

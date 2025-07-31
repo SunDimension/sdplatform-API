@@ -14,7 +14,7 @@ return new class extends Migration
     {
         // Note: Laravel does not directly support modifying ENUM columns.
         // You can use raw SQL queries to accomplish this.
-        DB::statement("ALTER TABLE sales_receipts MODIFY `payment_type` ENUM('Cash','Bank','Deposit','POS','Multi-Payment') NOT NULL;");
+        // DB::statement("ALTER TABLE sales_receipt MODIFY `payment_type` ENUM('Cash','Bank','Deposit','POS','Multi-Payment') NOT NULL;");
         Schema::table('sales_receipts', function (Blueprint $table) {
             $table->json('payment_detail');
         });

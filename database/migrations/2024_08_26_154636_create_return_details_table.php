@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('return_details', function (Blueprint $table) {
           $table->id();
-            $table->foreignId('return_id')->constrained('return_items','id')->onDelete('cascade');
-            $table->foreignId('product_id')->constrained('create_items','id')->onDelete('cascade');
+            $table->unsignedBigInteger('return_id')->nullable();
+            $table->unsignedBigInteger('product_id')->nullable();
             $table->integer('return_quantity');
             $table->integer('return_quantity_pieces');
-            $table->foreignId('item_sold_id')->constrained('item_solds','id')->onDelete('cascade');
+            $table->unsignedBigInteger('item_sold_id')->nullable();
             $table->float('unit_price');
-            $table->foreignId('store_id')->constrained('stores','id')->onDelete('cascade');
+            $table->unsignedBigInteger('store_id')->nullable();
             $table->bigInteger('unit_measurement');
             // $table->text('notes')->nullable();
             $table->timestamps();

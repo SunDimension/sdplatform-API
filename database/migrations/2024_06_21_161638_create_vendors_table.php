@@ -23,12 +23,12 @@ return new class extends Migration
             $table->string('contact_firstname');
             $table->string('contact_middlename');
             $table->string('contact_fullname');
-            $table->foreignId('vendor_type_id')->constrained();
+            $table->foreignId('vendor_type_id')->constrained('vendor_types');
             $table->string('phone_number');
             $table->string('email');
             $table->string('image_url');
             $table->string('tin');
-            $table->foreignId('bank_id');
+            $table->foreignId('bank_id')->constrained('banks');
             $table->string('account_number');
             $table->timestamps();
         });

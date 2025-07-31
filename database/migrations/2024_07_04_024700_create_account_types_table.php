@@ -15,12 +15,12 @@ return new class extends Migration
 
         Schema::create('account_types', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->foreignUuid('account_group_id')->constrained();
+            $table->uuid('account_group_id')->nullable();
             $table->string('name');
             $table->string('code');
-            $table->foreignId('created_by')->nullable()->constrained('users');
-            $table->foreignId('modified_by')->nullable()->constrained('users');
-            $table->foreignId('deleted_by')->nullable()->constrained('users');
+            $table->unsignedBigInteger('created_by')->nullable();
+            $table->unsignedBigInteger('modified_by')->nullable();
+            $table->unsignedBigInteger('deleted_by')->nullable();
             $table->timestamps();
         });
 

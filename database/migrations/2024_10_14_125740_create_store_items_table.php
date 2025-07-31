@@ -13,18 +13,19 @@ return new class extends Migration
     {
        Schema::create('store_items', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('item_category_id')->constrained();
-            $table->foreignId('create_item_id')->constrained('create_items');
-            $table->foreignId('unit_id')->constrained('units');
+            $table->unsignedBigInteger('item_category_id')->nullable();
+            $table->unsignedBigInteger('create_item_id')->nullable();
+            $table->unsignedBigInteger('unit_id')->nullable();
             $table->float('quantity');
             $table->float('quantity_holding')->default(0);
             $table->float('cost_price');
             $table->float('selling_price');
             $table->string('reorder_level');
-            $table->foreignId('discount')->constrained('discounts');
-            $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('branch_id')->constrained('branches');
-            $table->foreignId('store_id')->constrained('stores');
+            $table->unsignedBigInteger('discount')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('branch_id')->nullable();
+            $table->unsignedBigInteger('store_id')->nullable();
+            // $table->float('open_stock')->default(0);
             $table->timestamps();
         });
     }
