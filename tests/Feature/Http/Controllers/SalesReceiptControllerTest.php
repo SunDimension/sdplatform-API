@@ -52,7 +52,6 @@ final class SalesReceiptControllerTest extends TestCase
         $customer = Customer::factory()->create();
         $branch = Branch::factory()->create();
         $warehouse = Warehouse::factory()->create();
-        $product = Product::factory()->create();
         $tax = Tax::factory()->create();
         $payment_mode = PaymentMode::factory()->create();
         $discount = Discount::factory()->create();
@@ -66,7 +65,6 @@ final class SalesReceiptControllerTest extends TestCase
             'customer_id' => $customer->id,
             'branch_id' => $branch->id,
             'warehouse_id' => $warehouse->id,
-            'product_id' => $product->id,
             'tax_id' => $tax->id,
             'payment_mode_id' => $payment_mode->id,
             'discount_id' => $discount->id,
@@ -81,7 +79,6 @@ final class SalesReceiptControllerTest extends TestCase
             ->where('customer_id', $customer->id)
             ->where('branch_id', $branch->id)
             ->where('warehouse_id', $warehouse->id)
-            ->where('product_id', $product->id)
             ->where('tax_id', $tax->id)
             ->where('payment_mode_id', $payment_mode->id)
             ->where('discount_id', $discount->id)
@@ -183,5 +180,65 @@ final class SalesReceiptControllerTest extends TestCase
         $response->assertNoContent();
 
         $this->assertModelMissing($salesReceipt);
+    }
+
+    #[Test]
+    public function generate_accounting_entries_creates_journal_entries(): void
+    {
+        $salesReceipt = SalesReceipt::factory()->create([
+            'sales_receipt_number' => 'HGV-SR-1234567',
+            'amount_paid' => 1000.00,
+            'payment_type' => 'Cash'
+        ]);
+
+        $response = $this->post("/api/sales-receipts/{$salesReceipt->id}/generate-accounting-entries");
+
+        $response->assertOk();
+        $response->assertJson([
+            'message' => 'Accounting entries generated successfully'
+        ]);
+
+        // Verify that journal entries were created
+        $this->assertDatabaseHas('transaction_journal_entries', [
+            'description' => "Sales Receipt #{$salesReceipt->sales_receipt_number}"
+        ]);
+    }
+
+    #[Test]
+    public function get_accounting_entries_returns_journal_entries(): void
+    {
+        $salesReceipt = SalesReceipt::factory()->create([
+            'sales_receipt_number' => 'HGV-SR-1234567'
+        ]);
+
+        $response = $this->get("/api/sales-receipts/{$salesReceipt->id}/accounting-entries");
+
+        $response->assertOk();
+        $response->assertJson([
+            'message' => 'Accounting entries retrieved successfully'
+        ]);
+    }
+
+    #[Test]
+    public function generate_bulk_accounting_entries_processes_multiple_receipts(): void
+    {
+        $salesReceipt1 = SalesReceipt::factory()->create([
+            'sales_receipt_number' => 'HGV-SR-1111111',
+            'amount_paid' => 500.00
+        ]);
+        
+        $salesReceipt2 = SalesReceipt::factory()->create([
+            'sales_receipt_number' => 'HGV-SR-2222222',
+            'amount_paid' => 750.00
+        ]);
+
+        $response = $this->post('/api/sales-receipts/generate-bulk-accounting-entries', [
+            'sales_receipt_ids' => [$salesReceipt1->id, $salesReceipt2->id]
+        ]);
+
+        $response->assertOk();
+        $response->assertJson([
+            'message' => 'Bulk accounting entries generation completed'
+        ]);
     }
 }

@@ -160,7 +160,7 @@ class StoreTransferApprovalService
     private function getInventoryAccountNo(): ?string
     {
         // This should return the actual inventory account number from your accounts table
-        $account = Account::where('code', 'INV')->first();
+        $account = Account::where('name', 'Inventory')->first();
         return $account->code ?? null;
     }
 

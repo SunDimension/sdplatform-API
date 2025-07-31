@@ -13,6 +13,8 @@ use App\Models\PostOutflow;
 use App\Models\SalesOrder;
 use App\Models\PostInflow;
 use App\Models\SalesReceipt;
+use App\Models\TransactionJournalEntry;
+use App\Services\AccountingEntryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
@@ -22,6 +24,12 @@ use Carbon\Carbon;
 
 class SalesReceiptController extends Controller
 {
+    protected $accountingEntryService;
+
+    public function __construct(AccountingEntryService $accountingEntryService)
+    {
+        $this->accountingEntryService = $accountingEntryService;
+    }
 
 
 
@@ -369,6 +377,15 @@ class SalesReceiptController extends Controller
                 $customer->save();
             }
 
+            // Generate accounting entries for the sales receipt
+            try {
+                $this->accountingEntryService->generateSalesReceiptEntries($salesreceipt);
+            } catch (\Exception $e) {
+                Log::error("Failed to generate accounting entries for sales receipt: " . $e->getMessage());
+                // Don't throw here, as the sales receipt was created successfully
+                // Just log the error for debugging
+            }
+
             DB::commit();
 
             return response()->json([
@@ -453,5 +470,125 @@ class SalesReceiptController extends Controller
 
         // Return the results as a collection
         return new SalesReceiptCollection($salesReceipts);
+    }
+
+    /**
+     * Generate accounting entries for a specific sales receipt
+     * 
+     * @param int $id Sales receipt ID
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function generateAccountingEntries($id)
+    {
+        try {
+            $salesReceipt = SalesReceipt::findOrFail($id);
+            
+            // Check if accounting entries already exist for this sales receipt
+            $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Sales Receipt #{$salesReceipt->sales_receipt_number}%")->first();
+            
+            if ($existingEntries) {
+                return response()->json([
+                    'message' => 'Accounting entries already exist for this sales receipt',
+                    'data' => $existingEntries
+                ], 400);
+            }
+
+            // Generate accounting entries
+            $journalEntry = $this->accountingEntryService->generateSalesReceiptEntries($salesReceipt);
+
+            return response()->json([
+                'message' => 'Accounting entries generated successfully',
+                'data' => $journalEntry
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to generate accounting entries: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to generate accounting entries',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate accounting entries for multiple sales receipts
+     * 
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function generateBulkAccountingEntries(Request $request)
+    {
+        $request->validate([
+            'sales_receipt_ids' => 'required|array',
+            'sales_receipt_ids.*' => 'integer|exists:sales_receipts,id'
+        ]);
+
+        $salesReceiptIds = $request->input('sales_receipt_ids');
+        $generatedEntries = [];
+        $failedEntries = [];
+
+        foreach ($salesReceiptIds as $receiptId) {
+            try {
+                $salesReceipt = SalesReceipt::findOrFail($receiptId);
+                
+                // Check if accounting entries already exist
+                $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Sales Receipt #{$salesReceipt->sales_receipt_number}%")->first();
+                
+                if ($existingEntries) {
+                    $failedEntries[] = [
+                        'id' => $receiptId,
+                        'reason' => 'Accounting entries already exist'
+                    ];
+                    continue;
+                }
+
+                // Generate accounting entries
+                $journalEntry = $this->accountingEntryService->generateSalesReceiptEntries($salesReceipt);
+                $generatedEntries[] = $journalEntry;
+
+            } catch (\Exception $e) {
+                $failedEntries[] = [
+                    'id' => $receiptId,
+                    'reason' => $e->getMessage()
+                ];
+            }
+        }
+
+        return response()->json([
+            'message' => 'Bulk accounting entries generation completed',
+            'generated_entries' => count($generatedEntries),
+            'failed_entries' => count($failedEntries),
+            'generated_data' => $generatedEntries,
+            'failed_data' => $failedEntries
+        ], 200);
+    }
+
+    /**
+     * Get accounting entries for a sales receipt
+     * 
+     * @param int $id Sales receipt ID
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getAccountingEntries($id)
+    {
+        try {
+            $salesReceipt = SalesReceipt::findOrFail($id);
+            
+            $journalEntries = TransactionJournalEntry::where('description', 'LIKE', "%Sales Receipt #{$salesReceipt->sales_receipt_number}%")
+                ->with('details')
+                ->get();
+
+            return response()->json([
+                'message' => 'Accounting entries retrieved successfully',
+                'data' => $journalEntries
+            ], 200);
+
+        } catch (\Exception $e) {
+            Log::error("Failed to retrieve accounting entries: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to retrieve accounting entries',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

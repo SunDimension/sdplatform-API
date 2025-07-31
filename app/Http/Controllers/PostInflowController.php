@@ -14,9 +14,17 @@ use Illuminate\Support\Facades\Log as FacadesLog;
 use App\Models\SalesReceipt;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Services\AccountingEntryService;
+use App\Models\TransactionJournalEntry;
 
 class PostInflowController extends Controller
 {
+    protected $accountingEntryService;
+
+    public function __construct(AccountingEntryService $accountingEntryService)
+    {
+        $this->accountingEntryService = $accountingEntryService;
+    }
 
     public function index(Request $request): PostInflowCollection
     {
@@ -69,14 +77,31 @@ class PostInflowController extends Controller
     }
     public function store(PostInflowStoreRequest $request): PostInflowResource
     {
-        $data = $request->validated();
+        DB::beginTransaction();
+        
+        try {
+            $data = $request->validated();
 
-        // Set status based on whether customer_id is provided
-        $data['inflow_status'] = isset($data['customer_id']) ? 3 : 6;
+            // Set status based on whether customer_id is provided
+            $data['inflow_status'] = isset($data['customer_id']) ? 3 : 6;
 
-        $postinflow = PostInflow::create($data);
+            $postinflow = PostInflow::create($data);
 
-        return new PostInflowResource($postinflow);
+            // Generate accounting entries for the post inflow
+            try {
+                $this->accountingEntryService->generatePostInflowEntries($postinflow);
+            } catch (\Exception $e) {
+                Log::error("Failed to generate accounting entries for post inflow: " . $e->getMessage());
+                // Don't throw here, as the post inflow was created successfully
+                // Just log the error for debugging
+            }
+
+            DB::commit();
+            return new PostInflowResource($postinflow);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function show(Request $request, PostInflow $postinflow): PostInflowResource
@@ -194,5 +219,114 @@ class PostInflowController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Generate accounting entries for a specific post inflow
+     */
+    public function generateAccountingEntries($id)
+    {
+        $postInflow = PostInflow::findOrFail($id);
+
+        // Check if accounting entries already exist for this post inflow
+        $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Post Inflow #{$postInflow->id}%")->first();
+        
+        if ($existingEntries) {
+            return response()->json([
+                'message' => 'Accounting entries already exist for this post inflow',
+                'post_inflow_id' => $id
+            ], 400);
+        }
+
+        try {
+            $journalEntry = $this->accountingEntryService->generatePostInflowEntries($postInflow);
+            
+            return response()->json([
+                'message' => 'Accounting entries generated successfully',
+                'post_inflow_id' => $id,
+                'journal_entry_id' => $journalEntry->id
+            ]);
+        } catch (\Exception $e) {
+            Log::error("Failed to generate accounting entries for post inflow {$id}: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to generate accounting entries',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate accounting entries for multiple post inflows
+     */
+    public function generateBulkAccountingEntries(Request $request)
+    {
+        $validated = $request->validate([
+            'post_inflow_ids' => 'required|array',
+            'post_inflow_ids.*' => 'integer|exists:post_inflows,id'
+        ]);
+
+        $results = [];
+        $successCount = 0;
+        $failureCount = 0;
+
+        foreach ($validated['post_inflow_ids'] as $postInflowId) {
+            try {
+                $postInflow = PostInflow::findOrFail($postInflowId);
+                
+                // Check if accounting entries already exist
+                $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Post Inflow #{$postInflow->id}%")->first();
+                
+                if ($existingEntries) {
+                    $results[] = [
+                        'post_inflow_id' => $postInflowId,
+                        'status' => 'skipped',
+                        'message' => 'Accounting entries already exist'
+                    ];
+                    continue;
+                }
+
+                $journalEntry = $this->accountingEntryService->generatePostInflowEntries($postInflow);
+                
+                $results[] = [
+                    'post_inflow_id' => $postInflowId,
+                    'status' => 'success',
+                    'journal_entry_id' => $journalEntry->id
+                ];
+                $successCount++;
+            } catch (\Exception $e) {
+                Log::error("Failed to generate accounting entries for post inflow {$postInflowId}: " . $e->getMessage());
+                $results[] = [
+                    'post_inflow_id' => $postInflowId,
+                    'status' => 'failed',
+                    'error' => $e->getMessage()
+                ];
+                $failureCount++;
+            }
+        }
+
+        return response()->json([
+            'message' => "Bulk accounting entries generation completed",
+            'total_processed' => count($validated['post_inflow_ids']),
+            'success_count' => $successCount,
+            'failure_count' => $failureCount,
+            'results' => $results
+        ]);
+    }
+
+    /**
+     * Get accounting entries for a specific post inflow
+     */
+    public function getAccountingEntries($id)
+    {
+        $postInflow = PostInflow::findOrFail($id);
+        
+        $journalEntries = TransactionJournalEntry::where('description', 'LIKE', "%Post Inflow #{$postInflow->id}%")
+            ->with('details')
+            ->get();
+
+        return response()->json([
+            'post_inflow_id' => $id,
+            'journal_entries' => $journalEntries
+        ]);
     }
 }

@@ -250,10 +250,20 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
 
     Route::apiResource('post-outflows', App\Http\Controllers\PostOutflowController::class);
+    
+    // Accounting entries routes for post outflows
+    Route::post('post-outflows/{id}/generate-accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'generateAccountingEntries']);
+    Route::post('post-outflows/generate-bulk-accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'generateBulkAccountingEntries']);
+    Route::get('post-outflows/{id}/accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'getAccountingEntries']);
 
     Route::apiResource('settle-credits', App\Http\Controllers\SettleCreditController::class);
 
     Route::apiResource('post-inflows', App\Http\Controllers\PostInflowController::class);
+    
+    // Accounting entries routes for post inflows
+    Route::post('post-inflows/{id}/generate-accounting-entries', [App\Http\Controllers\PostInflowController::class, 'generateAccountingEntries']);
+    Route::post('post-inflows/generate-bulk-accounting-entries', [App\Http\Controllers\PostInflowController::class, 'generateBulkAccountingEntries']);
+    Route::get('post-inflows/{id}/accounting-entries', [App\Http\Controllers\PostInflowController::class, 'getAccountingEntries']);
 
     Route::apiResource('branches', App\Http\Controllers\BranchController::class);
 
@@ -322,6 +332,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('new-release-order-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class, 'pendingReleaseOrder']);
 
     Route::apiResource('sales-receipts', App\Http\Controllers\SalesReceiptController::class);
+    
+    // Accounting entries routes for sales receipts
+    Route::post('sales-receipts/{id}/generate-accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'generateAccountingEntries']);
+    Route::post('sales-receipts/generate-bulk-accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'generateBulkAccountingEntries']);
+    Route::get('sales-receipts/{id}/accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'getAccountingEntries']);
 
     Route::apiResource('credit-limits', App\Http\Controllers\CreditLimitController::class);
 

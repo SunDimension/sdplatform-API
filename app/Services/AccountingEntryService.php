@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\DB;
 use App\Models\StoreItem;
 use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
+use App\Models\PostInflow;
+use App\Models\PostOutflow;
 
 class AccountingEntryService
 {
@@ -325,7 +327,7 @@ class AccountingEntryService
     private function getAccountNo($name)
     {
         $account = Account::where('name', $name)->first();
-        return $account ? $account->account_no : null;
+        return $account ? $account->code : null;
     }
 
     /**
@@ -497,6 +499,156 @@ class AccountingEntryService
                 'branch_id' => $salesReceipt->branch_id,
                 'account_no' => $this->getAccountNo('Accounts Receivable'),
                 'account_id' => $this->getAccountId('Accounts Receivable'),
+                'created_by' => auth()->id()
+            ]);
+
+            return $journalEntry;
+        });
+    }
+
+    /**
+     * Generate accounting entries for a PostInflow
+     * 
+     * @param PostInflow $postInflow The post inflow to generate entries for
+     * @return JournalEntry
+     */
+    public function generatePostInflowEntries($postInflow)
+    {
+        return DB::transaction(function () use ($postInflow) {
+            // Create journal entry for the post inflow
+            $journalEntry = TransactionJournalEntry::create([
+                'description' => "Post Inflow #{$postInflow->id} - {$postInflow->narration}",
+                'payment_date' => $postInflow->inflow_date ?? now(),
+                'store_id' => $postInflow->store_id ?? null,
+                'branch_id' => $postInflow->branch_id ?? null,
+                'created_by' => auth()->id()
+            ]);
+
+            // Debit Bank/Cash account
+            TransactionJournalEntryDetail::create([
+                'transaction_journal_entry_id' => $journalEntry->id,
+                'journal_type_id' => 1, // Debit
+                'amount' => $postInflow->amount,
+                'description' => "Bank deposit for Post Inflow #{$postInflow->id}",
+                'account_id' => $this->getAccountId('Bank'),
+                'account_no' => $this->getAccountNo('Bank'),
+                'created_by' => auth()->id()
+            ]);
+
+            // Credit Suspense Account or Customer Account
+            if ($postInflow->customer_id) {
+                // If customer is assigned, credit customer account
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
+                    'journal_type_id' => 2, // Credit
+                    'amount' => $postInflow->amount,
+                    'description' => "Customer credit for Post Inflow #{$postInflow->id}",
+                    'account_id' => $this->getAccountId('Accounts Receivable'),
+                    'account_no' => $this->getAccountNo('Accounts Receivable'),
+                    'created_by' => auth()->id()
+                ]);
+            } else {
+                // If no customer assigned, credit suspense account
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
+                    'journal_type_id' => 2, // Credit
+                    'amount' => $postInflow->amount,
+                    'description' => "Suspense account for Post Inflow #{$postInflow->id}",
+                    'account_id' => $this->getAccountId('Suspense Account'),
+                    'account_no' => $this->getAccountNo('Suspense Account'),
+                    'created_by' => auth()->id()
+                ]);
+            }
+
+            // Create transaction records
+            $this->createTransactions([
+                'description' => "Post Inflow #{$postInflow->id}",
+                'transaction_date' => $postInflow->inflow_date ?? now(),
+                'transcode' => 'PI',
+                'transtype' => 'Inflow',
+                'naration' => "Post Inflow #{$postInflow->id} - {$postInflow->narration}",
+                'debit' => $postInflow->amount,
+                'credit' => $postInflow->amount,
+                'amount' => $postInflow->amount,
+                'store_id' => $postInflow->store_id ?? null,
+                'branch_id' => $postInflow->branch_id ?? null,
+                'account_no' => $this->getAccountNo('Bank'),
+                'account_id' => $this->getAccountId('Bank'),
+                'created_by' => auth()->id()
+            ]);
+
+            return $journalEntry;
+        });
+    }
+
+    /**
+     * Generate accounting entries for a PostOutflow
+     * 
+     * @param PostOutflow $postOutflow The post outflow to generate entries for
+     * @return JournalEntry
+     */
+    public function generatePostOutflowEntries($postOutflow)
+    {
+        return DB::transaction(function () use ($postOutflow) {
+            // Create journal entry for the post outflow
+            $journalEntry = TransactionJournalEntry::create([
+                'description' => "Post Outflow #{$postOutflow->id} - {$postOutflow->narration}",
+                'payment_date' => $postOutflow->outflow_date ?? now(),
+                'store_id' => $postOutflow->store_id ?? null,
+                'branch_id' => $postOutflow->branch_id ?? null,
+                'created_by' => auth()->id()
+            ]);
+
+            // Debit Customer Account or Suspense Account
+            if ($postOutflow->customer_id) {
+                // If customer is assigned, debit customer account
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
+                    'journal_type_id' => 1, // Debit
+                    'amount' => $postOutflow->amount,
+                    'description' => "Customer debit for Post Outflow #{$postOutflow->id}",
+                    'account_id' => $this->getAccountId('Accounts Receivable'),
+                    'account_no' => $this->getAccountNo('Accounts Receivable'),
+                    'created_by' => auth()->id()
+                ]);
+            } else {
+                // If no customer assigned, debit suspense account
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
+                    'journal_type_id' => 1, // Debit
+                    'amount' => $postOutflow->amount,
+                    'description' => "Suspense account for Post Outflow #{$postOutflow->id}",
+                    'account_id' => $this->getAccountId('Suspense Account'),
+                    'account_no' => $this->getAccountNo('Suspense Account'),
+                    'created_by' => auth()->id()
+                ]);
+            }
+
+            // Credit Bank/Cash account
+            TransactionJournalEntryDetail::create([
+                'transaction_journal_entry_id' => $journalEntry->id,
+                'journal_type_id' => 2, // Credit
+                'amount' => $postOutflow->amount,
+                'description' => "Bank withdrawal for Post Outflow #{$postOutflow->id}",
+                'account_id' => $this->getAccountId('Bank'),
+                'account_no' => $this->getAccountNo('Bank'),
+                'created_by' => auth()->id()
+            ]);
+
+            // Create transaction records
+            $this->createTransactions([
+                'description' => "Post Outflow #{$postOutflow->id}",
+                'transaction_date' => $postOutflow->outflow_date ?? now(),
+                'transcode' => 'PO',
+                'transtype' => 'Outflow',
+                'naration' => "Post Outflow #{$postOutflow->id} - {$postOutflow->narration}",
+                'debit' => $postOutflow->amount,
+                'credit' => $postOutflow->amount,
+                'amount' => $postOutflow->amount,
+                'store_id' => $postOutflow->store_id ?? null,
+                'branch_id' => $postOutflow->branch_id ?? null,
+                'account_no' => $this->getAccountNo('Bank'),
+                'account_id' => $this->getAccountId('Bank'),
                 'created_by' => auth()->id()
             ]);
 

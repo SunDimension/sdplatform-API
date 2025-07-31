@@ -14,10 +14,18 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Log;
+use Illuminate\Support\Facades\Log;
+use App\Services\AccountingEntryService;
+use App\Models\TransactionJournalEntry;
 
 class PostOutflowController extends Controller
 {
+    protected $accountingEntryService;
+
+    public function __construct(AccountingEntryService $accountingEntryService)
+    {
+        $this->accountingEntryService = $accountingEntryService;
+    }
   
   public function index(Request $request): PostOutflowCollection
 {
@@ -105,6 +113,15 @@ public function store(PostOutflowStoreRequest $request): PostOutflowResource
         // Create the post_outflows record
         $postOutflow = PostOutflow::create($request->validated());
 
+        // Generate accounting entries for the post outflow
+        try {
+            $this->accountingEntryService->generatePostOutflowEntries($postOutflow);
+        } catch (\Exception $e) {
+            Log::error("Failed to generate accounting entries for post outflow: " . $e->getMessage());
+            // Don't throw here, as the post outflow was created successfully
+            // Just log the error for debugging
+        }
+
         // Commit the transaction
         DB::commit();
 
@@ -172,6 +189,115 @@ public function getCustomerInflowDetails(Request $request)
     // Return inflow details
     return response()->json([
         'data' => $inflowDetails
+    ]);
+}
+
+/**
+ * Generate accounting entries for a specific post outflow
+ */
+public function generateAccountingEntries($id)
+{
+    $postOutflow = PostOutflow::findOrFail($id);
+
+    // Check if accounting entries already exist for this post outflow
+    $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Post Outflow #{$postOutflow->id}%")->first();
+    
+    if ($existingEntries) {
+        return response()->json([
+            'message' => 'Accounting entries already exist for this post outflow',
+            'post_outflow_id' => $id
+        ], 400);
+    }
+
+    try {
+        $journalEntry = $this->accountingEntryService->generatePostOutflowEntries($postOutflow);
+        
+        return response()->json([
+            'message' => 'Accounting entries generated successfully',
+            'post_outflow_id' => $id,
+            'journal_entry_id' => $journalEntry->id
+        ]);
+    } catch (\Exception $e) {
+        Log::error("Failed to generate accounting entries for post outflow {$id}: " . $e->getMessage());
+        return response()->json([
+            'message' => 'Failed to generate accounting entries',
+            'error' => $e->getMessage()
+        ], 500);
+    }
+}
+
+/**
+ * Generate accounting entries for multiple post outflows
+ */
+public function generateBulkAccountingEntries(Request $request)
+{
+    $validated = $request->validate([
+        'post_outflow_ids' => 'required|array',
+        'post_outflow_ids.*' => 'integer|exists:post_outflows,id'
+    ]);
+
+    $results = [];
+    $successCount = 0;
+    $failureCount = 0;
+
+    foreach ($validated['post_outflow_ids'] as $postOutflowId) {
+        try {
+            $postOutflow = PostOutflow::findOrFail($postOutflowId);
+            
+            // Check if accounting entries already exist
+            $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Post Outflow #{$postOutflow->id}%")->first();
+            
+            if ($existingEntries) {
+                $results[] = [
+                    'post_outflow_id' => $postOutflowId,
+                    'status' => 'skipped',
+                    'message' => 'Accounting entries already exist'
+                ];
+                continue;
+            }
+
+            $journalEntry = $this->accountingEntryService->generatePostOutflowEntries($postOutflow);
+            
+            $results[] = [
+                'post_outflow_id' => $postOutflowId,
+                'status' => 'success',
+                'journal_entry_id' => $journalEntry->id
+            ];
+            $successCount++;
+        } catch (\Exception $e) {
+            Log::error("Failed to generate accounting entries for post outflow {$postOutflowId}: " . $e->getMessage());
+            $results[] = [
+                'post_outflow_id' => $postOutflowId,
+                'status' => 'failed',
+                'error' => $e->getMessage()
+            ];
+            $failureCount++;
+        }
+    }
+
+    return response()->json([
+        'message' => "Bulk accounting entries generation completed",
+        'total_processed' => count($validated['post_outflow_ids']),
+        'success_count' => $successCount,
+        'failure_count' => $failureCount,
+        'results' => $results
+    ]);
+}
+
+/**
+ * Get accounting entries for a specific post outflow
+ */
+public function getAccountingEntries($id)
+{
+    $postOutflow = PostOutflow::findOrFail($id);
+    
+    $journalEntries = TransactionJournalEntry::where('description', 'LIKE', "%Post Outflow #{$postOutflow->id}%")
+        ->with('details')
+        ->get();
+
+    return response()->json([
+        'post_outflow_id' => $id,
+        'journal_entries' => $journalEntries
     ]);
 }
 }
