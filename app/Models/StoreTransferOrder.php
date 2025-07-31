@@ -45,7 +45,7 @@ class StoreTransferOrder extends Model
      * @var array
      */
     protected $casts = [
-        'transfer_date' => 'timestamp',
+        'transfer_date' => 'datetime',
         'source_branch_id' => 'integer',
         'source_store_id' => 'integer',
         'destination_branch_id' => 'integer',
@@ -78,22 +78,22 @@ class StoreTransferOrder extends Model
 
     public function sourceBranch(): BelongsTo
     {
-        return $this->belongsTo(Branch::class,'destination_branch_id');
+        return $this->belongsTo(Branch::class, 'destination_branch_id');
     }
 
     public function sourceStore(): BelongsTo
     {
-        return $this->belongsTo(Store::class,'source_store_id');
+        return $this->belongsTo(Store::class, 'source_store_id');
     }
 
     public function destinationBranch(): BelongsTo
     {
-        return $this->belongsTo(Branch::class,'destination_branch_id');
+        return $this->belongsTo(Branch::class, 'destination_branch_id');
     }
 
     public function destinationStore(): BelongsTo
     {
-        return $this->belongsTo(Store::class,'destination_store_id');
+        return $this->belongsTo(Store::class, 'destination_store_id');
     }
 
     public function approvalStage(): BelongsTo
@@ -103,16 +103,16 @@ class StoreTransferOrder extends Model
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,"created_by");
+        return $this->belongsTo(User::class, "created_by");
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'modified_by');
+        return $this->belongsTo(User::class, 'modified_by');
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'deleted_by');
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 }

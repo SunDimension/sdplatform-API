@@ -8,6 +8,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\SalesOrderController;
 use App\Http\Controllers\PostOutflowController;
 use App\Http\Controllers\ReturnItemController;
+use App\Http\Controllers\ProductAuditController;
 use App\Http\Controllers\SalesReceiptController;
 use App\Http\Controllers\StoreTransferItemController;
 use App\Http\Controllers\CreditTransactionController;
@@ -104,6 +105,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('regions', App\Http\Controllers\RegionController::class);
 
 
+    Route::post('/sales-receipts/{id}/block', [\App\Http\Controllers\SalesReceiptController::class, 'blockReceipt']);
+
+    // Unblock a sales receipt
+    Route::post('/sales-receipts/{id}/unblock', [\App\Http\Controllers\SalesReceiptController::class, 'unblockReceipt']);
+
+
+    Route::post('/receipts-blocking/search', [SalesReceiptController::class, 'searchForBlocking'])
+        ->name('sales.receipts.searchForBlocking');
+
+
     Route::apiResource('measurements', App\Http\Controllers\MeasurementController::class);
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
@@ -147,7 +158,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-    Route::get('return-transactions', [App\Http\Controllers\ReturnItemController::class, 'index']);
+    Route::post('return-transactions', [App\Http\Controllers\ReturnItemController::class, 'index']);
 
 
     Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
@@ -180,6 +191,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('credit-transactions/for-order/{salesOrderId}', [CreditTransactionController::class, 'getForOrder']);
 
 
+    Route::post('/sales-receipt/{id}/cancel', [SalesReceiptController::class, 'cancel']);
+
     // Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
 
     Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
@@ -191,7 +204,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('my-store-items', [App\Http\Controllers\StoreItemController::class, "myStoreItems"]);
 
-    Route::get('my-store-itemsold', [App\Http\Controllers\SalesOrderController::class, "mystoreItemSold"]);
+    // Route::get('my-store-itemsold', [App\Http\Controllers\SalesOrderController::class, "mystoreItemSold"]);
 
 
     Route::get('my-stores-inventory', [App\Http\Controllers\StoreItemController::class, "myStoreItemsSetLimit"]);
@@ -413,7 +426,38 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/credits/search', [CreditTransactionController::class, 'searchCredit']);
 
-    Route::get('/sales-report', [SalesOrderController::class, 'salesReport']);
+    // Route::get('/sales-report', [SalesOrderController::class, 'salesReport']);
+
+
+
+
+
+    Route::get('/my-store-itemsold', [SalesOrderController::class, 'myStoreItemSold'])
+        ->name('sales.stores');
+
+    // Generate sales report
+    Route::get('/sales-report', [SalesOrderController::class, 'salesReport'])
+        ->name('sales.report');
+
+    // Get products for a specific store
+    Route::get('/store/{storeId}/products', [SalesOrderController::class, 'getStoreProducts'])
+        ->name('sales.store.products');
+
+    // Get sales summary
+    Route::get('/sales-summary', [SalesOrderController::class, 'getSalesSummary'])
+        ->name('sales.summary');
+
+
+    //     Route::get('/product-audits', [ProductAuditController::class, 'index']);
+    // Route::get('/product-audits/action-types', [ProductAuditController::class, 'actionTypes']);
+
+
+    Route::prefix('product-audits')->group(function () {
+        Route::get('/', [ProductAuditController::class, 'index']);
+        Route::get('/action-types', [ProductAuditController::class, 'actionTypes']);
+        Route::get('/stores-with-products', [ProductAuditController::class, 'storesWithProducts']);
+        Route::get('/store-products/{store_id}', [ProductAuditController::class, 'getStoreProducts']);
+    });
 
     Route::get('/reports/product-availability', [SalesOrderController::class, 'productAvailabilityReport']);
 
@@ -430,7 +474,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
-    
+
     Route::get('pending-transfer-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'pending']);
     Route::get('pending-transfer-branch-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'branch_pending']);
     Route::post('approve-transfer-order', [App\Http\Controllers\StoreTransferOrderController::class, 'approve']);

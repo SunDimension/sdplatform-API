@@ -26,6 +26,10 @@ class UsersController extends Controller
     {
         $user = User::create($request->validated());
 
+        if (isset($validatedData['password'])) {
+            $validatedData['password'] = bcrypt($validatedData['password']);
+        }
+
         return new UserResource($user);
     }
 
@@ -50,16 +54,7 @@ class UsersController extends Controller
         return response(null, Response::HTTP_NO_CONTENT);
     }
 
-    //  public function assignRole(Request $request, User $user): JsonResponse
-    //     {
-    //         $role = Role::findOrFail($request->input('role_id'));
 
-    //         if (!$user->roles->contains($role)) {
-    //             $user->roles()->attach($role);
-    //         }
-
-    //         return response()->json(['message' => 'Role assigned successfully.'], Response::HTTP_OK);
-    //     }
 
     public function assignRole(Request $request, User $user): JsonResponse
     {

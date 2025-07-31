@@ -46,6 +46,15 @@ class StoreItem extends Model
         return $this->belongsTo(Store::class);
     }
 
+    public static function getCurrentQuantity($productId, $storeId)
+{
+    $item = self::where('create_item_id', $productId)
+        ->where('store_id', $storeId)
+        ->first();
+        
+    return $item ? $item->quantity : 0;
+}
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);

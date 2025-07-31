@@ -22,7 +22,7 @@ use Carbon\Carbon;
 
 class ReturnItemController extends Controller
 {
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): ReturnItemCollection
     {
         // Validate and retrieve query parameters from the request
         $validated = $request->validate([
@@ -31,7 +31,7 @@ class ReturnItemController extends Controller
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
             'product_id' => 'nullable|integer|exists:create_items,id',
-            'return_status' => 'nullable|string|in:approved,pending,rejected', // Changed from return_status to status
+            'return_status' => 'nullable|string|in:approved,pending,rejected',
         ]);
 
         // Extract validated parameters
@@ -40,7 +40,9 @@ class ReturnItemController extends Controller
         $fromDate = $validated['from_date'] ?? null;
         $toDate = $validated['to_date'] ?? null;
         $productId = $validated['product_id'] ?? null;
-        $status = $validated['status'] ?? 'approved'; // Default to approved
+        $returnStatus = $validated['return_status'] ?? 'approved'; // Default to 'approved'
+
+     
 
         // Start building the query with all returns
         $query = ReturnItem::with([
@@ -51,56 +53,42 @@ class ReturnItemController extends Controller
             'approvedBy',
             'returnDetails.product',
             'returnDetails.measurement',
-        ]);
+        ])->where('return_status', $returnStatus); // Always filter by return_status
 
-        // Apply store filter if provided
         if ($storeId) {
             $query->where('store_id', $storeId);
         }
 
-        // Apply branch filter if provided
         if ($branchId) {
             $query->whereHas('store', function ($query) use ($branchId) {
                 $query->where('branch_id', $branchId);
             });
         }
 
-        // Apply product filter if provided
         if ($productId) {
             $query->whereHas('returnDetails', function ($query) use ($productId) {
                 $query->where('product_id', $productId);
             });
         }
 
-        // Apply status filter - only if status is provided
-        $query->where('return_status', $status);
-
-        // Apply date range filters if provided (using return_date instead of created_at)
+        // Apply date range filters if provided (using return_date)
         if ($fromDate || $toDate) {
-            // Convert from_date and to_date to Carbon instances only if provided
             $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
             $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
-            // Apply date filter for the selected range
             if ($fromDate && $toDate) {
-                // Both from_date and to_date are provided
                 $query->whereBetween('return_date', [$fromDate, $toDate]);
             } elseif ($fromDate) {
-                // Only from_date is provided
                 $query->where('return_date', '>=', $fromDate);
             } elseif ($toDate) {
-                // Only to_date is provided
                 $query->where('return_date', '<=', $toDate);
             }
         }
 
-        // Order by recent first
         $query->orderBy('created_at', 'desc');
-
-        // Fetch the results and format them
         $returns = $query->get();
 
-        return response()->json($returns);
+        return new ReturnItemCollection($returns);
     }
     public function store(ReturnItemStoreRequest $request): ReturnItemResource
     {
@@ -157,6 +145,38 @@ class ReturnItemController extends Controller
             $salesReceipt = $returnItem->salesReceipt;
             $salesOrder = $salesReceipt ? SalesOrder::find($salesReceipt->sales_order_id) : null;
 
+            foreach ($returnItem->returnDetails as $returnDetail) {
+                // Find the ItemSold record matching product_id and store_id
+                $itemSold = ItemSold::where('product_id', $returnDetail->product_id)
+                    ->where('store_id', $returnItem->store_id)
+                    ->where('sales_order_id', $salesOrder ? $salesOrder->id : null)
+                    ->first();
+                if ($itemSold) {
+                    // Reduce quantity_sold or update returned_quantity as needed
+                    $itemSold->return_quantity = max(0, $itemSold->quantity - $returnDetail->return_quantity);
+                    $itemSold->return_quantity_pieces = max(0, $itemSold->quantity_pieces - $returnDetail->return_quantity_pieces);
+                    $itemSold->save();
+                }
+
+                // --- ProductAudit for return approval ---
+                $previousQuantity = \App\Classes\StockUtil::getQuantityForRequest($returnDetail->product_id, $returnItem->store_id);
+                $quantityChange = $returnDetail->return_quantity_pieces;
+                $newQuantity = $previousQuantity + $quantityChange;
+
+                \App\Models\ProductAudit::create([
+                    'action_type' => 'returned',
+                    'product_id' => $returnDetail->product_id,
+                    'user_id' => auth()->id(),
+                    'quantity_change' => $quantityChange,
+                    'previous_quantity' => $previousQuantity,
+                    'new_quantity' => $newQuantity,
+                    'reference_type' => 'ReturnItem',
+                    'reference_id' => $returnItem->id,
+                    'store_id' => $returnItem->store_id,
+                    'notes' => 'Product returned and approved'
+                ]);
+                // --- End ProductAudit ---
+            }
 
             if ($salesOrder && $salesOrder->payment_type === 'Credit') {
                 $data = new CreditTransaction();

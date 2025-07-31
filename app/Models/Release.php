@@ -49,10 +49,11 @@ class Release extends Model
         return $this->belongsTo(Store::class);
     }
 
-    public function salesreceipt(): BelongsTo
-    {
-        return $this->belongsTo(SalesReceipt::class);
-    }
+
+public function salesReceipt()
+{
+    return $this->belongsTo(SalesReceipt::class, 'sales_receipt_id');
+}
 
     public function releasedetail(): HasMany
     {

@@ -11,7 +11,9 @@ use App\Models\CreditTransaction;
 use App\Models\Customer;
 use App\Models\PostOutflow;
 use App\Models\SalesOrder;
+use App\Classes\StockUtil;
 use App\Models\PostInflow;
+use App\Models\ProductAudit;
 use App\Models\SalesReceipt;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -63,20 +65,20 @@ class SalesReceiptController extends Controller
             });
 
         // Handle date filtering
-            if ($fromDate || $toDate) {
-                $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
-                $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+        if ($fromDate || $toDate) {
+            $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+            $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
-                if ($fromDate && $toDate) {
-                    $receiptQuery->whereBetween('created_at', [$fromDate, $toDate]);
-                } elseif ($fromDate) {
-                    $receiptQuery->where('created_at', '>=', $fromDate);
-                } elseif ($toDate) {
-                    $receiptQuery->where('created_at', '<=', $toDate);
-                }
-
-                $receiptQuery->where('branch_id', $user->branch_id);
+            if ($fromDate && $toDate) {
+                $receiptQuery->whereBetween('created_at', [$fromDate, $toDate]);
+            } elseif ($fromDate) {
+                $receiptQuery->where('created_at', '>=', $fromDate);
+            } elseif ($toDate) {
+                $receiptQuery->where('created_at', '<=', $toDate);
             }
+
+            $receiptQuery->where('branch_id', $user->branch_id);
+        }
 
         // If with_returns is true, load return items
         if ($withReturns) {
@@ -230,17 +232,7 @@ class SalesReceiptController extends Controller
     }
 
 
-    // public function pendingReleaseStore($storeId)
-    // {
 
-
-    //     $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
-    //         // Add your specific criteria for ItemSold here
-    //         $query->where('store_id', $storeId)->where('status', 'pending'); // Example condition
-    //     })->get();
-
-    //     return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
-    // }
 
 
     public function pendingReleaseOrder($orderno)
@@ -294,6 +286,10 @@ class SalesReceiptController extends Controller
             $order = SalesOrder::where('id', $salesreceipt->sales_order_id)->first();
             $order->status = 'Paid';
             $order->save();
+
+
+
+
 
             $payments = $data['payment_detail'];
             $customerId = $salesreceipt->customer_id;
@@ -453,5 +449,155 @@ class SalesReceiptController extends Controller
 
         // Return the results as a collection
         return new SalesReceiptCollection($salesReceipts);
+    }
+
+    public function cancel($id)
+    {
+        DB::beginTransaction();
+
+        try {
+            // Load the sales receipt with all necessary relationships
+            $salesReceipt = SalesReceipt::with([
+                'salesOrder',
+                'customer',
+                'postOutflows',
+                'creditTransactions'
+            ])->findOrFail($id);
+
+            // Check if already canceled
+            if ($salesReceipt->status === 'Canceled') {
+                return response()->json(['message' => 'Receipt is already canceled'], 400);
+            }
+
+            // 1. Reverse any deposit payments
+            foreach ($salesReceipt->postOutflows as $outflow) {
+                if ($outflow->outflow_mode === 7) { // Deposit payment type
+                    // Create inflow record for the refund
+                    PostInflow::create([
+                        'customer_id' => $salesReceipt->customer_id,
+                        'sales_receipt_id' => $salesReceipt->id,
+                        'amount' => $outflow->amount,
+                        'inflow_mode' => 8, // Deposit refund
+                        'inflow_status' => 3, // Assigned
+                        'inflow_date' => now(),
+                        'notes' => 'Deposit refund from receipt cancellation'
+                    ]);
+
+                    // Mark the outflow as reversed
+                    $outflow->update(['is_reversed' => true]);
+                }
+            }
+
+            // 2. Reverse credit transactions if any
+            foreach ($salesReceipt->creditTransactions as $creditTransaction) {
+                if ($creditTransaction->type === 'payment') {
+                    $customer = $salesReceipt->customer;
+                    $previousBalance = $customer->credit_balance;
+
+                    // Reduce the customer's credit balance
+                    $customer->credit_balance -= $creditTransaction->amount;
+                    $customer->save();
+
+                    // Create a reversal transaction
+                    CreditTransaction::create([
+                        'branch_id' => $salesReceipt->branch_id,
+                        'customer_id' => $customer->id,
+                        'sales_receipt_id' => $salesReceipt->id,
+                        'amount' => $creditTransaction->amount,
+                        'credit_limit' => $customer->credit_limit,
+                        'credit_balance_before' => $previousBalance,
+                        'credit_balance_after' => $customer->credit_balance,
+                        'type' => 'payment_reversal',
+                        'created_by' => auth()->id(),
+                        'notes' => 'Payment reversal from receipt cancellation'
+                    ]);
+
+                    // Mark original transaction as reversed
+                    $creditTransaction->update(['is_reversed' => true]);
+                }
+            }
+
+            // 3. Update the sales order status
+            if ($salesReceipt->salesOrder) {
+                $salesOrder = $salesReceipt->salesOrder;
+
+                // Determine new status based on payment type
+                $newStatus = ($salesOrder->payment_type === 'Credit')
+                    ? 'Credit Pending'
+                    : 'Pending';
+
+                $salesOrder->update(['status' => $newStatus]);
+            }
+
+            // 4. Mark the receipt as canceled
+            $salesReceipt->update([
+                'status' => 'Canceled',
+                'canceled_by' => auth()->id(),
+                'canceled_at' => now()
+            ]);
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Sales receipt canceled successfully',
+                'data' => new SalesReceiptResource($salesReceipt)
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Failed to cancel sales receipt: " . $e->getMessage());
+
+            return response()->json([
+                'message' => 'Failed to cancel sales receipt',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function blockReceipt($id)
+    {
+        $receipt = SalesReceipt::findOrFail($id);
+        $receipt->blocked = true;
+        $receipt->save();
+
+        return response()->json(['message' => 'Receipt blocked from release.']);
+    }
+
+    public function unblockReceipt($id)
+    {
+        $receipt = SalesReceipt::findOrFail($id);
+        $receipt->blocked = false;
+        $receipt->save();
+
+        return response()->json(['message' => 'Receipt unblocked for release.']);
+    }
+
+    public function searchForBlocking(Request $request)
+    {
+        $validated = $request->validate([
+            'sales_receipt_number' => 'required|string'
+        ]);
+
+        $receiptNumber = trim($validated['sales_receipt_number']);
+
+        try {
+            $receipt = SalesReceipt::with([
+                'salesOrder' => function ($query) {
+                    $query->with(['customer', 'branch', 'store', 'itemSold' => function ($q) {
+                        $q->with(['product', 'store']);
+                    }]);
+                }
+            ])->where('sales_receipt_number', $receiptNumber)
+                ->firstOrFail();
+
+            return response()->json([
+                'success' => true,
+                'data' => $receipt
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Receipt not found'
+            ], 404);
+        }
     }
 }

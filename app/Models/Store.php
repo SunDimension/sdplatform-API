@@ -49,4 +49,13 @@ class Store extends Model
     {
         return $this->hasMany(ItemSold::class);
     }
+
+
+/**
+ * Get all product audits for this store
+ */
+public function productAudits()
+{
+    return $this->hasMany(ProductAudit::class);
+}
 }

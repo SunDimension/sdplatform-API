@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Hash;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
@@ -27,6 +28,8 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'store_id',
+        'branch_id',
 
     ];
 
@@ -37,6 +40,7 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
+        'remember_token',
     ];
 
     /**
@@ -46,12 +50,16 @@ class User extends Authenticatable
      */
     protected $casts = [
         'id' => 'integer',
-        // 'status_id' => 'integer',
-        // 'branch_id' => 'integer',
-        // 'warehouse_id' => 'integer',
-        // 'store_id' => 'integer'
+
+        'branch_id' => 'integer',
+        'password' => 'hashed',
+        'store_id' => 'integer'
     ];
 
+
+   
+
+  
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user');
@@ -62,20 +70,17 @@ class User extends Authenticatable
     //     return $this->belongsTo(Store::class);
     // }
 
-    public function status(): BelongsTo
-    {
-        return $this->belongsTo(Status::class);
-    }
+    // public function status(): BelongsTo
+    // {
+    //     return $this->belongsTo(Status::class);
+    // }
 
     public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);
     }
 
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
-    }
+
 
     public function store(): BelongsTo
     {

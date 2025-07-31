@@ -40,6 +40,7 @@ class StockUtil
         $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantity($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
