@@ -23,7 +23,7 @@ class AccountOpeningBalance extends Model
         'debit',
         'credit',
         'amount',
-        'warehouse_id',
+        'store_id',
         'account_no',
         'account_id',
         'created_by',
@@ -40,7 +40,7 @@ class AccountOpeningBalance extends Model
         'debit' => 'double',
         'credit' => 'double',
         'amount' => 'double',
-        'warehouse_id' => 'integer',
+        'store_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -56,9 +56,9 @@ class AccountOpeningBalance extends Model
         return $this->belongsTo(FinancialPeriod::class);
     }
 
-    public function warehouse(): BelongsTo
+    public function store(): BelongsTo
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Store::class);
     }
 
     public function account(): BelongsTo

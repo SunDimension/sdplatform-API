@@ -265,7 +265,7 @@ class SalesOrderController extends Controller
                 ->where('store_id', $item['store_id'])
                 ->first();
 
-            $storeItem->quantity_holding += $item['quantity'];
+            // $storeItem->quantity_holding += $item['quantity'];
             $storeItem->save();
         }
 

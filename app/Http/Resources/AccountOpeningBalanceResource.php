@@ -19,7 +19,7 @@ class AccountOpeningBalanceResource extends JsonResource
             'debit' => $this->debit,
             'credit' => $this->credit,
             'amount' => $this->amount,
-            'warehouse_id' => $this->warehouse_id,
+            'store_id' => $this->store_id,
             'account_no' => $this->account_no,
             'account_id' => $this->account_id,
             'created_by' => $this->created_by,
