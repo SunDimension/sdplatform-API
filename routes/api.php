@@ -215,6 +215,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::class);
 
+    // Accounting entries routes for return items
+    Route::post('return-items/{id}/generate-accounting-entries', [App\Http\Controllers\ReturnItemController::class, 'generateAccountingEntries']);
+    Route::post('return-items/generate-bulk-accounting-entries', [App\Http\Controllers\ReturnItemController::class, 'generateBulkAccountingEntries']);
+    Route::get('return-items/{id}/accounting-entries', [App\Http\Controllers\ReturnItemController::class, 'getAccountingEntries']);
+
     Route::post('return-approve', [App\Http\Controllers\ReturnItemController::class, 'approve']);
 
     Route::get('return-pending', [App\Http\Controllers\ReturnItemController::class, 'pending']);
@@ -417,6 +422,32 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('approval-stages', App\Http\Controllers\ApprovalStageController::class);
 
     Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
+
+    // Financial Reporting Routes
+    Route::prefix('financial-reporting')->group(function () {
+        Route::post('profit-and-loss', [App\Http\Controllers\FinancialReportingController::class, 'generateProfitAndLoss']);
+        Route::post('balance-sheet', [App\Http\Controllers\FinancialReportingController::class, 'generateBalanceSheet']);
+        Route::post('trial-balance', [App\Http\Controllers\FinancialReportingController::class, 'generateTrialBalance']);
+        Route::get('trial-balance-summary', [App\Http\Controllers\FinancialReportingController::class, 'getTrialBalanceSummary']);
+        Route::post('comparative-statements', [App\Http\Controllers\FinancialReportingController::class, 'generateComparativeStatements']);
+        Route::get('financial-periods', [App\Http\Controllers\FinancialReportingController::class, 'getFinancialPeriods']);
+        Route::get('account-summary', [App\Http\Controllers\FinancialReportingController::class, 'getAccountSummary']);
+        Route::get('financial-metrics', [App\Http\Controllers\FinancialReportingController::class, 'getFinancialMetrics']);
+    });
+
+    // Periodic Financial Reports Routes
+    Route::prefix('periodic-financial-reports')->group(function () {
+        Route::post('generate', [App\Http\Controllers\PeriodicFinancialReportController::class, 'generateReports']);
+        Route::get('reports', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getReports']);
+        Route::get('reports/{reportId}', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getReport']);
+        Route::put('reports/{reportId}/status', [App\Http\Controllers\PeriodicFinancialReportController::class, 'updateReportStatus']);
+        Route::delete('reports/{reportId}', [App\Http\Controllers\PeriodicFinancialReportController::class, 'deleteReport']);
+        Route::post('generate-for-branch', [App\Http\Controllers\PeriodicFinancialReportController::class, 'generateReportsForBranch']);
+        Route::post('generate-for-region', [App\Http\Controllers\PeriodicFinancialReportController::class, 'generateReportsForRegion']);
+        Route::get('summary', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getReportSummary']);
+        Route::post('archive-old', [App\Http\Controllers\PeriodicFinancialReportController::class, 'archiveOldReports']);
+        Route::get('filter-options', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getFilterOptions']);
+    });
 
     Route::post('/receipts/search', [SalesOrderController::class, 'searchReceipt'])
         ->name('sales.receipts.search');

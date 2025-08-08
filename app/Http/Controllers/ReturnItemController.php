@@ -15,6 +15,8 @@ use App\Models\ItemSold;
 use App\Models\SalesOrder;
 use App\Models\PostInflow;
 use App\Models\ReturnItem;
+use App\Models\TransactionJournalEntry;
+use App\Services\AccountingEntryService;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -22,6 +24,13 @@ use Carbon\Carbon;
 
 class ReturnItemController extends Controller
 {
+    protected $accountingEntryService;
+
+    public function __construct(AccountingEntryService $accountingEntryService)
+    {
+        $this->accountingEntryService = $accountingEntryService;
+    }
+
     public function index(Request $request): JsonResponse
     {
         // Validate and retrieve query parameters from the request
@@ -104,9 +113,22 @@ class ReturnItemController extends Controller
     }
     public function store(ReturnItemStoreRequest $request): ReturnItemResource
     {
-        $returnItem = ReturnItem::create($request->validated());
+        return DB::transaction(function () use ($request) {
+            $returnItem = ReturnItem::create($request->validated());
 
-        return new ReturnItemResource($returnItem);
+            // Generate accounting entries for the return item
+            try {
+                $this->accountingEntryService->generateReturnItemEntries($returnItem);
+            } catch (\Exception $e) {
+                Log::error('Failed to generate accounting entries for return item', [
+                    'return_item_id' => $returnItem->id,
+                    'error' => $e->getMessage()
+                ]);
+                // Don't throw the exception to avoid rolling back the main transaction
+            }
+
+            return new ReturnItemResource($returnItem);
+        });
     }
 
     public function show(Request $request, ReturnItem $returnItem): ReturnItemResource
@@ -203,6 +225,8 @@ class ReturnItemController extends Controller
                 $data->created_by = auth()->user()->id;
                 $data->notes = "Credit adjustment for return #{$returnItem->id}";
                 $data->save();
+
+                
             } else {
 
                 $data = new PostInflow();
@@ -361,5 +385,123 @@ class ReturnItemController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Generate accounting entries for a specific return item
+     */
+    public function generateAccountingEntries($id)
+    {
+        $returnItem = ReturnItem::with(['returnDetails', 'salesReceipt.salesOrder'])->findOrFail($id);
+
+        // Check if accounting entries already exist
+        $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Return Item #{$returnItem->id}%")->get();
+        
+        if ($existingEntries->count() > 0) {
+            return response()->json([
+                'message' => 'Accounting entries already exist for this return item',
+                'existing_entries' => $existingEntries
+            ], 400);
+        }
+
+        try {
+            $journalEntry = $this->accountingEntryService->generateReturnItemEntries($returnItem);
+            
+            return response()->json([
+                'message' => 'Accounting entries generated successfully',
+                'journal_entry' => $journalEntry
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to generate accounting entries for return item', [
+                'return_item_id' => $id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json([
+                'message' => 'Failed to generate accounting entries',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Generate accounting entries for multiple return items
+     */
+    public function generateBulkAccountingEntries(Request $request)
+    {
+        $validated = $request->validate([
+            'return_item_ids' => 'required|array',
+            'return_item_ids.*' => 'integer|exists:return_items,id'
+        ]);
+
+        $results = [];
+        $successCount = 0;
+        $failureCount = 0;
+
+        foreach ($validated['return_item_ids'] as $id) {
+            try {
+                $returnItem = ReturnItem::with(['returnDetails', 'salesReceipt.salesOrder'])->find($id);
+                
+                // Check if accounting entries already exist
+                $existingEntries = TransactionJournalEntry::where('description', 'LIKE', "%Return Item #{$returnItem->id}%")->get();
+                
+                if ($existingEntries->count() > 0) {
+                    $results[] = [
+                        'id' => $id,
+                        'status' => 'skipped',
+                        'message' => 'Accounting entries already exist'
+                    ];
+                    continue;
+                }
+
+                $journalEntry = $this->accountingEntryService->generateReturnItemEntries($returnItem);
+                
+                $results[] = [
+                    'id' => $id,
+                    'status' => 'success',
+                    'journal_entry_id' => $journalEntry->id
+                ];
+                $successCount++;
+            } catch (\Exception $e) {
+                Log::error('Failed to generate accounting entries for return item', [
+                    'return_item_id' => $id,
+                    'error' => $e->getMessage()
+                ]);
+
+                $results[] = [
+                    'id' => $id,
+                    'status' => 'failed',
+                    'error' => $e->getMessage()
+                ];
+                $failureCount++;
+            }
+        }
+
+        return response()->json([
+            'message' => "Bulk accounting entries generation completed. Success: {$successCount}, Failures: {$failureCount}",
+            'results' => $results,
+            'summary' => [
+                'total' => count($validated['return_item_ids']),
+                'success' => $successCount,
+                'failure' => $failureCount
+            ]
+        ]);
+    }
+
+    /**
+     * Get accounting entries for a specific return item
+     */
+    public function getAccountingEntries($id)
+    {
+        $returnItem = ReturnItem::findOrFail($id);
+
+        $journalEntries = TransactionJournalEntry::where('description', 'LIKE', "%Return Item #{$returnItem->id}%")
+            ->with(['details.account', 'details.journalType'])
+            ->get();
+
+        return response()->json([
+            'return_item_id' => $id,
+            'journal_entries' => $journalEntries
+        ]);
     }
 }

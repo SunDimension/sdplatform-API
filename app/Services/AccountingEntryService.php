@@ -13,6 +13,7 @@ use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
 use App\Models\PostInflow;
 use App\Models\PostOutflow;
+use App\Models\ReturnItem;
 
 class AccountingEntryService
 {
@@ -649,6 +650,101 @@ class AccountingEntryService
                 'branch_id' => $postOutflow->branch_id ?? null,
                 'account_no' => $this->getAccountNo('Bank'),
                 'account_id' => $this->getAccountId('Bank'),
+                'created_by' => auth()->id()
+            ]);
+
+            return $journalEntry;
+        });
+    }
+
+    /**
+     * Generate accounting entries for a ReturnItem
+     * 
+     * @param ReturnItem $returnItem The return item to generate entries for
+     * @return JournalEntry
+     */
+    public function generateReturnItemEntries($returnItem)
+    {
+        return DB::transaction(function () use ($returnItem) {
+            // Calculate total return amount
+            $totalReturnAmount = $returnItem->returnDetails->sum(function ($detail) {
+                return $detail->return_quantity * $detail->unit_price;
+            });
+
+            // Create journal entry for the return item
+            $journalEntry = TransactionJournalEntry::create([
+                'description' => "Return Item #{$returnItem->id} - Customer Return",
+                'payment_date' => $returnItem->return_date ?? now(),
+                'store_id' => $returnItem->store_id ?? null,
+                'branch_id' => $returnItem->branch_id ?? null,
+                'created_by' => auth()->id()
+            ]);
+
+            // Debit Sales Returns (reduces revenue)
+            TransactionJournalEntryDetail::create([
+                'transaction_journal_entry_id' => $journalEntry->id,
+                'journal_type_id' => 1, // Debit
+                'amount' => $totalReturnAmount,
+                'description' => "Sales Returns for Return Item #{$returnItem->id}",
+                'account_id' => $this->getAccountId('Sales Returns'),
+                'account_no' => $this->getAccountNo('Sales Returns'),
+                'created_by' => auth()->id()
+            ]);
+
+            // Credit Accounts Receivable (if credit sale) or Cash/Bank (if cash sale)
+            if ($returnItem->salesReceipt && $returnItem->salesReceipt->salesOrder) {
+                $salesOrder = $returnItem->salesReceipt->salesOrder;
+                
+                if ($salesOrder->payment_type === 'Credit') {
+                    // Credit Accounts Receivable for credit sales
+                    TransactionJournalEntryDetail::create([
+                        'transaction_journal_entry_id' => $journalEntry->id,
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $totalReturnAmount,
+                        'description' => "Accounts Receivable credit for Return Item #{$returnItem->id}",
+                        'account_id' => $this->getAccountId('Accounts Receivable'),
+                        'account_no' => $this->getAccountNo('Accounts Receivable'),
+                        'created_by' => auth()->id()
+                    ]);
+                } else {
+                    // Credit Cash/Bank for cash sales
+                    TransactionJournalEntryDetail::create([
+                        'transaction_journal_entry_id' => $journalEntry->id,
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $totalReturnAmount,
+                        'description' => "Cash/Bank credit for Return Item #{$returnItem->id}",
+                        'account_id' => $this->getAccountId('Bank'),
+                        'account_no' => $this->getAccountNo('Bank'),
+                        'created_by' => auth()->id()
+                    ]);
+                }
+            } else {
+                // Default to Cash/Bank if no sales receipt or order found
+                TransactionJournalEntryDetail::create([
+                    'transaction_journal_entry_id' => $journalEntry->id,
+                    'journal_type_id' => 2, // Credit
+                    'amount' => $totalReturnAmount,
+                    'description' => "Cash/Bank credit for Return Item #{$returnItem->id}",
+                    'account_id' => $this->getAccountId('Bank'),
+                    'account_no' => $this->getAccountNo('Bank'),
+                    'created_by' => auth()->id()
+                ]);
+            }
+
+            // Create transaction records
+            $this->createTransactions([
+                'description' => "Return Item #{$returnItem->id}",
+                'transaction_date' => $returnItem->return_date ?? now(),
+                'transcode' => 'RI',
+                'transtype' => 'Return',
+                'naration' => "Return Item #{$returnItem->id} - Customer Return",
+                'debit' => $totalReturnAmount,
+                'credit' => $totalReturnAmount,
+                'amount' => $totalReturnAmount,
+                'store_id' => $returnItem->store_id ?? null,
+                'branch_id' => $returnItem->branch_id ?? null,
+                'account_no' => $this->getAccountNo('Sales Returns'),
+                'account_id' => $this->getAccountId('Sales Returns'),
                 'created_by' => auth()->id()
             ]);
 
