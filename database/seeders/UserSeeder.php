@@ -23,7 +23,6 @@ class UserSeeder extends Seeder
                 'store_id' => 2,
                 'status_id' => 1,
                 'branch_id' => 2,
-                'warehouse_id' => 6,
                 'created_at' => now()
             ],
 
@@ -35,7 +34,6 @@ class UserSeeder extends Seeder
                 'store_id' => 2,
                 'status_id' => 1,
                 'branch_id' => 2,
-                'warehouse_id' => 6,
                 'created_at' => now()
             ],
                  [
@@ -46,7 +44,6 @@ class UserSeeder extends Seeder
                 'store_id' => 2,
                 'status_id' => 1,
                 'branch_id' => 2,
-                'warehouse_id' => 6,
                 'created_at' => now()
             ],
 
@@ -58,7 +55,6 @@ class UserSeeder extends Seeder
                 'store_id' => 2,
                 'status_id' => 1,
                 'branch_id' => 2,
-                'warehouse_id' => 6,
                 'created_at' => now()
             ]
         ]);

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('amount');
             $table->string('description');
             $table->foreignId('branch_id')->constrained();
-            $table->foreignId('warehouse_id')->constrained();
+
             $table->foreignId('tax_id')->constrained();
             $table->foreignId('vendor_id')->constrained();
             $table->foreignId('payment_mode_id')->constrained();

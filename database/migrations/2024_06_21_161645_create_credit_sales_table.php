@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('customer_id')->constrained('customers');
             $table->foreignId('branch_id')->constrained();
-            $table->foreignId('warehouse_id')->constrained();
+
             $table->foreignId('product_id')->constrained('create_items');
             $table->foreignId('credit_limit')->constrained('credit_limits');
             $table->string('credit_amount');

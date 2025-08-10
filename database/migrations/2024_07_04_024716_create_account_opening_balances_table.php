@@ -20,7 +20,7 @@ return new class extends Migration
             $table->double('debit');
             $table->double('credit');
             $table->double('amount');
-            $table->foreignId('warehouse_id')->constrained();
+
             $table->string('account_no');
             $table->foreignUuid('account_id')->constrained();
             $table->foreignId('created_by')->nullable()->constrained('users');

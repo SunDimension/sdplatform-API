@@ -24,7 +24,7 @@ class AccountTypeSeeder extends Seeder
                 'role_id' => 1, // Assuming role_id 1 exists
                 'status_id' => 1, // Assuming status_id 1 exists
                 'branch_id' => 1, // Assuming branch_id 1 exists
-                'warehouse_id' => 1, // Assuming warehouse_id 1 exists
+
             ]);
         }
 
@@ -33,7 +33,6 @@ class AccountTypeSeeder extends Seeder
         if (!$accountGroup) {
             $accountGroup = AccountGroup::create([
                 'name' => 'Default Account Group',
-                'code' => 'DEFAULT',
                 'created_by' => $user->id,
             ]);
         }

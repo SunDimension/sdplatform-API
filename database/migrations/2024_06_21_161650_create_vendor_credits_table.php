@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('vendor_credits', function (Blueprint $table) {
             $table->id();
             $table->foreignId('vendor_id')->constrained();
-            $table->foreignId('warehouse_id')->constrained();
+
             $table->string('credit_number');
             $table->string('purchase_order_number');
             $table->date('vendor_credit_date');

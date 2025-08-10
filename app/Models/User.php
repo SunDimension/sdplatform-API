@@ -31,7 +31,7 @@ class User extends Authenticatable
         'store_id',
         'status_id',
         'branch_id',
-        'warehouse_id',
+
     ];
 
     /**
@@ -52,7 +52,7 @@ class User extends Authenticatable
         'id' => 'integer',
         'status_id' => 'integer',
         'branch_id' => 'integer',
-        'warehouse_id' => 'integer',
+
         'store_id' => 'integer'
     ];
 
@@ -76,10 +76,7 @@ class User extends Authenticatable
         return $this->belongsTo(Branch::class);
     }
 
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
-    }
+
 
     public function store(): BelongsTo
     {

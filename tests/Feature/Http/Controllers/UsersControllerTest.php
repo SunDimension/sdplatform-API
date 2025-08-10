@@ -7,7 +7,7 @@ use App\Models\Role;
 use App\Models\Status;
 use App\Models\User;
 use App\Models\Users;
-use App\Models\Warehouse;
+
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -52,7 +52,7 @@ final class UsersControllerTest extends TestCase
         $password = $this->faker->password();
         $status = Status::factory()->create();
         $branch = Branch::factory()->create();
-        $warehouse = Warehouse::factory()->create();
+
 
         $response = $this->post(route('users.store'), [
             'role_id' => $role->id,
@@ -61,7 +61,7 @@ final class UsersControllerTest extends TestCase
             'password' => $password,
             'status_id' => $status->id,
             'branch_id' => $branch->id,
-            'warehouse_id' => $warehouse->id,
+
         ]);
 
         $users = User::query()
@@ -71,7 +71,7 @@ final class UsersControllerTest extends TestCase
             ->where('password', $password)
             ->where('status_id', $status->id)
             ->where('branch_id', $branch->id)
-            ->where('warehouse_id', $warehouse->id)
+
             ->get();
         $this->assertCount(1, $users);
         $user = $users->first();
@@ -113,7 +113,7 @@ final class UsersControllerTest extends TestCase
         $password = $this->faker->password();
         $status = Status::factory()->create();
         $branch = Branch::factory()->create();
-        $warehouse = Warehouse::factory()->create();
+
 
         $response = $this->put(route('users.update', $user), [
             'role_id' => $role->id,
@@ -122,7 +122,7 @@ final class UsersControllerTest extends TestCase
             'password' => $password,
             'status_id' => $status->id,
             'branch_id' => $branch->id,
-            'warehouse_id' => $warehouse->id,
+
         ]);
 
         $user->refresh();
@@ -136,7 +136,7 @@ final class UsersControllerTest extends TestCase
         $this->assertEquals($password, $user->password);
         $this->assertEquals($status->id, $user->status_id);
         $this->assertEquals($branch->id, $user->branch_id);
-        $this->assertEquals($warehouse->id, $user->warehouse_id);
+
     }
 
 

@@ -274,7 +274,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::apiResource('customer-types', App\Http\Controllers\CustomerTypeController::class);
 
-    Route::apiResource('warehouses', App\Http\Controllers\WarehouseController::class);
+    
 
     Route::apiResource('units', App\Http\Controllers\UnitController::class);
 

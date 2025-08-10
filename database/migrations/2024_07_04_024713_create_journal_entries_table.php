@@ -17,7 +17,7 @@ return new class extends Migration
             $table->uuid('id')->primary();
             $table->string('description');
             $table->timestamp('payment_date');
-            $table->foreignId('warehouse_id')->constrained();
+
             $table->string('vendor_id');
             $table->foreignId('created_by')->nullable()->constrained('users');
             $table->foreignId('modified_by')->nullable()->constrained('users');

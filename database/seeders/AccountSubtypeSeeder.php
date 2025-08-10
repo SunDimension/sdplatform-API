@@ -24,7 +24,7 @@ class AccountSubtypeSeeder extends Seeder
                 'role_id' => 1,
                 'status_id' => 1,
                 'branch_id' => 1,
-                'warehouse_id' => 1,
+
             ]);
         }
 
