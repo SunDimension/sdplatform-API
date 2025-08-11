@@ -159,6 +159,156 @@ class SalesOrderController extends Controller
 
 
     // Method to create a new Sales Order
+    // public function store(Request $request)
+    // {
+    //     // Validate incoming request data
+    //     $validated = $request->validate([
+    //         'customer_id' => 'required|exists:customers,id',
+    //         'branch_id' => 'required|exists:branches,id',
+    //         'store_id' => 'required|exists:stores,id',
+    //         'user_id' => 'required|exists:users,id',
+    //         'credit_limit' => 'nullable|numeric',
+    //         'items' => 'required|array',
+    //         'items.*.product_id' => 'required|exists:create_items,id',
+    //         'items.*.quantity' => 'required|integer',
+    //         'items.*.unit_measurement' => 'required|integer',
+    //         'items.*.unit_price' => 'required|numeric',
+    //         'items.*.store_id' => 'required|integer',
+    //         'items.*.discount' => 'nullable|numeric',
+    //         'total_amount' => 'required|numeric',
+    //         'invoice' => 'nullable|array',
+    //         'payment' => 'nullable|array',
+    //         'payment.total_amount' => 'required|numeric',
+    //         'payment.amount_paid' => 'required|numeric',
+    //         'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit',
+    //     ]);
+
+    //     $errors = [];
+
+    //     foreach ($validated['items'] as $item) {
+    //         $storeItem = StoreItem::where('create_item_id', $item['product_id'])
+    //             ->where('store_id', $item['store_id'])
+    //             ->first();
+
+    //         $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+
+    //         if (!$storeItem) {
+    //             $errors[] = "Item not found in store.";
+    //             continue;
+    //         }
+
+    //         $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'], $item['store_id']);
+    //         $item['quantity_pieces'] = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
+
+    //         // Check if requested quantity exceeds available stock
+    //         if ($quantityAvailable < $item['quantity_pieces']) {
+    //             $storeItem->load('createItem');
+    //             $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
+    //         }
+
+    //         //Enforce set_limit restriction
+    //         if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
+    //             $storeItem->load('createItem');
+    //             $errors[] = "Sale quantity for " . $storeItem->createItem->name .
+    //                 " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
+    //         }
+
+    //         $previousQuantity = $quantityAvailable;
+    //         $quantityChange = $item['quantity_pieces'];
+    //         $newQuantity = $previousQuantity - $quantityChange;
+
+    //         $auditLogs[] = [
+    //             'action_type' => 'sold',
+    //             'product_id' => $item['product_id'],
+    //             'user_id' => auth()->id(),
+    //             'store_id' => $item['store_id'],
+    //             'quantity_change' => -$quantityChange,
+    //             'previous_quantity' => $previousQuantity,
+    //             'new_quantity' => $newQuantity,
+    //             'reference_type' => 'SalesOrder',
+    //             'notes' => 'Product sold via sales order'
+    //         ];
+    //     }
+
+    //     // If any errors were found, return a bad request response
+    //     if (count($errors) > 0) {
+    //         return response()->json(['error' => implode(", ", $errors)], 400);
+    //     }
+
+    //     // Generate Sales Order Number
+    //     $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
+
+    //     // Create a new Sales Order
+    //     $order = [
+    //         'sales_order_number' => $salesOrderNumber,
+    //         'customer_id' => $validated['customer_id'],
+    //         'branch_id' => $validated['branch_id'],
+    //         'store_id' => $validated['store_id'],
+    //         'user_id' => $validated['user_id'],
+    //         'total_amount' => $validated['total_amount'],
+    //         'payment_type' => $validated['payment']['payment_type'],
+    //     ];
+
+    //     if ($validated['payment']['payment_type'] == 'Credit') {
+    //         $order["status"] = 'Credit Pending';
+    //     }
+
+    //     $salesOrder = SalesOrder::create($order);
+
+    //     // Now, insert ProductAudit logs with the correct reference_id
+    //     foreach ($auditLogs as $log) {
+    //         $log['reference_id'] = $salesOrder->id;
+    //         ProductAudit::create($log);
+    //     }
+
+    //     // Process Each Item in the Order
+    //     $itemSoldIds = [];
+
+    //     foreach ($validated['items'] as $item) {
+    //         $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+    //         $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
+    //         $itemSold = ItemSold::create([
+    //             'sales_order_id' => $salesOrder->id,
+    //             'product_id' => $item['product_id'],
+    //             'quantity' => $item['quantity'],
+    //             'unit_price' => $item['unit_price'],
+    //             'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
+    //             'store_id' => $item['store_id'],
+    //             'discount' => $item['discount'],
+    //             'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
+    //             'unit_measurement' => $item['unit_measurement'],
+    //             'sales_date' => now(),
+    //         ]);
+
+    //         $itemSoldIds[] = $itemSold->id;
+
+    //         // Update Stock: Increase quantity_holding
+    //         $storeItem = StoreItem::where('create_item_id', $item['product_id'])
+    //             ->where('store_id', $item['store_id'])
+    //             ->first();
+
+    //         // $storeItem->quantity_holding += $item['quantity'];
+    //         $storeItem->save();
+    //     }
+
+    //     // Find related sales receipts
+    //     $salesReceipts = SalesReceipt::where('sales_order_id', $salesOrder->id)->get();
+
+    //     foreach ($salesReceipts as $receipt) {
+    //         // You can decide how to recalculate amount_paid and total_paid.
+    //         // For example, set to the new total_amount of the order:
+    //         $receipt->amount_paid = $salesOrder->total_amount;
+    //         $receipt->total_amount = $salesOrder->total_amount;
+    //         $receipt->save();
+    //     }
+
+    //     return response()->json([
+    //         'message' => 'Sales Order Created Successfully',
+    //         'data' => $salesOrder
+    //     ], 200);
+    // }
+
+
     public function store(Request $request)
     {
         // Validate incoming request data
@@ -184,136 +334,154 @@ class SalesOrderController extends Controller
         ]);
 
         $errors = [];
+        $auditLogs = [];
 
-        foreach ($validated['items'] as $item) {
-            $storeItem = StoreItem::where('create_item_id', $item['product_id'])
-                ->where('store_id', $item['store_id'])
-                ->first();
+        // Start a database transaction
+        DB::beginTransaction();
 
-            $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+        try {
+            foreach ($validated['items'] as $item) {
+                $storeItem = StoreItem::where('create_item_id', $item['product_id'])
+                    ->where('store_id', $item['store_id'])
+                    ->lockForUpdate() // Lock the row to prevent race conditions
+                    ->first();
 
-            if (!$storeItem) {
-                $errors[] = "Item not found in store.";
-                continue;
+                if (!$storeItem) {
+                    $errors[] = "Item not found in store for product ID: {$item['product_id']}.";
+                    continue;
+                }
+
+                $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+                $quantityInPieces = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
+                $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'], $item['store_id']);
+
+                // Check if requested quantity exceeds available stock
+                if ($quantityAvailable < $quantityInPieces) {
+                    $storeItem->load('createItem');
+                    $errors[] = "Insufficient stock for " . $storeItem->createItem->name . ". Available: $quantityAvailable, Requested: $quantityInPieces.";
+                    continue;
+                }
+
+                // Enforce set_limit restriction
+                if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
+                    $storeItem->load('createItem');
+                    $errors[] = "Sale quantity for " . $storeItem->createItem->name .
+                        " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
+                    continue;
+                }
+
+                // Log the stock change for audit
+                $previousQuantity = $quantityAvailable;
+                $quantityChange = $quantityInPieces;
+                $newQuantity = max(0, $previousQuantity - $quantityChange); // Ensure new quantity is non-negative
+
+                $auditLogs[] = [
+                    'action_type' => 'sold',
+                    'product_id' => $item['product_id'],
+                    'user_id' => auth()->id(),
+                    'store_id' => $item['store_id'],
+                    'quantity_change' => -$quantityChange,
+                    'previous_quantity' => $previousQuantity,
+                    'new_quantity' => $newQuantity,
+                    'reference_type' => 'SalesOrder',
+                    'notes' => 'Product sold via sales order'
+                ];
             }
 
-            $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'], $item['store_id']);
-            $item['quantity_pieces'] = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
-
-            // Check if requested quantity exceeds available stock
-            if ($quantityAvailable < $item['quantity_pieces']) {
-                $storeItem->load('createItem');
-                $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
+            // If any errors were found, rollback and return
+            if (count($errors) > 0) {
+                DB::rollBack();
+                return response()->json(['error' => implode(", ", $errors)], 400);
             }
 
-            //Enforce set_limit restriction
-            if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
-                $storeItem->load('createItem');
-                $errors[] = "Sale quantity for " . $storeItem->createItem->name .
-                    " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
-            }
+            // Generate Sales Order Number
+            $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
 
-            $previousQuantity = $quantityAvailable;
-            $quantityChange = $item['quantity_pieces'];
-            $newQuantity = $previousQuantity - $quantityChange;
-
-            $auditLogs[] = [
-                'action_type' => 'sold',
-                'product_id' => $item['product_id'],
-                'user_id' => auth()->id(),
-                'store_id' => $item['store_id'],
-                'quantity_change' => -$quantityChange,
-                'previous_quantity' => $previousQuantity,
-                'new_quantity' => $newQuantity,
-                'reference_type' => 'SalesOrder',
-                'notes' => 'Product sold via sales order'
+            // Create a new Sales Order
+            $order = [
+                'sales_order_number' => $salesOrderNumber,
+                'customer_id' => $validated['customer_id'],
+                'branch_id' => $validated['branch_id'],
+                'store_id' => $validated['store_id'],
+                'user_id' => $validated['user_id'],
+                'total_amount' => $validated['total_amount'],
+                'payment_type' => $validated['payment']['payment_type'],
+                'status' => $validated['payment']['payment_type'] == 'Credit' ? 'Credit Pending' : 'Pending',
             ];
+
+            $salesOrder = SalesOrder::create($order);
+
+            // Insert ProductAudit logs with the correct reference_id
+            foreach ($auditLogs as $log) {
+                $log['reference_id'] = $salesOrder->id;
+                ProductAudit::create($log);
+            }
+
+            // Process Each Item in the Order
+            $itemSoldIds = [];
+
+            foreach ($validated['items'] as $item) {
+                $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+                $storeItem = StoreItem::where('create_item_id', $item['product_id'])
+                    ->where('store_id', $item['store_id'])
+                    ->first();
+
+                $quantityInPieces = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
+
+                $itemSold = ItemSold::create([
+                    'sales_order_id' => $salesOrder->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'unit_price' => $item['unit_price'],
+                    'amount' => $item['quantity'] * ($item['unit_price'] - ($item['discount'] ?? 0)),
+                    'store_id' => $item['store_id'],
+                    'discount' => $item['discount'] ?? 0,
+                    'quantity_pieces' => $quantityInPieces,
+                    'unit_measurement' => $item['unit_measurement'],
+                    'sales_date' => now(),
+                ]);
+
+                $itemSoldIds[] = $itemSold->id;
+            }
+
+
+            DB::commit();
+
+            return response()->json([
+                'message' => 'Sales Order Created Successfully',
+                'data' => $salesOrder
+            ], 200);
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+            Log::error("Error creating sales order: " . $e->getMessage());
+            return response()->json(['error' => 'An error occurred while creating the sales order.'], 500);
         }
-
-        // If any errors were found, return a bad request response
-        if (count($errors) > 0) {
-            return response()->json(['error' => implode(", ", $errors)], 400);
-        }
-
-        // Generate Sales Order Number
-        $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
-
-        // Create a new Sales Order
-        $order = [
-            'sales_order_number' => $salesOrderNumber,
-            'customer_id' => $validated['customer_id'],
-            'branch_id' => $validated['branch_id'],
-            'store_id' => $validated['store_id'],
-            'user_id' => $validated['user_id'],
-            'total_amount' => $validated['total_amount'],
-            'payment_type' => $validated['payment']['payment_type'],
-        ];
-
-        if ($validated['payment']['payment_type'] == 'Credit') {
-            $order["status"] = 'Credit Pending';
-        }
-
-        $salesOrder = SalesOrder::create($order);
-
-        // Now, insert ProductAudit logs with the correct reference_id
-        foreach ($auditLogs as $log) {
-            $log['reference_id'] = $salesOrder->id;
-            ProductAudit::create($log);
-        }
-
-        // Process Each Item in the Order
-        $itemSoldIds = [];
-
-        foreach ($validated['items'] as $item) {
-            $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
-            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
-            $itemSold = ItemSold::create([
-                'sales_order_id' => $salesOrder->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'unit_price' => $item['unit_price'],
-                'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
-                'store_id' => $item['store_id'],
-                'discount' => $item['discount'],
-                'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
-                'unit_measurement' => $item['unit_measurement'],
-                'sales_date' => now(),
-            ]);
-
-            $itemSoldIds[] = $itemSold->id;
-
-            // Update Stock: Increase quantity_holding
-            $storeItem = StoreItem::where('create_item_id', $item['product_id'])
-                ->where('store_id', $item['store_id'])
-                ->first();
-
-            // $storeItem->quantity_holding += $item['quantity'];
-            $storeItem->save();
-        }
-
-        // Find related sales receipts
-        $salesReceipts = SalesReceipt::where('sales_order_id', $salesOrder->id)->get();
-
-        foreach ($salesReceipts as $receipt) {
-            // You can decide how to recalculate amount_paid and total_paid.
-            // For example, set to the new total_amount of the order:
-            $receipt->amount_paid = $salesOrder->total_amount;
-            $receipt->total_amount = $salesOrder->total_amount;
-            $receipt->save();
-        }
-
-        return response()->json([
-            'message' => 'Sales Order Created Successfully',
-            'data' => $salesOrder
-        ], 200);
     }
-
 
 
 
 
     public function edit($id)
     {
+
+
+        // Check if sales order is linked to any releases
+        $salesOrder = SalesOrder::findOrFail($id);
+        $hasRelease = SalesReceipt::where('sales_order_id', $salesOrder->id)
+            ->whereExists(function ($query) {
+                $query->select(DB::raw(1))
+                    ->from('releases')
+                    ->whereColumn('releases.sales_receipt_id', 'sales_receipts.id');
+            })
+            ->exists();
+
+        if ($hasRelease) {
+            return response()->json([
+                'message' => 'Cannot edit sales order that has been released'
+            ], 403);
+        }
+
         // Retrieve the sales order with all related data needed for editing
         $salesOrder = SalesOrder::with([
             'customer',
@@ -354,6 +522,21 @@ class SalesOrderController extends Controller
             // Find the sales order
             $salesOrder = SalesOrder::findOrFail($id);
 
+            $hasRelease = SalesReceipt::where('sales_order_id', $salesOrder->id)
+                ->whereExists(function ($query) {
+                    $query->select(DB::raw(1))
+                        ->from('releases')
+                        ->whereColumn('releases.sales_receipt_id', 'sales_receipts.id');
+                })
+                ->exists();
+
+            if ($hasRelease) {
+                DB::rollBack();
+                return response()->json([
+                    'message' => 'Cannot update sales order that has been released'
+                ], 403);
+            }
+
             // Update sales order details
             $salesOrder->update([
                 'customer_id' => $validated['customer_id'],
@@ -393,10 +576,17 @@ class SalesOrderController extends Controller
             $salesReceipts = SalesReceipt::where('sales_order_id', $salesOrder->id)->get();
 
             foreach ($salesReceipts as $receipt) {
-                // You can decide how to recalculate amount_paid and total_paid.
-                // For example, set to the new total_amount of the order:
                 $receipt->amount_paid = $salesOrder->total_amount;
                 $receipt->total_amount = $salesOrder->total_amount;
+
+                // If payment_detail is a JSON column, update it here.
+                // Example: set all to new total_amount as cash (adjust as needed for your logic)
+                $receipt->payment_detail = json_encode([
+                    [
+                        'payment_type' => $salesOrder->payment_type,
+                        'amount' => $salesOrder->total_amount
+                    ]
+                ]);
                 $receipt->save();
             }
 
@@ -558,6 +748,17 @@ class SalesOrderController extends Controller
             'notes' => 'nullable|string|max:500',
         ]);
 
+        // --- Prevent double returns ---
+        $salesReceipt = SalesReceipt::where('sales_receipt_number', $validated['sales_receipt_number'])->firstOrFail();
+        $existingReturn = ReturnItem::where('sales_receipt_id', $salesReceipt->id)->exists();
+        if ($existingReturn) {
+            return response()->json([
+                'success' => false,
+                'message' => 'This receipt has already been processed for returns.',
+            ], 400);
+        }
+        // --- End double return check ---
+
         DB::beginTransaction();
 
         try {
@@ -603,8 +804,10 @@ class SalesOrderController extends Controller
                     );
                 }
 
-                // Calculate return amount
-                $returnAmount = $itemData['quantity_returned'] * $itemData['unit_price'];
+                // Calculate return amount using discounted unit price
+                $discount = $itemSold->discount ?? 0;
+                $discountedUnitPrice = max(0, ($itemData['unit_price'] ?? 0) - $discount);
+                $returnAmount = $itemData['quantity_returned'] * $discountedUnitPrice;
                 $totalReturnAmount += $returnAmount;
 
                 // Update item_sold record
@@ -614,6 +817,7 @@ class SalesOrderController extends Controller
                 $returnDetails->return_quantity = $itemData['quantity_returned'];
                 $returnDetails->item_sold_id = $itemData['item_sold_id'];
                 $returnDetails->unit_price = $itemData['unit_price'];
+                $returnDetails->discount = $discount; // persist discount at the time of sale
                 $returnDetails->store_id = $itemData['store_id'];
                 $returnDetails->return_quantity_pieces = $itemData['quantity_returned_pieces'];
                 $returnDetails->unit_measurement = $itemData['unit_measurement'];

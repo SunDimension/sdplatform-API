@@ -206,7 +206,10 @@ class ReturnItemController extends Controller
                 });
 
                 $data->amount = $returnItem->returnDetails->sum(function ($detail) {
-                    return -$detail->return_quantity * $detail->unit_price;
+                    $itemSold = $detail->item_sold_id ? \App\Models\ItemSold::find($detail->item_sold_id) : null;
+                    $discount = $detail->discount ?? ($itemSold->discount ?? 0);
+                    $unitPrice = $detail->unit_price ?? 0;
+                    return -$detail->return_quantity * max(0, $unitPrice - $discount);
                 });
                 $salesOrder->total_amount = $totalamount;
                 $salesOrder->save();
@@ -229,7 +232,10 @@ class ReturnItemController extends Controller
                 $data->inflow_status = 3; // claimed status
                 $data->customer_id = $returnItem->customer_id;
                 $data->amount = $returnItem->returnDetails->sum(function ($detail) {
-                    return $detail->return_quantity * $detail->unit_price;
+                    $itemSold = $detail->item_sold_id ? \App\Models\ItemSold::find($detail->item_sold_id) : null;
+                    $discount = $detail->discount ?? ($itemSold->discount ?? 0);
+                    $unitPrice = $detail->unit_price ?? 0;
+                    return $detail->return_quantity * max(0, $unitPrice - $discount);
                 });
                 $data->narration = "Return of items";
                 $data->inflow_date = now();
@@ -325,9 +331,12 @@ class ReturnItemController extends Controller
             ], 400);
         }
 
-        // Calculate return amount
+        // Calculate return amount using discounted unit price
         $returnAmount = $returnItem->returnDetails->sum(function ($detail) {
-            return $detail->return_quantity * $detail->unit_price;
+            $itemSold = $detail->item_sold_id ? \App\Models\ItemSold::find($detail->item_sold_id) : null;
+            $discount = $detail->discount ?? ($itemSold->discount ?? 0);
+            $unitPrice = $detail->unit_price ?? 0;
+            return $detail->return_quantity * max(0, $unitPrice - $discount);
         });
 
         DB::beginTransaction();

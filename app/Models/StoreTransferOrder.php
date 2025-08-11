@@ -21,19 +21,11 @@ class StoreTransferOrder extends Model
     protected $fillable = [
         'order_number',
         'transfer_date',
-        'source_branch_id',
         'source_store_id',
-        'destination_branch_id',
         'destination_store_id',
-        'approval_stage_id',
-        'source_status',
-        'source_approved_by',
-        'source_approval_date',
-        'destination_status',
-        'destination_approved_by',
-        'destination_approval_date',
-        'branch_approved_by',
-        'branch_approval_date',
+        'status',
+        'approved_by',
+        'approved_at',
         'created_by',
         'modified_by',
         'deleted_by',
@@ -46,14 +38,9 @@ class StoreTransferOrder extends Model
      */
     protected $casts = [
         'transfer_date' => 'datetime',
-        'source_branch_id' => 'integer',
         'source_store_id' => 'integer',
-        'destination_branch_id' => 'integer',
         'destination_store_id' => 'integer',
-        'approval_stage_id' => 'integer',
-        'source_approval_date' => 'timestamp',
-        'destination_approval_date' => 'timestamp',
-        'branch_approval_date' => 'timestamp',
+        'approved_at' => 'timestamp',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
@@ -76,29 +63,14 @@ class StoreTransferOrder extends Model
         return $this->hasMany(StoreTransferItem::class, 'transfer_order_id');
     }
 
-    public function sourceBranch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class, 'destination_branch_id');
-    }
-
     public function sourceStore(): BelongsTo
     {
         return $this->belongsTo(Store::class, 'source_store_id');
     }
 
-    public function destinationBranch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class, 'destination_branch_id');
-    }
-
     public function destinationStore(): BelongsTo
     {
         return $this->belongsTo(Store::class, 'destination_store_id');
-    }
-
-    public function approvalStage(): BelongsTo
-    {
-        return $this->belongsTo(ApprovalStage::class);
     }
 
     public function createdBy(): BelongsTo

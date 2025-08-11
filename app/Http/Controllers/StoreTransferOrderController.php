@@ -26,34 +26,12 @@ class StoreTransferOrderController extends Controller
 
     public function pending(Request $request)
     {
-        $receiveOrders = StoreTransferOrder::where('source_status', 'outgoing')
-            ->where('source_store_id', auth()->user()->store_id)
-            ->get();
-
-        $receiveOrders2 = StoreTransferOrder::where('destination_status', 'incoming')
-            ->where('source_status', 'approved')
+        $receiveOrders = StoreTransferOrder::where('status', 'pending')
             ->where('destination_store_id', auth()->user()->store_id)
             ->get();
 
         return response()->json(['data' => [
-            'incoming' => StoreTransferOrderResource::collection($receiveOrders),
-            'outgoing' => StoreTransferOrderResource::collection($receiveOrders2)
-        ]]);
-    }
-
-    public function branch_pending(Request $request)
-    {
-        $receiveOrders = StoreTransferOrder::where('source_status', 'Pending')
-            ->where('source_branch_id', auth()->user()->branch_id)
-            ->get();
-
-        $receiveOrders2 = StoreTransferOrder::where('destination_status', 'Pending')
-            ->where('destination_branch_id', auth()->user()->branch_id)
-            ->get();
-
-        return response()->json(['data' => [
-            'incoming' => StoreTransferOrderResource::collection($receiveOrders),
-            'outgoing' => StoreTransferOrderResource::collection($receiveOrders2)
+            'incoming' => StoreTransferOrderResource::collection($receiveOrders)
         ]]);
     }
 
@@ -90,8 +68,7 @@ class StoreTransferOrderController extends Controller
     public function store(StoreTransferOrderStoreRequest $request)
     {
         $validated = $request->validated();
-        $validated['source_status'] = 'outgoing';
-        $validated['destination_status'] = 'incoming';
+        $validated['status'] = 'pending';
         $validated['created_by'] = auth()->user()->id;
 
         DB::beginTransaction();
@@ -155,97 +132,61 @@ class StoreTransferOrderController extends Controller
         $validated = $request->validate([
             'comment' => ['nullable'],
             'status' => ['required', 'string'],
-            'id' => ['required', 'string'],
-            'source' => ['required', 'string'],
-            'stage' => ['required', 'string']
+            'id' => ['required', 'string']
         ]);
 
         DB::beginTransaction();
         try {
-            if ($validated['source'] == 'source') {
-                $storeTransferOrder = StoreTransferOrder::where('id', $validated['id'])
-                    ->where('source_status', $validated['stage'] == 'store' ? 'outgoing' : 'pending')
-                    ->firstOrFail();
+            $storeTransferOrder = StoreTransferOrder::where('id', $validated['id'])
+                ->where('status', 'pending')
+                ->firstOrFail();
 
-                if ($validated['stage'] == 'store') {
-                    $storeTransferOrder->source_status = $validated['status'];
-                    $storeTransferOrder->source_store_approval_by = auth()->user()->id;
-                    $storeTransferOrder->source_store_approval_date = now();
-                } elseif ($validated['stage'] == 'branch') {
-                    $storeTransferOrder->source_status = $validated['status'];
-                    $storeTransferOrder->source_branch_approval_by = auth()->user()->id;
-                    $storeTransferOrder->source_branch_approval_date = now();
-                }
+            $storeTransferOrder->status = $validated['status'];
+            $storeTransferOrder->approved_by = auth()->user()->id;
+            $storeTransferOrder->approved_at = now();
 
-                // If this is final source approval, update source store inventory
-                if ($validated['status'] == 'approved' && $validated['stage'] == 'store') {
-                    foreach ($storeTransferOrder->items as $item) {
-                        $sourceStoreItem = StoreItem::firstOrCreate([
-                            'create_item_id' => $item->product_id,
-                            'store_id' => $storeTransferOrder->source_store_id
-                        ]);
+            // If this is final approval, update inventories
+            if ($storeTransferOrder->status == 'approved') {
+                foreach ($storeTransferOrder->items as $item) {
+                    $sourceStoreItem = StoreItem::firstOrCreate([
+                        'create_item_id' => $item->product_id,
+                        'store_id' => $storeTransferOrder->source_store_id
+                    ]);
+                    $destStoreItem = StoreItem::firstOrCreate([
+                        'create_item_id' => $item->product_id,
+                        'store_id' => $storeTransferOrder->destination_store_id
+                    ]);
 
-                        $prevQty = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->source_store_id);
-                        $sourceStoreItem->save();
-                        $newQty = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->source_store_id);
-                        $this->logTransferAudit(
-                            ProductAudit::ACTION_TRANSFER_OUT,
-                            $item->product_id,
-                            $storeTransferOrder->source_store_id,
-                            -$item->quantity_pieces,
-                            $storeTransferOrder->id,
-                            'StoreTransferOrder',
-                            'Inventory deducted for transfer to store ' . $storeTransferOrder->destination_store_id,
-                            $prevQty,
-                            $newQty
-                        );
-                    }
-                }
-            } elseif ($validated['source'] == 'destination') {
-                $storeTransferOrder = StoreTransferOrder::where('id', $validated['id'])
-                    ->where('destination_status', $validated['stage'] == 'store' ? 'incoming' : 'pending')
-                    ->firstOrFail();
+                    $prevQtySource = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->source_store_id);
+                    $prevQtyDest = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->destination_store_id);
 
-                if ($validated['stage'] == 'store') {
-                    $storeTransferOrder->destination_status = $validated['status'];
-                    $storeTransferOrder->destination_store_approval_by = auth()->user()->id;
-                    $storeTransferOrder->destination_store_approval_date = now();
+                    $sourceStoreItem->save();
+                    $destStoreItem->save();
+                    $newQtySource = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->source_store_id);
+                    $newQtyDest = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->destination_store_id);
 
-                    if (
-                        $storeTransferOrder->destination_branch_id == $storeTransferOrder->source_branch_id &&
-                        $validated['status'] == 'pending'
-                    ) {
-                        $storeTransferOrder->destination_status = 'approved';
-                    }
-                } elseif ($validated['stage'] == 'branch') {
-                    $storeTransferOrder->destination_status = $validated['status'];
-                    $storeTransferOrder->destination_branch_approval_by = auth()->user()->id;
-                    $storeTransferOrder->destination_branch_approval_date = now();
-                }
-
-                // If this is final destination approval, update destination store inventory
-                if ($storeTransferOrder->destination_status == 'approved' && $validated['stage'] == 'store') {
-                    foreach ($storeTransferOrder->items as $item) {
-                        $destStoreItem = StoreItem::firstOrCreate([
-                            'create_item_id' => $item->product_id,
-                            'store_id' => $storeTransferOrder->destination_store_id
-                        ]);
-
-                        $prevQty = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->destination_store_id);
-                        $destStoreItem->save();
-                        $newQty = StockUtil::getQuantityForRequest($item->product_id, $storeTransferOrder->destination_store_id);
-                        $this->logTransferAudit(
-                            ProductAudit::ACTION_TRANSFER_IN,
-                            $item->product_id,
-                            $storeTransferOrder->destination_store_id,
-                            $item->quantity_pieces,
-                            $storeTransferOrder->id,
-                            'StoreTransferOrder',
-                            'Inventory received from store ' . $storeTransferOrder->source_store_id,
-                            $prevQty,
-                            $newQty
-                        );
-                    }
+                    $this->logTransferAudit(
+                        ProductAudit::ACTION_TRANSFER_OUT,
+                        $item->product_id,
+                        $storeTransferOrder->source_store_id,
+                        -$item->quantity_pieces,
+                        $storeTransferOrder->id,
+                        'StoreTransferOrder',
+                        'Inventory deducted for transfer to store ' . $storeTransferOrder->destination_store_id,
+                        $prevQtySource,
+                        $newQtySource
+                    );
+                    $this->logTransferAudit(
+                        ProductAudit::ACTION_TRANSFER_IN,
+                        $item->product_id,
+                        $storeTransferOrder->destination_store_id,
+                        $item->quantity_pieces,
+                        $storeTransferOrder->id,
+                        'StoreTransferOrder',
+                        'Inventory received from store ' . $storeTransferOrder->source_store_id,
+                        $prevQtyDest,
+                        $newQtyDest
+                    );
                 }
             }
 

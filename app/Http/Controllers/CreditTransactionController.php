@@ -11,6 +11,9 @@ use App\Models\CreditTransaction;
 use App\Models\Customer;
 use App\Models\SalesOrder;
 use App\Models\SalesReceipt;
+use App\Models\ProductAudit;
+use App\Models\StoreItem;
+use App\Classes\StockUtil;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
@@ -44,16 +47,22 @@ class CreditTransactionController extends Controller
     {
         $data = $request->validated();
         $data["created_by"] = auth()->user()->id;
-        $customer = Customer::findOrFail($data['customer_id']);
-        $creditSum = CreditTransaction::where('customer_id', $data['customer_id'])->sum('amount');
-        $data['credit_balance_before'] = $customer->credit_limit - $creditSum;
-        $data['credit_balance_after'] = $customer->credit_limit - $creditSum - $data['amount'];
-        //$data->credit_limit = $customer->credit_limit;
+
+        // Calculate previous debt (not based on credit limit)
+        $totalCredit = CreditTransaction::where('customer_id', $data['customer_id'])
+            ->where('type', 'credit')
+            ->sum('amount');
+        $totalPayment = CreditTransaction::where('customer_id', $data['customer_id'])
+            ->where('type', 'payment')
+            ->sum('amount');
+        $previousDebt = $totalCredit - $totalPayment;
+        $data['credit_balance_before'] = $previousDebt;
+        $data['credit_balance_after'] = $previousDebt + $data['amount'];
 
         $creditTransaction = CreditTransaction::create($data);
         if ($creditTransaction->type == 'credit') {
             $salesOrder = SalesOrder::findOrFail($creditTransaction->sales_order_id);
-            $salesOrder->credit_limit = $creditTransaction->credit_balance_before;
+            // Remove credit_limit from calculation and assignment
             $salesOrder->credit_balance = $creditTransaction->amount;
             $salesOrder->status = "Pending";
 
@@ -188,4 +197,63 @@ class CreditTransactionController extends Controller
             ], 404);
         }
     }
+
+    // public function cancelCredit($id)
+    // {
+    //     // Start a database transaction
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Find the sales order
+    //         $salesOrder = SalesOrder::with('itemSold')->findOrFail($id);
+
+    //         // Check if the sales order is already canceled
+    //         if ($salesOrder->status === 'Canceled') {
+    //             return response()->json(['message' => 'Sales Order is already canceled.'], 400);
+    //         }
+
+    //         // Loop through items in the sales order and restore stock
+    //         foreach ($salesOrder->itemSold as $itemSold) {
+    //             $storeItem = StoreItem::where('create_item_id', $itemSold->product_id)
+    //                 ->where('store_id', $salesOrder->store_id)
+    //                 ->first();
+
+    //             if ($storeItem) {
+    //                 // Calculate previous quantity using StockUtil
+    //                 $previousQuantity = StockUtil::getQuantityForRequest($itemSold->product_id, $itemSold->store_id);
+    //                 $quantityChange = $itemSold->quantity_pieces;
+    //                 $newQuantity = $previousQuantity + $quantityChange;
+
+
+    //                 // Log the restoration in ProductAudit
+    //                 ProductAudit::create([
+    //                     'action_type' => 'restored',
+    //                     'product_id' => $itemSold->product_id,
+    //                     'user_id' => auth()->id(),
+    //                     'quantity_change' => $quantityChange,
+    //                     'previous_quantity' => $previousQuantity,
+    //                     'new_quantity' => $newQuantity,
+    //                     'reference_type' => 'SalesOrder',
+    //                     'reference_id' => $salesOrder->id,
+    //                     'store_id' => $salesOrder->store_id,
+    //                     'notes' => 'Stock restored due to order cancellation'
+    //                 ]);
+    //             } else {
+    //                 Log::warning("StoreItem for product {$itemSold->product_id} not found in store {$salesOrder->store_id}");
+    //             }
+    //         }
+
+    //         // Update the order status to 'Canceled' instead of deleting it
+    //         $salesOrder->update(['status' => 'Canceled']);
+
+    //         // Commit the transaction
+    //         DB::commit();
+
+    //         return response()->json(['message' => 'Sales Order Canceled Successfully.'], 200);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error canceling sales order: ' . $e->getMessage());
+    //         return response()->json(['message' => 'An error occurred while canceling the order.'], 500);
+    //     }
+    // }
 }

@@ -41,23 +41,26 @@ class SalesReceiptResource extends JsonResource
             'payment_detail' => $details,
             //'cash'
             'return_items' => $this->whenLoaded('returnItems', function () {
-                return $this->returnItems->map(function ($item) {
-                    return [
-                        'id' => $item->id,
-                        'return_date' => $item->return_date,
-                        'return_status' => $item->return_status,
-                        'return_details' => $item->returnDetails->map(function ($detail) {
-                            return [
-                                'id' => $detail->id,
-                                'product_id' => $detail->product_id,
-                                'product_name' => $detail->product->name ?? null,
-                                'return_quantity' => $detail->return_quantity,
-                                'unit_price' => $detail->unit_price,
-                                'amount' => $detail->return_quantity * $detail->unit_price
-                            ];
-                        })
-                    ];
-                });
+                return $this->returnItems
+                    ->where('return_status', 'Approved')
+                    ->values()
+                    ->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'return_date' => $item->return_date,
+                            'return_status' => $item->return_status,
+                            'return_details' => $item->returnDetails->map(function ($detail) {
+                                return [
+                                    'id' => $detail->id,
+                                    'product_id' => $detail->product_id,
+                                    'product_name' => $detail->product->name ?? null,
+                                    'return_quantity' => $detail->return_quantity,
+                                    'unit_price' => $detail->unit_price,
+                                    'amount' => ($detail->return_quantity ?? 0) * ($detail->unit_price ?? 0)
+                                ];
+                            })
+                        ];
+                    });
             }),
 
         ];

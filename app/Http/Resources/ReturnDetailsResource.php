@@ -18,6 +18,7 @@ class ReturnDetailsResource extends JsonResource
             'unit_price' => $this->unit_price,
             'store_id' => $this->store_id,
             'store_name' => $this->store->name ?? null,
+            'discount' => $this->discount ?? 0,
             'unit_measurement' => $this->unit_measurement,
             'unit_measurement_name' => $this->measurement->name ?? null,
             'item_sold_id' => $this->item_sold_id,

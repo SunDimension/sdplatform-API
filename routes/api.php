@@ -170,6 +170,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
 
 
+   
+Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::class, 'cancelCredit']);
+
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
 
     Route::get('/post-outflow/customer-inflow-details', [PostOutflowController::class, 'getCustomerInflowDetails']);
