@@ -41,10 +41,50 @@ class StockUtil
         $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
 
         // Additional stock adjustments (if needed)
+        $stockTransfered = self::getTotalReceivedViaTransferQuantity($item_id, $store_id) - self::getTotalTransferredQuantity($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
         return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
     }
+
+    /**
+     * Get the available quantity for a request (excluding pending sales).
+     *
+     * @param int $item_id
+     * @param int $store_id
+     * @return float
+     */
+    // public static function getQuantityForRequest($item_id, $store_id)
+    // {
+    //     // Get the opening stock quantity
+    //     $storeItem = StoreItem::where('create_item_id', $item_id)
+    //         ->where('store_id', $store_id)
+    //         ->first();
+
+    //     if (!$storeItem) {
+    //         Log::warning("StoreItem not found for item_id: $item_id and store_id: $store_id");
+    //         return 0;
+    //     }
+
+    //     $openStock = $storeItem->open_stock * $storeItem->quantity_in_package;
+
+    //     // Calculate total received quantity
+    //     $stockReceived = self::getTotalReceivedQuantity($item_id, $store_id);
+
+    //     // Calculate total released quantity
+    //     $stockReleased = self::getTotalReleasedQuantity($item_id, $store_id);
+
+    //     // Calculate pending sales quantity
+    //     $stockSalesPending = self::getTotalPendingSalesQuantity($item_id, $store_id);
+
+    //     // Additional stock adjustments (if needed)
+    //     $stockTransfered = self::getTotalReceivedViaTransferQuantityRequest($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
+    //     $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
+
+    //     return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
+    // }
+
+
 
     /**
      * Get the available quantity for a request (excluding pending sales).
@@ -80,10 +120,13 @@ class StockUtil
         $stockTransfered = self::getTotalReceivedViaTransferQuantityRequest($item_id, $store_id) - self::getTotalTransferredQuantityRequest($item_id, $store_id); // Example: Transfers to other stores
         $stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
-        return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
+        // Calculate available quantity and ensure it doesn't go negative
+        $availableQuantity = $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned - $stockSalesPending;
+
+        return max(0, $availableQuantity); // Ensure quantity is never negative
     }
 
-    
+
     /**
      * Get the total transferred quantity for an item from a store (outgoing transfers).
      *
@@ -99,7 +142,7 @@ class StockUtil
             ->select('store_transfer_items.product_id', DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
             ->where('store_transfer_items.product_id', $item_id)
             ->where('store_transfer_orders.source_store_id', $store_id)
-            ->whereIn('store_transfer_orders.source_status', ['approved']) // Only count approved/outgoing
+            // ->whereIn('store_transfer_orders.source_status', ['approved']) // Only count approved/outgoing
             ->groupBy('store_transfer_items.product_id')
             ->first();
 
@@ -121,7 +164,7 @@ class StockUtil
             ->select('store_transfer_items.product_id', DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
             ->where('store_transfer_items.product_id', $item_id)
             ->where('store_transfer_orders.destination_store_id', $store_id)
-            ->whereIn('store_transfer_orders.destination_status', ['approved']) // Only count approved/incoming
+            ->whereIn('store_transfer_orders.status', ['approved']) // Only count approved/incoming
             ->groupBy('store_transfer_items.product_id')
             ->first();
 
@@ -143,8 +186,8 @@ class StockUtil
             ->select('store_transfer_items.product_id', DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
             ->where('store_transfer_items.product_id', $item_id)
             ->where('store_transfer_orders.source_store_id', $store_id)
-            ->whereIn('store_transfer_orders.source_status', ['approved', 'outgoing','pe
-            nding']) // Only count approved/outgoing
+            // ->whereIn('store_transfer_orders.source_status', ['approved', 'outgoing', 'pe
+            // nding']) // Only count approved/outgoing
             ->groupBy('store_transfer_items.product_id')
             ->first();
 
@@ -166,7 +209,7 @@ class StockUtil
             ->select('store_transfer_items.product_id', DB::raw('SUM(store_transfer_items.quantity_pieces) as total_quantity'))
             ->where('store_transfer_items.product_id', $item_id)
             ->where('store_transfer_orders.destination_store_id', $store_id)
-            ->whereIn('store_transfer_orders.destination_status', ['approved', 'incoming', 'pending']) // Only count approved/incoming
+            ->whereIn('store_transfer_orders.status', ['approved', 'cancelled', 'pending']) // Only count approved/incoming
             ->groupBy('store_transfer_items.product_id')
             ->first();
 
@@ -202,7 +245,7 @@ class StockUtil
 
         //$stockReturned = self::getTotalReturnQuantity($item_id, $store_id);  // Example: Returned items
 
-        return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned ;
+        return $openStock + $stockReceived - $stockReleased + $stockTransfered + $stockReturned;
     }
 
     /**

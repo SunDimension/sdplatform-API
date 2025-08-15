@@ -68,6 +68,8 @@ class CustomerController extends Controller
 
 
 
+
+
     public function balances()
     {
         $user = auth()->user();

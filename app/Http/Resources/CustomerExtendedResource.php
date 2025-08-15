@@ -19,15 +19,15 @@ class CustomerExtendedResource extends JsonResource
             'surname' => $this->surname,
             'firstname' => $this->firstname,
             'middlename' => $this->middlename,
-            'name' => trim($this->surname . ' ' . $this->firstname), 
+            'name' => trim($this->surname . ' ' . $this->firstname),
             'address' => $this->address,
             'phone_number' => $this->phone_number,
             'customer_type_id' => $this->customer_type_id,
             'title_id' => $this->title_id,
-            'branch_id'=>$this->branch_id,
-            'branch_name'=>$this->branch_name,
+            'branch_id' => $this->branch_id,
+            'branch_name' => $this->branch_name,
             'credit_limit' => $this->credit_limit,
-            'credit_balance' => $this->credit_balance ??$this->credit_limit,
+            'credit_balance' => $this->credit_balance ?? $this->credit_limit,
             'total_credit' => $this->total_credit ?? 0,
             'total_payment' => $this->total_payment ?? 0,
             'balance' => ($this->total_payment ?? 0) - ($this->total_payment ?? 0),
@@ -36,7 +36,16 @@ class CustomerExtendedResource extends JsonResource
             'deposit_balance' => $this->total_inflow ?? 0 - $this->total_outflow ?? 0,
             'inflows' => PostInflowResource::collection($this->whenLoaded("inflows")),
             'outflows' => PostOutflowResource::collection($this->whenLoaded("outflows")),
-            'creditTransactions' => CreditTransactionResource::collection($this->whenLoaded("creditTransactions")), 
+            'creditTransactions' => $this->creditTransactions->map(function ($transaction) {
+                return [
+                    'id' => $transaction->id,
+                    'type' => $transaction->type,
+                    'amount' => $transaction->amount,
+                    'credit_balance_before' => $transaction->credit_balance_before ?? 0,
+                    'current_debt' => $transaction->current_debt ?? 0,
+                    'created_at' => $transaction->created_at,
+                ];
+            }),
         ];
     }
 }

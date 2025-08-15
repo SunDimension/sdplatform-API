@@ -40,11 +40,19 @@ class ProductAudit extends Model
     const ACTION_CREATED = 'created';
     const ACTION_UPDATED = 'updated';
     const ACTION_DELETED = 'deleted';
+    const ACTION_RELEASED = 'released';
+    const ACTION_PENDING_RECEIPT = 'pending_receipt';
     const ACTION_RECEIVED = 'received';
+    const ACTION_RECEIPT_CANCELLED = 'receipt_cancelled';
     const ACTION_SOLD = 'sold';
     const ACTION_RETURNED = 'returned';
     const ACTION_PRICE_CHANGE = 'price_change';
     const ACTION_STOCK_ADJUSTMENT = 'stock_adjustment';
+    const ACTION_TRANSFER_OUT_PENDING = 'transfer_out_pending';
+    const ACTION_TRANSFER_IN_PENDING = 'transfer_in_pending';
+    const ACTION_TRANSFER_OUT = 'transfer_out';
+    const ACTION_TRANSFER_IN = 'transfer_in';
+    const ACTION_TRANSFER_CANCELLED = 'transfer_cancelled';
 
     /**
      * Get the user who performed the action
@@ -67,7 +75,7 @@ class ProductAudit extends Model
      */
     public function store()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class, 'store_id');
     }
 
     /**
@@ -120,8 +128,9 @@ class ProductAudit extends Model
         ]);
     }
 
-      // Polymorphic relationship to reference various models
-    public function reference() {
+    // Polymorphic relationship to reference various models
+    public function reference()
+    {
         return $this->morphTo(__FUNCTION__, 'reference_type', 'reference_id');
     }
 }
