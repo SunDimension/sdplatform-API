@@ -137,10 +137,6 @@ class SalesReceiptController extends Controller
     }
 
 
-
-
-
-
     public function myReceipts(Request $request)
     {
 

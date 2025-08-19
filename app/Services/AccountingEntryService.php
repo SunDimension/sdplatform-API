@@ -14,6 +14,7 @@ use App\Models\SalesReceipt;
 use App\Models\PostInflow;
 use App\Models\PostOutflow;
 use App\Models\ReturnItem;
+use App\Models\FinancialPeriod;
 
 class AccountingEntryService
 {
@@ -207,7 +208,13 @@ class AccountingEntryService
             'amount' => $transferData['amount'],
             'description' => 'Inventory Transfer Out',
             'account_id' => $this->getAccountId('Inventory'),
-            'account_no' => $this->getAccountNo('Inventory')
+            'account_no' => $this->getAccountNo('Inventory'),
+            'store_id' => $transferData['source_store_id'], // Source store for this entry
+            'branch_id' => $transferData['source_branch_id'] ?? null,
+            'transaction_date' => $transferData['transaction_date'],
+            'transcode' => 'STK_TRF_OUT', // Stock Transfer Out code
+            'transtype' => 'TRANSFER_OUT',
+            'naration' => 'Inventory Transfer Out to ' . $transferData['destination_store_id']
         ];
 
         // Destination store inventory increase
@@ -216,14 +223,27 @@ class AccountingEntryService
             'amount' => $transferData['amount'],
             'description' => 'Inventory Transfer In',
             'account_id' => $this->getAccountId('Inventory'),
-            'account_no' => $this->getAccountNo('Inventory')
+            'account_no' => $this->getAccountNo('Inventory'),
+            'store_id' => $transferData['destination_store_id'], // Destination store for this entry
+            'branch_id' => $transferData['destination_branch_id'] ?? null,
+            'transaction_date' => $transferData['transaction_date'],
+            'transcode' => 'STK_TRF_IN', // Stock Transfer In code
+            'transtype' => 'TRANSFER_IN',
+            'naration' => 'Inventory Transfer In from ' . $transferData['source_store_id']
         ];
 
         return $this->createInventoryEntries([
             'description' => 'Stock Transfer - ' . $transferData['reference'],
             'transaction_date' => $transferData['transaction_date'],
-            'store_id' => $transferData['source_store_id'],
-            'entries' => $entries
+            'store_id' => $transferData['destination_store_id'], // Use destination store for journal entry header
+            'branch_id' => $transferData['destination_branch_id'] ?? null,
+            'vendor_id' => null, // Transfers don't involve vendors
+            'entries' => $entries,
+            // Add fields needed for Transaction creation
+            'financial_period_id' => $transferData['financial_period_id'] ?? $this->getCurrentFinancialPeriodId(),
+            'transcode' => 'STK_TRF', // Stock Transfer code
+            'transtype' => 'TRANSFER',
+            'naration' => 'Stock Transfer between stores'
         ]);
     }
 
@@ -296,20 +316,26 @@ class AccountingEntryService
     private function createTransactions($data)
     {
         foreach ($data['entries'] as $entry) {
+            $transactionDate = $entry['transaction_date'] ?? $data['transaction_date'];
+            
             Transaction::create([
-                'financial_period_id' => $data['financial_period_id'],
-                'transaction_date' => $data['transaction_date'],
-                'transcode' => $data['transcode'] ?? 'INV',
-                'transtype' => $data['transtype'] ?? 'Inventory',
+                'financial_period_id' => $entry['financial_period_id'] ?? 
+                                       $data['financial_period_id'] ?? 
+                                       $this->getFinancialPeriodId($transactionDate),
+                'transaction_date' => $transactionDate,
+                'transcode' => $entry['transcode'] ?? $data['transcode'] ?? 'INV',
+                'transtype' => $entry['transtype'] ?? $data['transtype'] ?? 'Inventory',
                 'naration' => $entry['description'],
                 'debit' => $entry['journal_type_id'] == 1 ? $entry['amount'] : 0,
                 'credit' => $entry['journal_type_id'] == 2 ? $entry['amount'] : 0,
                 'amount' => $entry['amount'],
-                'store_id' => $data['store_id'],
+                'store_id' => $entry['store_id'] ?? $data['store_id'],
+                'branch_id' => $entry['branch_id'] ?? $data['branch_id'] ?? null,
                 'account_no' => $entry['account_no'],
                 'account_id' => $entry['account_id'],
                 'created_by' => auth()->id()
             ]);
+
         }
     }
 
@@ -329,6 +355,19 @@ class AccountingEntryService
     {
         $account = Account::where('name', $name)->first();
         return $account ? $account->code : null;
+    }
+
+    /**
+     * Get financial period ID for a given date
+     */
+    private function getFinancialPeriodId($date)
+    {
+        $financialPeriod = \App\Models\FinancialPeriod::where('date_from', '<=', $date)
+            ->where('date_to', '>=', $date)
+            ->where('is_active', true)
+            ->first();
+        
+        return $financialPeriod ? $financialPeriod->id : null;
     }
 
     /**
@@ -362,7 +401,7 @@ class AccountingEntryService
                 $storeItem = StoreItem::where('create_item_id', $itemSold->product_id)
                     ->where('store_id', $itemSold->store_id)
                     ->first();
-                
+
                 if ($storeItem) {
                     $costAmount = $storeItem->cost_price * $itemSold->quantity;
                     $totalCost += $costAmount;
@@ -425,21 +464,67 @@ class AccountingEntryService
                 ]);
             }
 
-            // Create transaction records
+            // Create transaction records for all journal entry details
             $this->createTransactions([
-                'description' => "Sales Order #{$salesOrder->sales_order_number}",
-                'transaction_date' => $salesOrder->sales_date ?? now(),
-                'transcode' => 'SO',
-                'transtype' => 'Sales',
-                'naration' => "Sales Order #{$salesOrder->sales_order_number}",
-                'debit' => $totalAmount,
-                'credit' => $totalAmount,
-                'amount' => $totalAmount,
-                'store_id' => $salesOrder->store_id,
-                'branch_id' => $salesOrder->branch_id,
-                'account_no' => $this->getAccountNo('Sales Revenue'),
-                'account_id' => $this->getAccountId('Sales Revenue'),
-                'created_by' => auth()->id()
+                'entries' => [
+                    // COGS entries
+                    [
+                        'journal_type_id' => 1, // Debit
+                        'amount' => $totalCost,
+                        'description' => "Cost of Goods Sold for Sales Order #{$salesOrder->sales_order_number}",
+                        'account_id' => $this->getAccountId('Cost of Goods Sold'),
+                        'account_no' => $this->getAccountNo('Cost of Goods Sold'),
+                        'transaction_date' => $salesOrder->sales_date ?? now(),
+                        'store_id' => $salesOrder->store_id,
+                        'branch_id' => $salesOrder->branch_id,
+                        'transcode' => 'SO',
+                        'transtype' => 'Sales'
+                    ],
+                    [
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $totalCost,
+                        'description' => "Inventory reduction for Sales Order #{$salesOrder->sales_order_number}",
+                        'account_id' => $this->getAccountId('Inventory'),
+                        'account_no' => $this->getAccountNo('Inventory'),
+                        'transaction_date' => $salesOrder->sales_date ?? now(),
+                        'store_id' => $salesOrder->store_id,
+                        'branch_id' => $salesOrder->branch_id,
+                        'transcode' => 'SO',
+                        'transtype' => 'Sales'
+                    ],
+                    // Sales Revenue entry
+                    [
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $totalAmount,
+                        'description' => "Sales Revenue for Sales Order #{$salesOrder->sales_order_number}",
+                        'account_id' => $this->getAccountId('Sales Revenue'),
+                        'account_no' => $this->getAccountNo('Sales Revenue'),
+                        'transaction_date' => $salesOrder->sales_date ?? now(),
+                        'store_id' => $salesOrder->store_id,
+                        'branch_id' => $salesOrder->branch_id,
+                        'transcode' => 'SO',
+                        'transtype' => 'Sales'
+                    ],
+                    // Accounts Receivable or Cash/Bank entry
+                    [
+                        'journal_type_id' => 1, // Debit
+                        'amount' => $totalAmount,
+                        'description' => $salesOrder->payment_type === 'Credit' ? 
+                            "Accounts Receivable for Sales Order #{$salesOrder->sales_order_number}" :
+                            "Cash/Bank for Sales Order #{$salesOrder->sales_order_number}",
+                        'account_id' => $salesOrder->payment_type === 'Credit' ? 
+                            $this->getAccountId('Accounts Receivable') :
+                            $this->getAccountId($salesOrder->payment_type === 'Bank' ? 'Bank' : 'Cash'),
+                        'account_no' => $salesOrder->payment_type === 'Credit' ? 
+                            $this->getAccountNo('Accounts Receivable') :
+                            $this->getAccountNo($salesOrder->payment_type === 'Bank' ? 'Bank' : 'Cash'),
+                        'transaction_date' => $salesOrder->sales_date ?? now(),
+                        'store_id' => $salesOrder->store_id,
+                        'branch_id' => $salesOrder->branch_id,
+                        'transcode' => 'SO',
+                        'transtype' => 'Sales'
+                    ]
+                ]
             ]);
 
             return $journalEntry;
@@ -470,8 +555,8 @@ class AccountingEntryService
                 'journal_type_id' => 1, // Debit
                 'amount' => $salesReceipt->amount_paid,
                 'description' => "Payment received for Sales Receipt #{$salesReceipt->sales_receipt_number}",
-                'account_id' => $this->getAccountId($salesReceipt->payment_type === 'Bank' ? 'Bank' : 'Cash'),
-                'account_no' => $this->getAccountNo($salesReceipt->payment_type === 'Bank' ? 'Bank' : 'Cash'),
+                'account_id' => $this->getAccountId($salesReceipt->payment_type === 'Bank' ? 'Bank Accounts' : 'Cash Accounts'),
+                'account_no' => $this->getAccountNo($salesReceipt->payment_type === 'Bank' ? 'Bank Accounts' : 'Cash Accounts'),
                 'created_by' => auth()->id()
             ]);
 
@@ -486,21 +571,34 @@ class AccountingEntryService
                 'created_by' => auth()->id()
             ]);
 
-            // Create transaction records
+            // Create transaction records for both entries
             $this->createTransactions([
-                'description' => "Sales Receipt #{$salesReceipt->sales_receipt_number}",
-                'transaction_date' => $salesReceipt->payment_date ?? now(),
-                'transcode' => 'SR',
-                'transtype' => 'Payment',
-                'naration' => "Payment received for Sales Receipt #{$salesReceipt->sales_receipt_number}",
-                'debit' => $salesReceipt->amount_paid,
-                'credit' => $salesReceipt->amount_paid,
-                'amount' => $salesReceipt->amount_paid,
-                'store_id' => $salesReceipt->store_id,
-                'branch_id' => $salesReceipt->branch_id,
-                'account_no' => $this->getAccountNo('Accounts Receivable'),
-                'account_id' => $this->getAccountId('Accounts Receivable'),
-                'created_by' => auth()->id()
+                'entries' => [
+                    [
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $salesReceipt->amount_paid,
+                        'description' => "Accounts Receivable reduction for Sales Receipt #{$salesReceipt->sales_receipt_number}",
+                        'account_id' => $this->getAccountId('Accounts Receivable'),
+                        'account_no' => $this->getAccountNo('Accounts Receivable'),
+                        'transaction_date' => $salesReceipt->payment_date ?? now(),
+                        'store_id' => $salesReceipt->store_id,
+                        'branch_id' => $salesReceipt->branch_id,
+                        'transcode' => $salesReceipt->sales_receipt_number,
+                        'transtype' => 'Payment'
+                    ],
+                    [
+                        'journal_type_id' => 1, // Debit
+                        'amount' => $salesReceipt->amount_paid,
+                        'description' => "Payment received for Sales Receipt #{$salesReceipt->sales_receipt_number}",
+                        'account_id' => $this->getAccountId($salesReceipt->payment_type === 'Bank' ? 'Bank Accounts' : 'Cash Accounts'),
+                        'account_no' => $this->getAccountNo($salesReceipt->payment_type === 'Bank' ? 'Bank Accounts' : 'Cash Accounts'),
+                        'transaction_date' => $salesReceipt->payment_date ?? now(),
+                        'store_id' => $salesReceipt->store_id,
+                        'branch_id' => $salesReceipt->branch_id,
+                        'transcode' => $salesReceipt->sales_receipt_number,
+                        'transtype' => 'Payment'
+                    ]
+                ]
             ]);
 
             return $journalEntry;
@@ -561,21 +659,40 @@ class AccountingEntryService
                 ]);
             }
 
-            // Create transaction records
+            // Create transaction records for both entries
             $this->createTransactions([
-                'description' => "Post Inflow #{$postInflow->id}",
-                'transaction_date' => $postInflow->inflow_date ?? now(),
-                'transcode' => 'PI',
-                'transtype' => 'Inflow',
-                'naration' => "Post Inflow #{$postInflow->id} - {$postInflow->narration}",
-                'debit' => $postInflow->amount,
-                'credit' => $postInflow->amount,
-                'amount' => $postInflow->amount,
-                'store_id' => $postInflow->store_id ?? null,
-                'branch_id' => $postInflow->branch_id ?? null,
-                'account_no' => $this->getAccountNo('Bank'),
-                'account_id' => $this->getAccountId('Bank'),
-                'created_by' => auth()->id()
+                'entries' => [
+                    [
+                        'journal_type_id' => 1, // Debit
+                        'amount' => $postInflow->amount,
+                        'description' => "Bank deposit for Post Inflow #{$postInflow->id}",
+                        'account_id' => $this->getAccountId('Bank'),
+                        'account_no' => $this->getAccountNo('Bank'),
+                        'transaction_date' => $postInflow->inflow_date ?? now(),
+                        'store_id' => $postInflow->store_id ?? null,
+                        'branch_id' => $postInflow->branch_id ?? null,
+                        'transcode' => 'PI',
+                        'transtype' => 'Inflow'
+                    ],
+                    [
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $postInflow->amount,
+                        'description' => $postInflow->customer_id ? 
+                            "Customer credit for Post Inflow #{$postInflow->id}" :
+                            "Suspense account for Post Inflow #{$postInflow->id}",
+                        'account_id' => $postInflow->customer_id ? 
+                            $this->getAccountId('Accounts Receivable') :
+                            $this->getAccountId('Suspense Account'),
+                        'account_no' => $postInflow->customer_id ? 
+                            $this->getAccountNo('Accounts Receivable') :
+                            $this->getAccountNo('Suspense Account'),
+                        'transaction_date' => $postInflow->inflow_date ?? now(),
+                        'store_id' => $postInflow->store_id ?? null,
+                        'branch_id' => $postInflow->branch_id ?? null,
+                        'transcode' => 'PI',
+                        'transtype' => 'Inflow'
+                    ]
+                ]
             ]);
 
             return $journalEntry;
@@ -636,21 +753,40 @@ class AccountingEntryService
                 'created_by' => auth()->id()
             ]);
 
-            // Create transaction records
+            // Create transaction records for both entries
             $this->createTransactions([
-                'description' => "Post Outflow #{$postOutflow->id}",
-                'transaction_date' => $postOutflow->outflow_date ?? now(),
-                'transcode' => 'PO',
-                'transtype' => 'Outflow',
-                'naration' => "Post Outflow #{$postOutflow->id} - {$postOutflow->narration}",
-                'debit' => $postOutflow->amount,
-                'credit' => $postOutflow->amount,
-                'amount' => $postOutflow->amount,
-                'store_id' => $postOutflow->store_id ?? null,
-                'branch_id' => $postOutflow->branch_id ?? null,
-                'account_no' => $this->getAccountNo('Bank'),
-                'account_id' => $this->getAccountId('Bank'),
-                'created_by' => auth()->id()
+                'entries' => [
+                    [
+                        'journal_type_id' => 1, // Debit
+                        'amount' => $postOutflow->amount,
+                        'description' => $postOutflow->customer_id ? 
+                            "Customer debit for Post Outflow #{$postOutflow->id}" :
+                            "Suspense account for Post Outflow #{$postOutflow->id}",
+                        'account_id' => $postOutflow->customer_id ? 
+                            $this->getAccountId('Accounts Receivable') :
+                            $this->getAccountId('Suspense Account'),
+                        'account_no' => $postOutflow->customer_id ? 
+                            $this->getAccountNo('Accounts Receivable') :
+                            $this->getAccountNo('Suspense Account'),
+                        'transaction_date' => $postOutflow->outflow_date ?? now(),
+                        'store_id' => $postOutflow->store_id ?? null,
+                        'branch_id' => $postOutflow->branch_id ?? null,
+                        'transcode' => 'PO',
+                        'transtype' => 'Outflow'
+                    ],
+                    [
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $postOutflow->amount,
+                        'description' => "Bank withdrawal for Post Outflow #{$postOutflow->id}",
+                        'account_id' => $this->getAccountId('Bank'),
+                        'account_no' => $this->getAccountNo('Bank'),
+                        'transaction_date' => $postOutflow->outflow_date ?? now(),
+                        'store_id' => $postOutflow->store_id ?? null,
+                        'branch_id' => $postOutflow->branch_id ?? null,
+                        'transcode' => 'PO',
+                        'transtype' => 'Outflow'
+                    ]
+                ]
             ]);
 
             return $journalEntry;
@@ -694,7 +830,7 @@ class AccountingEntryService
             // Credit Accounts Receivable (if credit sale) or Cash/Bank (if cash sale)
             if ($returnItem->salesReceipt && $returnItem->salesReceipt->salesOrder) {
                 $salesOrder = $returnItem->salesReceipt->salesOrder;
-                
+
                 if ($salesOrder->payment_type === 'Credit') {
                     // Credit Accounts Receivable for credit sales
                     TransactionJournalEntryDetail::create([
@@ -731,24 +867,52 @@ class AccountingEntryService
                 ]);
             }
 
-            // Create transaction records
+            // Create transaction records for both entries
             $this->createTransactions([
-                'description' => "Return Item #{$returnItem->id}",
-                'transaction_date' => $returnItem->return_date ?? now(),
-                'transcode' => 'RI',
-                'transtype' => 'Return',
-                'naration' => "Return Item #{$returnItem->id} - Customer Return",
-                'debit' => $totalReturnAmount,
-                'credit' => $totalReturnAmount,
-                'amount' => $totalReturnAmount,
-                'store_id' => $returnItem->store_id ?? null,
-                'branch_id' => $returnItem->branch_id ?? null,
-                'account_no' => $this->getAccountNo('Sales Returns'),
-                'account_id' => $this->getAccountId('Sales Returns'),
-                'created_by' => auth()->id()
+                'entries' => [
+                    [
+                        'journal_type_id' => 1, // Debit
+                        'amount' => $totalReturnAmount,
+                        'description' => "Sales Returns for Return Item #{$returnItem->id}",
+                        'account_id' => $this->getAccountId('Sales Returns'),
+                        'account_no' => $this->getAccountNo('Sales Returns'),
+                        'transaction_date' => $returnItem->return_date ?? now(),
+                        'store_id' => $returnItem->store_id ?? null,
+                        'branch_id' => $returnItem->branch_id ?? null,
+                        'transcode' => 'RI',
+                        'transtype' => 'Return'
+                    ],
+                    [
+                        'journal_type_id' => 2, // Credit
+                        'amount' => $totalReturnAmount,
+                        'description' => $returnItem->salesReceipt && $returnItem->salesReceipt->salesOrder && $returnItem->salesReceipt->salesOrder->payment_type === 'Credit' ? 
+                            "Accounts Receivable credit for Return Item #{$returnItem->id}" :
+                            "Cash/Bank credit for Return Item #{$returnItem->id}",
+                        'account_id' => $returnItem->salesReceipt && $returnItem->salesReceipt->salesOrder && $returnItem->salesReceipt->salesOrder->payment_type === 'Credit' ? 
+                            $this->getAccountId('Accounts Receivable') :
+                            $this->getAccountId('Bank'),
+                        'account_no' => $returnItem->salesReceipt && $returnItem->salesReceipt->salesOrder && $returnItem->salesReceipt->salesOrder->payment_type === 'Credit' ? 
+                            $this->getAccountNo('Accounts Receivable') :
+                            $this->getAccountNo('Bank'),
+                        'transaction_date' => $returnItem->return_date ?? now(),
+                        'store_id' => $returnItem->store_id ?? null,
+                        'branch_id' => $returnItem->branch_id ?? null,
+                        'transcode' => 'RI',
+                        'transtype' => 'Return'
+                    ]
+                ]
             ]);
 
             return $journalEntry;
         });
     }
-} 
+
+    /**
+     * Get current active financial period ID
+     */
+    private function getCurrentFinancialPeriodId()
+    {
+        // Return current financial period ID
+        return FinancialPeriod::where('status', 'active')->first()?->id;
+    }
+}
