@@ -8,10 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\Syncable;
 
 class JournalEntry extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, Syncable;
 
     /**
      * The attributes that are mass assignable.
@@ -28,7 +29,14 @@ class JournalEntry extends Model
         'modified_by',
         'deleted_by',
         'approval_stage_id',
-        'approval_officer_id'
+        'approval_officer_id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error'
     ];
 
     /**
@@ -45,7 +53,10 @@ class JournalEntry extends Model
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
         'approval_stage_id' => 'integer',
-        'approval_officer_id' => 'integer'
+        'approval_officer_id' => 'integer',
+        'last_synced_at' => 'datetime',
+        'last_sync_attempt_at' => 'datetime',
+        'sync_version' => 'integer'
     ];
 
     public function store(): BelongsTo

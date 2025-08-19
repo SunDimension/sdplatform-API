@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductAuditController;
 use App\Http\Controllers\SalesReceiptController;
 use App\Http\Controllers\StoreTransferItemController;
 use App\Http\Controllers\CreditTransactionController;
+use App\Http\Controllers\SyncController;
 use App\Models\CreditTransaction;
 use Illuminate\Support\Facades\Route;
 
@@ -536,4 +537,13 @@ Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::cl
     Route::apiResource('change-reasons', App\Http\Controllers\ChangeReasonController::class);
     Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class, 'pending']);
     Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class, 'approve']);
+
+    // Synchronization Routes
+    Route::prefix('sync')->group(function () {
+        Route::post('/push', [SyncController::class, 'push']);
+        Route::post('/pull', [SyncController::class, 'pull']);
+        Route::post('/queue/process', [SyncController::class, 'processQueue']);
+        Route::get('/status', [SyncController::class, 'status']);
+        Route::post('/force', [SyncController::class, 'forceSync']);
+    });
 });

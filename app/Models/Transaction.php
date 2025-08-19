@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\Syncable;
 
 class Transaction extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, Syncable;
 
     /**
      * The attributes that are mass assignable.
@@ -18,21 +20,22 @@ class Transaction extends Model
      * @var array
      */
     protected $fillable = [
-        'financial_period_id',
-        'transaction_date',
-        'transcode',
-        'transtype',
-        'naration',
-        'debit',
-        'credit',
+        'transaction_type_id',
         'amount',
+        'description',
+        'transaction_date',
         'store_id',
         'branch_id',
-        'account_no',
-        'account_id',
         'created_by',
         'modified_by',
         'deleted_by',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error'
     ];
 
     /**
@@ -41,15 +44,16 @@ class Transaction extends Model
      * @var array
      */
     protected $casts = [
+        'amount' => 'decimal:2',
         'transaction_date' => 'date',
-        'debit' => 'double',
-        'credit' => 'double',
-        'amount' => 'double',
         'store_id' => 'integer',
         'branch_id' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',
+        'last_synced_at' => 'datetime',
+        'last_sync_attempt_at' => 'datetime',
+        'sync_version' => 'integer'
     ];
 
     public function financialPeriod(): BelongsTo
