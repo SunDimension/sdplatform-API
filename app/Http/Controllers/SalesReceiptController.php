@@ -11,7 +11,9 @@ use App\Models\CreditTransaction;
 use App\Models\Customer;
 use App\Models\PostOutflow;
 use App\Models\SalesOrder;
+use App\Classes\StockUtil;
 use App\Models\PostInflow;
+use App\Models\ProductAudit;
 use App\Models\SalesReceipt;
 use App\Models\TransactionJournalEntry;
 use App\Services\AccountingEntryService;
@@ -32,6 +34,151 @@ class SalesReceiptController extends Controller
     }
 
 
+    // public function index(Request $request)
+    // {
+    //     // Validate and retrieve query parameters from the request
+    //     $validated = $request->validate([
+    //         'store_id' => 'nullable|integer|exists:stores,id',
+    //         'branch_id' => 'nullable|integer|exists:stores,branch_id',
+    //         'from_date' => 'nullable|date',
+    //         'to_date' => 'nullable|date',
+    //         'with_returns' => 'nullable|boolean'
+    //     ]);
+
+    //     // Extract validated parameters
+    //     $storeId = $validated['store_id'] ?? null;
+    //     $branchId = $validated['branch_id'] ?? null;
+    //     $fromDate = $validated['from_date'] ?? null;
+    //     $toDate = $validated['to_date'] ?? null;
+    //     $withReturns = $validated['with_returns'] ?? false;
+
+    //     // Get the authenticated user
+    //     $user = auth()->user();
+
+    //     // Build the SalesReceipt query
+    //     $receiptQuery = SalesReceipt::with([
+    //         'customer',
+    //         'store',
+    //         'user',
+    //         'branch',
+    //         'salesorder',
+    //         'returnItems' => function ($q) {
+    //             $q->where('return_status', 'Approved')
+    //                 ->with(['returnDetails.product']);
+    //         }
+    //     ])
+    //         ->when($storeId, function ($query, $storeId) {
+    //             return $query->where('store_id', $storeId);
+    //         })
+    //         ->when($branchId, function ($query, $branchId) {
+    //             return $query->where('branch_id', $branchId);
+    //         });
+
+    //     // Handle date filtering
+    //     if ($fromDate || $toDate) {
+    //         $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+    //         $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+
+    //         if ($fromDate && $toDate) {
+    //             $receiptQuery->whereBetween('created_at', [$fromDate, $toDate]);
+    //         } elseif ($fromDate) {
+    //             $receiptQuery->where('created_at', '>=', $fromDate);
+    //         } elseif ($toDate) {
+    //             $receiptQuery->where('created_at', '<=', $toDate);
+    //         }
+
+    //         $receiptQuery->where('branch_id', $user->branch_id);
+    //     }
+
+    //     // If with_returns is true, ensure return items are loaded
+    //     if ($withReturns) {
+    //         $receiptQuery->with([
+    //             'returnItems' => function ($q) {
+    //                 $q->where('return_status', 'Approved')
+    //                     ->with(['returnDetails']);
+    //             }
+    //         ]);
+    //     }
+
+    //     // Fetch SalesReceipts
+    //     $salesReceipts = $receiptQuery->get();
+
+    //     // Calculate the gross total (original total before any adjustments)
+    //     $grossTotalReceiptAmount = $salesReceipts->sum('total_amount');
+
+    //     // Calculate total return amount and adjust each receipt's total_amount
+    //     $totalReturnAmount = 0;
+    //     $netSalesReceipts = $salesReceipts->map(function ($receipt) use (&$totalReturnAmount) {
+    //         // Calculate return amount for this receipt
+    //         $returnAmount = 0;
+    //         if ($receipt->relationLoaded('returnItems') && $receipt->returnItems->isNotEmpty()) {
+    //             foreach ($receipt->returnItems as $returnItem) {
+    //                 if ($returnItem->return_status === 'Approved') {
+    //                     if ($returnItem->relationLoaded('returnDetails') && $returnItem->returnDetails->isNotEmpty()) {
+    //                         $returnAmount += $returnItem->returnDetails->sum(function ($detail) {
+    //                             // Apply discount if available, otherwise use 0
+    //                             $discount = $detail->discount ?? 0;
+    //                             // Ensure discounted price is not negative
+    //                             $discountedUnitPrice = max(0, ($detail->unit_price ?? 0) - $discount);
+    //                             return ($detail->return_quantity ?? 0) * $discountedUnitPrice;
+    //                         });
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         $totalReturnAmount += $returnAmount;
+
+    //         // Adjust total_amount to be net of returns
+    //         $receipt->total_amount = $receipt->total_amount - $returnAmount;
+
+    //         return $receipt;
+    //     });
+
+    //     // Calculate total sales receipt amount (sum of net amounts)
+    //     $totalReceiptAmount = $netSalesReceipts->sum('total_amount');
+
+    //     // Build the SalesOrder query based on the same filters
+    //     $orderQuery = SalesOrder::query()
+    //         ->when($storeId, function ($query, $storeId) {
+    //             return $query->where('store_id', $storeId);
+    //         })
+    //         ->when($branchId, function ($query, $branchId) {
+    //             return $query->where('branch_id', $branchId);
+    //         });
+
+    //     // Apply the same date filtering to SalesOrder
+    //     if ($fromDate || $toDate) {
+    //         if ($fromDate && $toDate) {
+    //             $orderQuery->whereBetween('created_at', [$fromDate, $toDate]);
+    //         } elseif ($fromDate) {
+    //             $orderQuery->where('created_at', '>=', $fromDate);
+    //         } elseif ($toDate) {
+    //             $orderQuery->where('created_at', '<=', $toDate);
+    //         }
+
+    //         $orderQuery->where('branch_id', $user->branch_id);
+    //     }
+
+    //     // Fetch SalesOrders and calculate total amount
+    //     $salesOrders = $orderQuery->get();
+    //     $totalOrderAmount = $salesOrders->sum('total_amount');
+
+    //     // Calculate the difference (net receipt amount - sales order amount)
+    //     $difference = $totalReceiptAmount - $totalOrderAmount;
+
+    //     // Calculate net total correctly (gross total - returns)
+    //     $netTotal = $grossTotalReceiptAmount - $totalReturnAmount;
+
+    //     // Return the response
+    //     return response()->json([
+    //         'sales_receipts' => new SalesReceiptCollection($netSalesReceipts),
+    //         'total_sales_receipt_amount' => $grossTotalReceiptAmount,
+    //         'total_return_amount' => $totalReturnAmount,
+    //         'total_sales_order_amount' => $totalOrderAmount,
+    //         'difference' => $difference,
+    //         'net_total' => $netTotal,
+    //     ]);
+    // }
 
     public function index(Request $request)
     {
@@ -54,87 +201,139 @@ class SalesReceiptController extends Controller
         // Get the authenticated user
         $user = auth()->user();
 
-        // Build the SalesReceipt query
-        $receiptQuery = SalesReceipt::with([
-            'customer',
-            'store',
-            'user',
-            'branch',
-            'salesorder',
-            'returnItems.returnDetails.product'
-        ])
-            ->when($storeId, function ($query, $storeId) {
-                return $query->where('store_id', $storeId);
-            })
-            ->when($branchId, function ($query, $branchId) {
-                return $query->where('branch_id', $branchId);
-            });
+    // Build the SalesReceipt query
+    $receiptQuery = SalesReceipt::with([
+        'customer',
+        'store',
+        'user',
+        'branch',
+        'salesorder',
+        'returnItems' => function ($q) {
+            $q->where('return_status', 'Approved')
+                ->with(['returnDetails.product']);
+        }
+    ])
+        ->when($storeId, function ($query, $storeId) {
+            return $query->where('store_id', $storeId);
+        })
+        ->when($branchId, function ($query, $branchId) {
+            return $query->where('branch_id', $branchId);
+        });
 
-        // Handle date filtering
-            if ($fromDate || $toDate) {
-                $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
-                $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
+    // Handle date filtering
+    if ($fromDate || $toDate) {
+        $fromDate = $fromDate ? Carbon::parse($fromDate)->startOfDay() : null;
+        $toDate = $toDate ? Carbon::parse($toDate)->endOfDay() : null;
 
-                if ($fromDate && $toDate) {
-                    $receiptQuery->whereBetween('created_at', [$fromDate, $toDate]);
-                } elseif ($fromDate) {
-                    $receiptQuery->where('created_at', '>=', $fromDate);
-                } elseif ($toDate) {
-                    $receiptQuery->where('created_at', '<=', $toDate);
-                }
-
-                $receiptQuery->where('branch_id', $user->branch_id);
-            }
-
-        // If with_returns is true, load return items
-        if ($withReturns) {
-            $receiptQuery->with(['returnItems.returnDetails']);
+        if ($fromDate && $toDate) {
+            $receiptQuery->whereBetween('created_at', [$fromDate, $toDate]);
+        } elseif ($fromDate) {
+            $receiptQuery->where('created_at', '>=', $fromDate);
+        } elseif ($toDate) {
+            $receiptQuery->where('created_at', '<=', $toDate);
         }
 
-        // Fetch SalesReceipts
-        $salesReceipts = $receiptQuery->get();
+        $receiptQuery->where('branch_id', $user->branch_id);
+    }
 
-        // Calculate total sales receipt amount
-        $totalReceiptAmount = $salesReceipts->sum('total_amount');
-
-        // Build the SalesOrder query based on the same filters
-        $orderQuery = SalesOrder::query()
-            ->when($storeId, function ($query, $storeId) {
-                return $query->where('store_id', $storeId);
-            })
-            ->when($branchId, function ($query, $branchId) {
-                return $query->where('branch_id', $branchId);
-            });
-
-        // Apply the same date filtering to SalesOrder
-        if ($fromDate || $toDate) {
-            if ($fromDate && $toDate) {
-                $orderQuery->whereBetween('created_at', [$fromDate, $toDate]);
-            } elseif ($fromDate) {
-                $orderQuery->where('created_at', '>=', $fromDate);
-            } elseif ($toDate) {
-                $orderQuery->where('created_at', '<=', $toDate);
+    // If with_returns is true, ensure return items are loaded
+    if ($withReturns) {
+        $receiptQuery->with([
+            'returnItems' => function ($q) {
+                $q->where('return_status', 'Approved')
+                    ->with(['returnDetails']);
             }
-
-            $orderQuery->where('branch_id', $user->branch_id);
-        }
-
-        // Fetch SalesOrders and calculate total amount
-        $salesOrders = $orderQuery->get();
-        $totalOrderAmount = $salesOrders->sum('total_amount');
-
-        // Calculate the difference
-        // $difference = $totalOrderAmount - $totalReceiptAmount;
-        $difference = $totalReceiptAmount - $totalOrderAmount;
-
-        // Return the response
-        return response()->json([
-            'sales_receipts' => new SalesReceiptCollection($salesReceipts),
-            'total_sales_receipt_amount' => $totalReceiptAmount,
-            'total_sales_order_amount' => $totalOrderAmount,
-            'difference' => $difference,
         ]);
     }
+
+    // Fetch SalesReceipts
+    $salesReceipts = $receiptQuery->get();
+
+    // Calculate the gross total (original total before any adjustments)
+    $grossTotalReceiptAmount = $salesReceipts->sum('total_amount');
+
+    // Calculate total return amount and adjust each receipt's total_amount
+    $totalReturnAmount = 0;
+    $netSalesReceipts = $salesReceipts->map(function ($receipt) use (&$totalReturnAmount) {
+        // Calculate return amount for this receipt
+        $returnAmount = 0;
+        if ($receipt->relationLoaded('returnItems') && $receipt->returnItems->isNotEmpty()) {
+            foreach ($receipt->returnItems as $returnItem) {
+                if ($returnItem->return_status === 'Approved') {
+                    if ($returnItem->relationLoaded('returnDetails') && $returnItem->returnDetails->isNotEmpty()) {
+                        $returnAmount += $returnItem->returnDetails->sum(function ($detail) {
+                            // Apply discount if available, otherwise use 0
+                            $discount = $detail->discount ?? 0;
+                            // Ensure discounted price is not negative
+                            $discountedUnitPrice = max(0, ($detail->unit_price ?? 0) - $discount);
+                            return ($detail->return_quantity ?? 0) * $discountedUnitPrice;
+                        });
+                    }
+                }
+            }
+        }
+        $totalReturnAmount += $returnAmount;
+
+        // Add calculated return amount as an attribute to the receipt
+        $receipt->calculated_return_amount = $returnAmount;
+        
+        // Store original total amount before adjustment
+        $receipt->original_total_amount = $receipt->total_amount;
+        
+        // Adjust total_amount to be net of returns
+        $receipt->total_amount = $receipt->total_amount - $returnAmount;
+
+        return $receipt;
+    });
+
+    // Calculate total sales receipt amount (sum of net amounts)
+    $totalReceiptAmount = $netSalesReceipts->sum('total_amount');
+
+    // Build the SalesOrder query based on the same filters
+    $orderQuery = SalesOrder::query()
+        ->when($storeId, function ($query, $storeId) {
+            return $query->where('store_id', $storeId);
+        })
+        ->when($branchId, function ($query, $branchId) {
+            return $query->where('branch_id', $branchId);
+        });
+
+    // Apply the same date filtering to SalesOrder
+    if ($fromDate || $toDate) {
+        if ($fromDate && $toDate) {
+            $orderQuery->whereBetween('created_at', [$fromDate, $toDate]);
+        } elseif ($fromDate) {
+            $orderQuery->where('created_at', '>=', $fromDate);
+        } elseif ($toDate) {
+            $orderQuery->where('created_at', '<=', $toDate);
+        }
+
+        $orderQuery->where('branch_id', $user->branch_id);
+    }
+
+    // Fetch SalesOrders and calculate total amount
+    $salesOrders = $orderQuery->get();
+    $totalOrderAmount = $salesOrders->sum('total_amount');
+
+    // Calculate the difference (net receipt amount - sales order amount)
+    $difference = $totalReceiptAmount - $totalOrderAmount;
+
+    // Calculate net total correctly (gross total - returns)
+    $netTotal = $grossTotalReceiptAmount - $totalReturnAmount;
+
+    // Return the response
+    return response()->json([
+        'sales_receipts' => new SalesReceiptCollection($netSalesReceipts),
+        'total_sales_receipt_amount' => $grossTotalReceiptAmount,
+        'total_return_amount' => $totalReturnAmount,
+        'total_sales_order_amount' => $totalOrderAmount,
+        'difference' => $difference,
+        'net_total' => $netTotal,
+    ]);
+}
+
+
+
 
 
     public function myReceipts(Request $request)
@@ -234,17 +433,7 @@ class SalesReceiptController extends Controller
     }
 
 
-    // public function pendingReleaseStore($storeId)
-    // {
 
-
-    //     $salesReceipts = SalesReceipt::with('salesOrder')->whereHas('salesOrder.itemsold', function ($query) use ($storeId) {
-    //         // Add your specific criteria for ItemSold here
-    //         $query->where('store_id', $storeId)->where('status', 'pending'); // Example condition
-    //     })->get();
-
-    //     return response()->json(['data' => SalesReceiptResource::collection($salesReceipts)]);
-    // }
 
 
     public function pendingReleaseOrder($orderno)
@@ -369,7 +558,7 @@ class SalesReceiptController extends Controller
                     'created_by' => auth()->user()->id
                 ];
                 $creditTransaction = CreditTransaction::create($data1);
-                $customer->credit_balance += $creditTransaction->amount;
+                $customer->credit_balance -= $creditTransaction->amount;
                 $customer->save();
             }
 
@@ -618,6 +807,7 @@ class SalesReceiptController extends Controller
         }
     }
 
+
     /**
      * Generate accounting entries for a specific sales receipt
      * 
@@ -738,3 +928,4 @@ class SalesReceiptController extends Controller
         }
     }
 }
+
