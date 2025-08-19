@@ -18,6 +18,7 @@ class ReturnDetails extends Model
         'return_quantity_pieces',
         'item_sold_id',
         'unit_price',
+        'discount',
         'store_id',
         'unit_measurement',
     ];

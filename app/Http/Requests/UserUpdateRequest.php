@@ -17,16 +17,14 @@ class UserUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-    public function rules(): array
+  public function rules(): array
     {
         return [
-            'role_id' => ['required', 'integer', 'exists:roles,id'],
-            'user_name' => ['required', 'string'],
-            'user_email' => ['required', 'string'],
-            'password' => ['required', 'password'],
-            'status_id' => ['required', 'integer', 'exists:statuses,id'],
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8'],
             'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
+            'store_id' => ['required', 'integer', 'exists:stores,id'],
         ];
     }
 }

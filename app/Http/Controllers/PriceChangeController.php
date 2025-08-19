@@ -113,17 +113,20 @@ class PriceChangeController extends Controller
                     ->where('store_id', $item->store_id)
                     ->first();
 
-                ProductAudit::create([
-                    'action_type' => 'price_adjustment',
-                    'product_id' => $item->product_id,
-                    'user_id' => auth()->id(),
-                    'previous_price' => $storeItem->selling_price,
-                    'new_price' => $item->new_selling_price,
-                    'price_change' => $item->new_selling_price - $storeItem->selling_price,
-                    'reference_type' => 'PriceChange',
-                    'reference_id' => $priceChanges->id,
-                    'notes' => 'Price adjustment'
-                ]);
+                if ($storeItem && $storeItem->selling_price != $item->new_selling_price) {
+                    ProductAudit::create([
+                        'action_type'    => 'price_adjustment',
+                        'product_id'     => $item->product_id,
+                        'user_id'        => auth()->id(),
+                        'store_id'       => $item->store_id,
+                        'previous_price' => $storeItem->selling_price,
+                        'new_price'      => $item->new_selling_price,
+                        'price_change'   => $item->new_selling_price - $storeItem->selling_price,
+                        'reference_type' => 'PriceChange',
+                        'reference_id'   => $priceChanges->id,
+                        'notes'          => 'Price adjustment approved'
+                    ]);
+                }
             }
         }
 

@@ -158,4 +158,34 @@ class StoreItemController extends Controller
         $storeItem->delete();
         return response(null, Response::HTTP_NO_CONTENT);
     }
+
+    /**
+     * Get products available in a specific store for transfer
+     *
+     * @param int $storeId
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function getStoreProducts($storeId)
+    {
+        try {
+            $products = CreateItem::whereIn('id', function ($query) use ($storeId) {
+                $query->select('create_item_id')
+                    ->from('store_items')
+                    ->where('store_id', $storeId);
+            })
+            ->with(['storeItems' => function ($query) use ($storeId) {
+                $query->where('store_id', $storeId);
+            }])
+            ->get();
+
+            return CreateItemResource::collection($products);
+        } catch (\Exception $e) {
+            Log::error("Error fetching store products: " . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error fetching store products',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
 }

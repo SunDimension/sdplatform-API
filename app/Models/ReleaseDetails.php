@@ -9,34 +9,34 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class ReleaseDetails extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    protected $table ="release_details";
+    protected $table = "release_details";
 
     protected $fillable = [
 
         'release_id',
         'product_id',
         'release_quantity',
+        'amount',
         'quantity_pieces',
         'unit_measurement',
-        'amount'
     ];
 
     protected $cast = [
 
-        'id'=>'integer',
-        'release_id'=>'integer',
-        'product_id'=>'integer',
+        'id' => 'integer',
+        'release_id' => 'integer',
+        'product_id' => 'integer',
 
     ];
 
-     public function product():BelongsTo
+    public function product(): BelongsTo
     {
         return $this->belongsTo(CreateItem::class, "product_id");
     }
 
-     public function release()
+    public function release()
     {
         return $this->belongsTo(Release::class);
     }

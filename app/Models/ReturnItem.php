@@ -24,6 +24,7 @@ class ReturnItem extends Model
         'created_by',
         'approved_by',
         'approved_at',
+        
         'return_status',
         'approval_comment'
 

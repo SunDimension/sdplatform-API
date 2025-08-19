@@ -23,12 +23,15 @@ class SalesReceipt extends Model
         'store_id',
         'cashier_id',
         'user_id',
+        'status',
         'sales_receipt_number',
         'payment_type',
         'total_amount',
         'amount_paid',
         'receipt_date',
         'sales_order_id',
+        'canceled_by',
+        'canceled_at',
         'payment_detail'
     ];
 
@@ -107,8 +110,26 @@ class SalesReceipt extends Model
     {
         return $this->hasMany(ReturnItem::class, 'sales_receipt_id');
     }
-    // public function itemSold()
-    // {
-    //     return $this->hasMany(ItemSold::class);
-    // }
+
+
+    public function postOutflows()
+    {
+        return $this->hasMany(PostOutflow::class, 'sales_receipt_id');
+    }
+
+    public function creditTransactions()
+    {
+        return $this->hasMany(CreditTransaction::class, 'sales_receipt_id');
+    }
+
+    public function canceledBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'canceled_by');
+    }
+
+   
+public function releases()
+{
+    return $this->hasMany(Release::class, 'sales_receipt_id');
+}
 }

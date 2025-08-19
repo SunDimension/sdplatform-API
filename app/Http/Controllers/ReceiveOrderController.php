@@ -28,88 +28,120 @@ class ReceiveOrderController extends Controller
 
     public function pending(Request $request)
     {
-        $receiveOrders = ReceiveOrder::where('status', 'Pending')->where('store_id', auth()->user()->store_id)->get();
-        // $receiveOrders = ReceiveOrder::where('status','Pending')->get();
+        $receiveOrders = ReceiveOrder::where('status', 'Pending')
+            ->where('store_id', auth()->user()->store_id)
+            ->get();
         return new ReceiveOrderCollection($receiveOrders);
     }
 
     public function store(ReceiveOrderStoreRequest $request)
     {
         $validated = $request->validated();
-        //Log::debug($validated);
 
-        $receiveOrder = ReceiveOrder::create($validated);
-        $itemSoldIds = [];
-        foreach ($validated['items'] as $item) {
-            //Log::debug($item);
+        DB::beginTransaction();
+        try {
+            $receiveOrder = ReceiveOrder::create($validated);
 
-            $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
-            $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
-            ReceiveItem::create([
-                'receive_order_id' => $receiveOrder->id,
-                'product_id' => $item['product_id'],
-                'quantity' => $item['quantity'],
-                'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
-                'unit_price' => $item['unit_price'],
-                'description' => $item['description'],
-                'unit_measurement' => $item['unit_measurement'],
-                'created_by' => auth()->user()->id
-            ]);
-        }
-        return new ReceiveOrderResource($receiveOrder);
-    }
+            foreach ($validated['items'] as $item) {
+                $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
+                $createItem = StoreItem::where('create_item_id', $item['product_id'])
+                    ->where('store_id', $request->store_id)
+                    ->first();
 
-public function approve(Request $request)
-{
-    $validated = $request->validate([
-        'comment' => ['nullable'],
-        'status' => ['required', 'string'],
-        'id' => ['required', 'string']
-    ]);
-    
-    $receiveOrder = ReceiveOrder::findOrFail($validated['id']);
-    $receiveOrder->approval_comment = $validated['comment'];
-    $receiveOrder->status = $validated['status'];
-    $receiveOrder->approved_by = auth()->user()->id;
-    $receiveOrder->approval_date = now();
-    $receiveOrder->save();
-
-    if ($receiveOrder->status == 'Approved') {
-        foreach ($receiveOrder->receiveItems as $item) {
-            // Get the current store item record
-            $storeItem = StoreItem::where('create_item_id', $item->product_id)
-                ->where('store_id', $receiveOrder->store_id)
-                ->first();
-            
-            // If store item doesn't exist, create it (optional)
-            if (!$storeItem) {
-                $storeItem = StoreItem::create([
-                    'create_item_id' => $item->product_id,
-                    'store_id' => $receiveOrder->store_id,
-                    'branch_id' => $receiveOrder->branch_id,
-                    'quantity' => 0,
-                    'created_by' => auth()->id()
+                // Create receive item record
+                $receiveItem = ReceiveItem::create([
+                    'receive_order_id' => $receiveOrder->id,
+                    'product_id' => $item['product_id'],
+                    'quantity' => $item['quantity'],
+                    'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
+                    'unit_price' => $item['unit_price'],
+                    'description' => $item['description'],
+                    'unit_measurement' => $item['unit_measurement'],
+                    'created_by' => auth()->user()->id
                 ]);
+
+                // --- ProductAudit for receive order creation (pending approval) ---
+                $previousQuantity = StockUtil::getQuantityForRequest($item['product_id'], $request->store_id);
+                $quantityChange = StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']);
+                $newQuantity = $previousQuantity + $quantityChange;
+
+                ProductAudit::create([
+                    'action_type' => 'receive_pending',
+                    'product_id' => $item['product_id'],
+                    'user_id' => auth()->id(),
+                    'store_id' => $request->store_id,
+                    'quantity_change' => $quantityChange,
+                    'previous_quantity' => $previousQuantity,
+                    'new_quantity' => $newQuantity,
+                    'reference_type' => 'ReceiveOrder',
+                    'reference_id' => $receiveOrder->id,
+                    'notes' => 'Receive order created - pending approval'
+                ]);
+                // --- End ProductAudit ---
             }
-            
-            // Log the audit trail
-            ProductAudit::create([
-                'action_type' => 'replenished',
-                'product_id' => $item->product_id,
-                'store_id' => $receiveOrder->store_id,
-                'user_id' => auth()->id(),
-                'quantity_change' => $item->quantity,
-                'previous_quantity' => $storeItem->quantity,
-                'new_quantity' => $storeItem->quantity + $item->quantity,
-                'reference_type' => 'ReceiveOrder',
-                'reference_id' => $receiveOrder->id,
-                'notes' => 'Stock replenishment'
-            ]);
+
+            DB::commit();
+            return new ReceiveOrderResource($receiveOrder);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Receive order creation failed: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to create receive order',
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 
-    return new ReceiveOrderResource($receiveOrder);
-}
+    public function approve(Request $request)
+    {
+        $validated = $request->validate([
+            'comment' => ['nullable'],
+            'status' => ['required', 'string'],
+            'id' => ['required', 'string']
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $receiveOrder = ReceiveOrder::findOrFail($validated['id']);
+            $receiveOrder->approval_comment = $validated['comment'];
+            $receiveOrder->status = $validated['status'];
+            $receiveOrder->approved_by = auth()->user()->id;
+            $receiveOrder->approval_date = now();
+            $receiveOrder->save();
+
+            if ($receiveOrder->status == 'Approved') {
+                foreach ($receiveOrder->receiveItems as $item) {
+                    $storeItem = StoreItem::where('create_item_id', $item->product_id)
+                        ->where('store_id', $receiveOrder->store_id)
+                        ->first();
+
+                    if (!$storeItem) {
+                        $storeItem = StoreItem::create([
+                            'create_item_id' => $item->product_id,
+                            'store_id' => $receiveOrder->store_id,
+                            'branch_id' => $receiveOrder->branch_id,
+                            'quantity' => 0,
+                            'created_by' => auth()->id()
+                        ]);
+                    }
+
+                    // Calculate quantities before update
+
+                }
+            }
+
+            DB::commit();
+            return new ReceiveOrderResource($receiveOrder);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Receive order approval failed: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to approve receive order',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
     public function show(Request $request, ReceiveOrder $receiveOrder)
     {
         return new ReceiveOrderResource($receiveOrder->load('receiveItems'));
@@ -118,14 +150,44 @@ public function approve(Request $request)
     public function update(ReceiveOrderUpdateRequest $request, ReceiveOrder $receiveOrder)
     {
         $receiveOrder->update($request->validated());
-
         return new ReceiveOrderResource($receiveOrder);
     }
 
     public function destroy(Request $request, ReceiveOrder $receiveOrder)
     {
-        $receiveOrder->delete();
+        DB::beginTransaction();
+        try {
+            // Log audit records before deletion
+            foreach ($receiveOrder->receiveItems as $item) {
+                $storeItem = StoreItem::where('create_item_id', $item->product_id)
+                    ->where('store_id', $receiveOrder->store_id)
+                    ->first();
 
-        return response()->noContent();
+                ProductAudit::create([
+                    'action_type' => ProductAudit::ACTION_RECEIPT_CANCELLED,
+                    'product_id' => $item->product_id,
+                    'store_id' => $receiveOrder->store_id,
+                    'user_id' => auth()->id(),
+                    'quantity_change' => -$item->quantity_pieces, // Negative for cancelled receipt
+                    'previous_quantity' => $storeItem ? $storeItem->quantity : 0,
+                    'new_quantity' => $storeItem ? $storeItem->quantity : 0,
+                    'reference_type' => 'ReceiveOrder',
+                    'reference_id' => $receiveOrder->id,
+                    'notes' => 'Receive order cancelled - stock not received'
+                ]);
+            }
+
+            $receiveOrder->delete();
+            DB::commit();
+
+            return response()->noContent();
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Receive order deletion failed: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Failed to delete receive order',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }

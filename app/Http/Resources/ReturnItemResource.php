@@ -34,7 +34,21 @@ class ReturnItemResource extends JsonResource
             'approved_at' => $this->approved_at,
             'return_status' => $this->return_status,
             'approval_comment' => $this->approval_comment,
-            'items' => ReturnDetailsResource::collection($this->returnDetails),
+            'original_total_amount' => $this->original_total_amount ?? $this->total_amount,
+            'calculated_return_amount' => $this->calculated_return_amount ?? 0,
+            'items' => $this->returnDetails->map(function ($detail) {
+                return [
+                    'product_name' => $detail->product->name ?? '',
+                    'return_quantity' => $detail->return_quantity,
+                    'unit_price' => $detail->unit_price,
+                    'discount' => $detail->discount ?? 0,
+                    'total' => ($detail->return_quantity * ($detail->unit_price - ($detail->discount ?? 0))),
+                    // add other fields as needed
+                ];
+            }),
+            'total_discounted' => $this->returnDetails->sum(function ($detail) {
+                return $detail->return_quantity * ($detail->unit_price - ($detail->discount ?? 0));
+            }),
             'sales_receipt' => $this->whenLoaded('salesReceipt', function () {
                 return new SalesReceiptResource($this->salesReceipt);
             }),

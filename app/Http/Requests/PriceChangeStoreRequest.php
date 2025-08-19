@@ -25,7 +25,7 @@ class PriceChangeStoreRequest extends FormRequest
             'details.*.cost_price' => 'required|numeric|min:0',
             'details.*.new_selling_price' => 'required|numeric|min:0',
             'details.*.current_selling_price' => 'required|numeric|min:0',
-            'details.*.mark_up' => 'required|numeric|min:0',
+            'details.*.mark_up' => 'required|numeric',
             'store_id' => ['required', 'integer'],
             'branch_id' => ['required', 'integer'],
             'change_reason_id' => ['required', 'integer'],
