@@ -192,8 +192,8 @@ class SyncController extends Controller
         $syncableModels = config('sync.models', []);
         
         foreach (array_keys($syncableModels) as $modelClass) {
-            if (class_exists($modelClass)) {
-                $count += $modelClass::needsSync()->count();
+            if (class_exists($modelClass) && method_exists($modelClass, 'scopeBySyncStatus')) {
+                $count += $modelClass::whereIn('sync_status', ['pending', 'deleted_pending'])->count();
             }
         }
         
@@ -209,7 +209,7 @@ class SyncController extends Controller
         $syncableModels = config('sync.models', []);
         
         foreach (array_keys($syncableModels) as $modelClass) {
-            if (class_exists($modelClass)) {
+            if (class_exists($modelClass) && method_exists($modelClass, 'scopeBySyncStatus')) {
                 $count += $modelClass::bySyncStatus('failed')->count();
             }
         }

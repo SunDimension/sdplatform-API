@@ -75,10 +75,13 @@ class SyncService
         ];
 
         try {
+            // Debug: Log the URL being used
+            Log::info('Sync pull URL', ['url' => $this->centralHubUrl . '/api/sync/pull']);
+            
             $response = Http::withHeaders([
                 'Authorization' => 'Bearer ' . $this->apiKey,
                 'X-Location-ID' => $this->locationId,
-            ])->get($this->centralHubUrl . '/api/sync/pull');
+            ])->post($this->centralHubUrl . '/api/sync/pull');
 
             if ($response->successful()) {
                 $changes = $response->json('data', []);
@@ -190,12 +193,13 @@ class SyncService
         $models = [];
         
         if ($modelType) {
-            $models[] = $modelType::needsSync()->get();
+            $models = $modelType::whereIn('sync_status', ['pending', 'deleted_pending'])->get()->all();
         } else {
             // Get all syncable models
             $syncableModels = $this->getSyncableModels();
             foreach ($syncableModels as $modelClass) {
-                $models = array_merge($models, $modelClass::needsSync()->get()->toArray());
+                $pendingModels = $modelClass::whereIn('sync_status', ['pending', 'deleted_pending'])->get();
+                $models = array_merge($models, $pendingModels->all());
             }
         }
         
@@ -278,7 +282,7 @@ class SyncService
     /**
      * Check if system is online
      */
-    protected function isOnline(): bool
+    public function isOnline(): bool
     {
         try {
             $response = Http::timeout(5)->get($this->centralHubUrl . '/health');
