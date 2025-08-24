@@ -37,13 +37,36 @@ class SyncService
         ];
 
         try {
+            // Debug: Log push operation start
+            Log::info('Starting push operation', [
+                'model_type' => $modelType,
+                'central_hub_url' => $this->centralHubUrl,
+                'location_id' => $this->locationId
+            ]);
+            
             // Get all models that need syncing
             $models = $this->getModelsNeedingSync($modelType);
             
+            Log::info('Models found for syncing', [
+                'total_models' => count($models),
+                'model_types' => array_map('get_class', $models)
+            ]);
+            
             foreach ($models as $model) {
                 try {
+                    Log::info('Pushing model to central hub', [
+                        'model_class' => get_class($model),
+                        'model_id' => $model->id,
+                        'sync_id' => $model->sync_id ?? 'none'
+                    ]);
+                    
                     $this->pushModelToHub($model);
                     $results['success']++;
+                    
+                    Log::info('Model pushed successfully', [
+                        'model_class' => get_class($model),
+                        'model_id' => $model->id
+                    ]);
                 } catch (Exception $e) {
                     $results['failed']++;
                     $results['errors'][] = [
@@ -68,6 +91,12 @@ class SyncService
                     }
                 }
             }
+            
+            Log::info('Push operation completed', [
+                'success' => $results['success'],
+                'failed' => $results['failed'],
+                'total' => count($models)
+            ]);
         } catch (Exception $e) {
             Log::error('Sync push process failed', ['error' => $e->getMessage()]);
             throw $e;
@@ -406,20 +435,62 @@ class SyncService
      */
     protected function pushModelToHub($model): bool
     {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'X-Location-ID' => $this->locationId,
-        ])->post($this->centralHubUrl . '/api/sync/push', [
-            'model_type' => get_class($model),
-            'data' => $model->getSyncData(),
-        ]);
-
-        if ($response->successful()) {
+        // If this IS the central hub, mark as synced locally (no external HTTP call needed)
+        if ($this->isCentralHub()) {
+            Log::info('Central hub detected - marking model as synced locally', [
+                'model_class' => get_class($model),
+                'model_id' => $model->id
+            ]);
+            
             $model->markAsSynced();
             return true;
         }
+        
+        // Regular location: make HTTP request to external central hub
+        $url = $this->centralHubUrl . '/api/sync/push';
+        $payload = [
+            'model_type' => get_class($model),
+            'data' => $model->getSyncData(),
+        ];
+        
+        Log::info('Making HTTP request to central hub', [
+            'url' => $url,
+            'model_type' => get_class($model),
+            'model_id' => $model->id,
+            'payload_size' => strlen(json_encode($payload))
+        ]);
+        
+        try {
+            $response = Http::withHeaders([
+                'Authorization' => 'Bearer ' . $this->apiKey,
+                'X-Location-ID' => $this->locationId,
+            ])->post($url, $payload);
+            
+            Log::info('HTTP response received', [
+                'status_code' => $response->status(),
+                'response_body' => $response->body(),
+                'successful' => $response->successful()
+            ]);
 
-        throw new Exception('Push failed: ' . $response->body());
+            if ($response->successful()) {
+                $model->markAsSynced();
+                Log::info('Model marked as synced', [
+                    'model_class' => get_class($model),
+                    'model_id' => $model->id
+                ]);
+                return true;
+            }
+
+            throw new Exception('Push failed: ' . $response->body());
+        } catch (Exception $e) {
+            Log::error('HTTP request failed', [
+                'url' => $url,
+                'error' => $e->getMessage(),
+                'model_class' => get_class($model),
+                'model_id' => $model->id
+            ]);
+            throw $e;
+        }
     }
 
     /**
@@ -501,6 +572,12 @@ class SyncService
      */
     public function isOnline(): bool
     {
+        // If this IS the central hub, it's always "online" (no external dependency)
+        if ($this->isCentralHub()) {
+            return true;
+        }
+        
+        // Regular location: check connectivity to external central hub
         try {
             $response = Http::timeout(5)->get($this->centralHubUrl . '/api/sync/status');
             return $response->successful();
