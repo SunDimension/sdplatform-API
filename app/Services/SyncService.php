@@ -574,7 +574,7 @@ class SyncService
         $url = $this->centralHubUrl . '/api/sync/push';
         $payload = [
             'model_type' => get_class($model),
-            'data' => $model->getSyncData(),
+            'data' => $this->prepareModelForHub($model),
         ];
         
         Log::info('Making HTTP request to central hub', [
@@ -967,26 +967,29 @@ class SyncService
     protected function prepareModelForHub($model): array
     {
         $syncData = [
-            'model_type' => get_class($model),
-            'model_id' => $model->id,
+            'id' => $model->id,
+            'name' => $model->name,
+            // Include other model fields that should be synced
+            // The central hub will extract these for model creation/update
+        ];
+        
+        // Add sync metadata in the structure the central hub expects
+        $syncData['sync_metadata'] = [
             'sync_id' => $model->sync_id,
             'location_id' => $model->location_id,
             'sync_version' => $model->sync_version ?? 1,
             'sync_status' => $model->sync_status,
             'action' => $this->determineModelAction($model),
-            'data' => $model->getSyncData(),
-            'metadata' => [
-                'created_at' => $model->created_at?->toISOString(),
-                'updated_at' => $model->updated_at?->toISOString(),
-                'last_synced_at' => $model->last_synced_at?->toISOString(),
-                'last_sync_attempt_at' => $model->last_sync_attempt_at?->toISOString(),
-            ]
+            'created_at' => $model->created_at?->toISOString(),
+            'updated_at' => $model->updated_at?->toISOString(),
+            'last_synced_at' => $model->last_synced_at?->toISOString(),
+            'last_sync_attempt_at' => $model->last_sync_attempt_at?->toISOString(),
         ];
 
         // Add soft delete information if applicable
         if (method_exists($model, 'trashed') && $model->trashed()) {
-            $syncData['action'] = 'delete';
-            $syncData['deleted_at'] = $model->deleted_at?->toISOString();
+            $syncData['sync_metadata']['action'] = 'delete';
+            $syncData['sync_metadata']['deleted_at'] = $model->deleted_at?->toISOString();
         }
 
         return $syncData;
