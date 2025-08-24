@@ -27,7 +27,12 @@ trait Syncable
 
         static::updating(function (Model $model) {
             // Only update sync status if it's not being explicitly set to 'synced'
-            if ($model->sync_status !== 'synced') {
+            // and if this is not a sync-related update (to avoid infinite loops)
+            if ($model->sync_status !== 'synced' && 
+                !$model->isDirty('sync_status') && 
+                !$model->isDirty('last_synced_at') &&
+                !$model->isDirty('sync_version')) {
+                
                 $model->sync_status = 'pending';
                 $model->sync_version = ($model->sync_version ?? 0) + 1;
             }
@@ -86,6 +91,17 @@ trait Syncable
             'sync_status' => 'failed',
             'sync_error' => $error,
             'last_sync_attempt_at' => now(),
+        ]);
+    }
+
+    /**
+     * Mark record as needing sync (for testing and manual operations)
+     */
+    public function markAsNeedingSync(): void
+    {
+        $this->update([
+            'sync_status' => 'pending',
+            'sync_version' => ($this->sync_version ?? 0) + 1,
         ]);
     }
 

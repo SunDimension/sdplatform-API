@@ -844,19 +844,38 @@ class SyncService
             }
         }
         
-        // Set sync metadata
+        // Set sync metadata - ensure these are set before save
         $model->sync_id = $syncMetadata['sync_id'] ?? Str::uuid();
         $model->location_id = $syncMetadata['location_id'] ?? 'unknown';
         $model->sync_version = $syncMetadata['sync_version'] ?? 1;
         $model->sync_status = 'synced';
         $model->last_synced_at = now();
         
+        // Save the model
         $model->save();
+        
+        // Verify the sync_status was saved correctly
+        $savedModel = $modelType::find($model->id);
+        if ($savedModel && $savedModel->sync_status !== 'synced') {
+            Log::warning('Sync status not saved correctly, forcing update', [
+                'model_type' => $modelType,
+                'model_id' => $model->id,
+                'expected_status' => 'synced',
+                'actual_status' => $savedModel->sync_status
+            ]);
+            
+            // Force update the sync_status
+            $savedModel->update([
+                'sync_status' => 'synced',
+                'last_synced_at' => now()
+            ]);
+        }
         
         Log::info('Created model from sync data', [
             'model_type' => $modelType,
             'sync_id' => $model->sync_id,
-            'location_id' => $model->location_id
+            'location_id' => $model->location_id,
+            'sync_status' => $savedModel ? $savedModel->sync_status : 'unknown'
         ]);
     }
 
@@ -893,10 +912,28 @@ class SyncService
         
         $model->save();
         
+        // Verify the sync_status was saved correctly
+        $savedModel = $modelType::find($model->id);
+        if ($savedModel && $savedModel->sync_status !== 'synced') {
+            Log::warning('Sync status not saved correctly during update, forcing update', [
+                'model_type' => $modelType,
+                'model_id' => $model->id,
+                'expected_status' => 'synced',
+                'actual_status' => $savedModel->sync_status
+            ]);
+            
+            // Force update the sync_status
+            $savedModel->update([
+                'sync_status' => 'synced',
+                'last_synced_at' => now()
+            ]);
+        }
+        
         Log::info('Updated model from sync data', [
             'model_type' => $modelType,
             'sync_id' => $model->sync_id,
-            'location_id' => $model->location_id
+            'location_id' => $model->location_id,
+            'sync_status' => $savedModel ? $savedModel->sync_status : 'unknown'
         ]);
     }
 
@@ -973,10 +1010,13 @@ class SyncService
             // The central hub will extract these for model creation/update
         ];
         
+        // Ensure location_id is always set to a valid value
+        $locationId = $model->location_id ?? config('app.location_id', 'unknown');
+        
         // Add sync metadata in the structure the central hub expects
         $syncData['sync_metadata'] = [
             'sync_id' => $model->sync_id,
-            'location_id' => $model->location_id,
+            'location_id' => $locationId,
             'sync_version' => $model->sync_version ?? 1,
             'sync_status' => $model->sync_status,
             'action' => $this->determineModelAction($model),
