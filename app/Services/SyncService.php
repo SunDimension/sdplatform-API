@@ -6,6 +6,7 @@ use App\Models\SyncQueue;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 use Exception;
 use App\Services\SyncNotificationService;
@@ -26,6 +27,73 @@ class SyncService
     }
 
     /**
+     * Process incoming sync data from other locations (for central hub)
+     */
+    public function processIncomingSyncData(string $modelType, array $syncData): array
+    {
+        $results = [
+            'success' => 0,
+            'failed' => 0,
+            'errors' => []
+        ];
+
+        try {
+            Log::info('Processing incoming sync data', [
+                'model_type' => $modelType,
+                'data_size' => count($syncData)
+            ]);
+
+            // Extract sync metadata
+            $syncMetadata = $syncData['sync_metadata'] ?? [];
+            $modelData = array_diff_key($syncData, ['sync_metadata' => '']);
+            
+            // Determine the action (create, update, delete)
+            $action = $syncMetadata['sync_status'] === 'deleted_pending' ? 'delete' : 'update';
+            if (!isset($syncData['id']) || $syncData['id'] === null) {
+                $action = 'create';
+            }
+
+            // Process based on action
+            switch ($action) {
+                case 'create':
+                    $this->createModelFromSyncData($modelType, $modelData, $syncMetadata);
+                    $results['success']++;
+                    break;
+                    
+                case 'update':
+                    $this->updateModelFromSyncData($modelType, $modelData, $syncMetadata);
+                    $results['success']++;
+                    break;
+                    
+                case 'delete':
+                    $this->deleteModelFromSyncData($modelType, $syncMetadata);
+                    $results['success']++;
+                    break;
+                    
+                default:
+                    $results['failed']++;
+                    $results['errors'][] = "Unknown action: {$action}";
+            }
+
+            Log::info('Incoming sync data processed', [
+                'action' => $action,
+                'success' => $results['success'],
+                'failed' => $results['failed']
+            ]);
+
+        } catch (Exception $e) {
+            $results['failed']++;
+            $results['errors'][] = $e->getMessage();
+            Log::error('Failed to process incoming sync data', [
+                'model_type' => $modelType,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return $results;
+    }
+
+    /**
      * Push local changes to central hub
      */
     public function pushChanges(string $modelType = null): array
@@ -41,8 +109,64 @@ class SyncService
             Log::info('Starting push operation', [
                 'model_type' => $modelType,
                 'central_hub_url' => $this->centralHubUrl,
-                'location_id' => $this->locationId
+                'location_id' => $this->locationId,
+                'is_central_hub' => $this->isCentralHub()
             ]);
+            
+            // Check if this IS the central hub
+            if ($this->isCentralHub()) {
+                Log::info('Central hub detected - processing local models for sync');
+                
+                // Central hub processes its own models locally
+                $models = $this->getModelsNeedingSync($modelType);
+                
+                Log::info('Central hub models found for syncing', [
+                    'total_models' => count($models),
+                    'model_types' => array_map('get_class', $models)
+                ]);
+                
+                foreach ($models as $model) {
+                    try {
+                        Log::info('Central hub processing local model', [
+                            'model_class' => get_class($model),
+                            'model_id' => $model->id,
+                            'sync_id' => $model->sync_id ?? 'none'
+                        ]);
+                        
+                        // For central hub, just mark as synced (no external push needed)
+                        $model->markAsSynced();
+                        $results['success']++;
+                        
+                        Log::info('Central hub model marked as synced', [
+                            'model_class' => get_class($model),
+                            'model_id' => $model->id
+                        ]);
+                    } catch (Exception $e) {
+                        $results['failed']++;
+                        $results['errors'][] = [
+                            'model' => get_class($model),
+                            'id' => $model->id,
+                            'error' => $e->getMessage()
+                        ];
+                        Log::error('Central hub sync failed', [
+                            'model' => get_class($model),
+                            'id' => $model->id,
+                            'error' => $e->getMessage()
+                        ]);
+                    }
+                }
+                
+                Log::info('Central hub push operation completed', [
+                    'success' => $results['success'],
+                    'failed' => $results['failed'],
+                    'total' => count($models)
+                ]);
+                
+                return $results;
+            }
+            
+            // Regular location: push to external central hub
+            Log::info('Regular location detected - pushing to external central hub');
             
             // Get all models that need syncing
             $models = $this->getModelsNeedingSync($modelType);
@@ -92,7 +216,7 @@ class SyncService
                 }
             }
             
-            Log::info('Push operation completed', [
+            Log::info('Regular location push operation completed', [
                 'success' => $results['success'],
                 'failed' => $results['failed'],
                 'total' => count($models)
@@ -704,6 +828,99 @@ class SyncService
             'App\Models\Branch',
             // Add more models as needed
         ];
+    }
+
+    /**
+     * Create model from incoming sync data (for central hub)
+     */
+    protected function createModelFromSyncData(string $modelType, array $modelData, array $syncMetadata): void
+    {
+        $model = new $modelType();
+        
+        // Fill model with data
+        foreach ($modelData as $key => $value) {
+            if ($model->isFillable($key)) {
+                $model->$key = $value;
+            }
+        }
+        
+        // Set sync metadata
+        $model->sync_id = $syncMetadata['sync_id'] ?? Str::uuid();
+        $model->location_id = $syncMetadata['location_id'] ?? 'unknown';
+        $model->sync_version = $syncMetadata['sync_version'] ?? 1;
+        $model->sync_status = 'synced';
+        $model->last_synced_at = now();
+        
+        $model->save();
+        
+        Log::info('Created model from sync data', [
+            'model_type' => $modelType,
+            'sync_id' => $model->sync_id,
+            'location_id' => $model->location_id
+        ]);
+    }
+
+    /**
+     * Update model from incoming sync data (for central hub)
+     */
+    protected function updateModelFromSyncData(string $modelType, array $modelData, array $syncMetadata): void
+    {
+        $syncId = $syncMetadata['sync_id'] ?? null;
+        
+        if (!$syncId) {
+            throw new Exception('Sync ID required for updates');
+        }
+        
+        $model = $modelType::where('sync_id', $syncId)->first();
+        
+        if (!$model) {
+            // If model doesn't exist, create it
+            $this->createModelFromSyncData($modelType, $modelData, $syncMetadata);
+            return;
+        }
+        
+        // Update model with new data
+        foreach ($modelData as $key => $value) {
+            if ($model->isFillable($key)) {
+                $model->$key = $value;
+            }
+        }
+        
+        // Update sync metadata
+        $model->sync_version = max($model->sync_version ?? 0, $syncMetadata['sync_version'] ?? 1);
+        $model->sync_status = 'synced';
+        $model->last_synced_at = now();
+        
+        $model->save();
+        
+        Log::info('Updated model from sync data', [
+            'model_type' => $modelType,
+            'sync_id' => $model->sync_id,
+            'location_id' => $model->location_id
+        ]);
+    }
+
+    /**
+     * Delete model from incoming sync data (for central hub)
+     */
+    protected function deleteModelFromSyncData(string $modelType, array $syncMetadata): void
+    {
+        $syncId = $syncMetadata['sync_id'] ?? null;
+        
+        if (!$syncId) {
+            throw new Exception('Sync ID required for deletions');
+        }
+        
+        $model = $modelType::where('sync_id', $syncId)->first();
+        
+        if ($model) {
+            $model->delete();
+            
+            Log::info('Deleted model from sync data', [
+                'model_type' => $modelType,
+                'sync_id' => $syncId
+            ]);
+        }
     }
 
     /**

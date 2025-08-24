@@ -24,26 +24,52 @@ class SyncController extends Controller
     public function push(Request $request): JsonResponse
     {
         try {
-            $validator = Validator::make($request->all(), [
-                'model_type' => 'nullable|string',
-                'force' => 'boolean'
-            ]);
+            // Check if this is an external push request or local central hub call
+            if ($request->has('model_type') && $request->has('data')) {
+                // External location pushing to central hub
+                $validator = Validator::make($request->all(), [
+                    'model_type' => 'required|string',
+                    'data' => 'required|array'
+                ]);
 
-            if ($validator->fails()) {
+                if ($validator->fails()) {
+                    return response()->json([
+                        'success' => false,
+                        'errors' => $validator->errors()
+                    ], 422);
+                }
+
+                // Process incoming sync data from other locations
+                $modelType = $request->input('model_type');
+                $syncData = $request->input('data');
+                
+                Log::info('Received sync data from external location', [
+                    'model_type' => $modelType,
+                    'data_size' => strlen(json_encode($syncData)),
+                    'location_id' => $request->header('X-Location-ID')
+                ]);
+                
+                // Process the incoming sync data
+                $results = $this->syncService->processIncomingSyncData($modelType, $syncData);
+
                 return response()->json([
-                    'success' => false,
-                    'errors' => $validator->errors()
-                ], 422);
+                    'success' => true,
+                    'message' => 'Changes pushed successfully',
+                    'data' => $results
+                ]);
+            } else {
+                // Local central hub call (no parameters needed)
+                Log::info('Local central hub push request received');
+                
+                // Process local models for sync
+                $results = $this->syncService->pushChanges();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Local changes processed successfully',
+                    'data' => $results
+                ]);
             }
-
-            $modelType = $request->input('model_type');
-            $results = $this->syncService->pushChanges($modelType);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Changes pushed successfully',
-                'data' => $results
-            ]);
 
         } catch (\Exception $e) {
             Log::error('Sync push failed', ['error' => $e->getMessage()]);
