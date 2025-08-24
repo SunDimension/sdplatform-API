@@ -30,11 +30,26 @@ trait Syncable
             // and if this is not a sync-related update (to avoid infinite loops)
             if ($model->sync_status !== 'synced' && 
                 !$model->isDirty('sync_status') && 
-                !$model->isDirty('last_synced_at') &&
-                !$model->isDirty('sync_version')) {
+                !$model->isDirty('last_synced_at')) {
                 
                 $model->sync_status = 'pending';
                 $model->sync_version = ($model->sync_version ?? 0) + 1;
+            }
+        });
+
+        static::updated(function (Model $model) {
+            // Fallback: if the updating event didn't work, check if we need to mark as pending
+            // This ensures that any model update (except sync-related ones) gets marked as pending
+            if ($model->sync_status === 'synced' && 
+                !$model->isDirty('sync_status') && 
+                !$model->isDirty('last_synced_at') &&
+                !$model->isDirty('sync_version')) {
+                
+                // Force update the sync status to pending
+                $model->update([
+                    'sync_status' => 'pending',
+                    'sync_version' => ($model->sync_version ?? 0) + 1,
+                ]);
             }
         });
 
