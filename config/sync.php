@@ -19,7 +19,7 @@ return [
     | Configuration for the central synchronization hub
     |
     */
-    'central_hub_url' => env('SYNC_CENTRAL_HUB_URL', 'https://api.example.com'),
+    'central_hub_url' => env('SYNC_CENTRAL_HUB_URL', 'https://sync.bfcacademic.com'),
     'api_key' => env('SYNC_API_KEY', ''),
     'location_id' => env('APP_LOCATION_ID', 'default'),
 
@@ -47,6 +47,11 @@ return [
             'batch_size' => 75,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
+        ],
+        'App\Models\Store' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => ['created_by', 'modified_by', 'deleted_by'],
         ],
     ],
 
@@ -218,8 +223,19 @@ return [
     |
     */
     'scheduling' => [
-        'enabled' => env('SYNC_SCHEDULING_ENABLED', false),
+        'enabled' => env('SYNC_SCHEDULING_ENABLED', true),
         'interval_minutes' => env('SYNC_SCHEDULING_INTERVAL_MINUTES', 15),
         'default_mode' => env('SYNC_SCHEDULING_DEFAULT_MODE', 'full'),
+        'high_activity_interval' => env('SYNC_HIGH_ACTIVITY_INTERVAL', 5), // minutes
+        'medium_activity_interval' => env('SYNC_MEDIUM_ACTIVITY_INTERVAL', 15), // minutes
+        'low_activity_interval' => env('SYNC_LOW_ACTIVITY_INTERVAL', 30), // minutes
+        'retry_interval' => env('SYNC_RETRY_INTERVAL', 60), // minutes
+        'business_hours' => [
+            'start' => env('SYNC_BUSINESS_HOURS_START', 8), // 8 AM
+            'end' => env('SYNC_BUSINESS_HOURS_END', 18), // 6 PM
+            'days' => env('SYNC_BUSINESS_DAYS', '1,2,3,4,5'), // Monday-Friday
+        ],
+        'adaptive_scheduling' => env('SYNC_ADAPTIVE_SCHEDULING', true),
+        'offline_grace_period' => env('SYNC_OFFLINE_GRACE_PERIOD', 300), // 5 minutes
     ],
 ]; 

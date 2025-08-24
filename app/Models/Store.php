@@ -15,7 +15,13 @@ class Store extends Model
         'store_type_id',
         'name',
         'branch_id',
-
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
 
@@ -28,7 +34,11 @@ class Store extends Model
         'id' => 'integer',
         'store_type_id' => 'integer',
         'branch_id' => 'integer',
-
+        'sync_id' => 'string',
+        'location_id' => 'string',
+        'sync_version' => 'integer',
+        'last_synced_at' => 'datetime',
+        'last_sync_attempt_at' => 'datetime',
     ];
 
     public function storetype(): BelongsTo

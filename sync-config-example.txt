@@ -1,0 +1,129 @@
+# =============================================================================
+# SYNCHRONIZATION SYSTEM CONFIGURATION
+# =============================================================================
+
+# Central Hub Configuration
+SYNC_CENTRAL_HUB_URL=https://sync.bfcacademic.com
+SYNC_API_KEY=your_api_key_here
+APP_LOCATION_ID=store_001
+
+# Synchronization Settings
+SYNC_BATCH_SIZE=100
+SYNC_MAX_MEMORY_MB=512
+SYNC_MAX_RETRIES=3
+SYNC_RETRY_DELAY=300
+
+# Scheduling Configuration
+SYNC_SCHEDULING_ENABLED=true
+SYNC_SCHEDULING_INTERVAL_MINUTES=15
+SYNC_SCHEDULING_DEFAULT_MODE=full
+SYNC_HIGH_ACTIVITY_INTERVAL=5
+SYNC_MEDIUM_ACTIVITY_INTERVAL=15
+SYNC_LOW_ACTIVITY_INTERVAL=30
+SYNC_RETRY_INTERVAL=60
+SYNC_BUSINESS_HOURS_START=8
+SYNC_BUSINESS_HOURS_END=18
+SYNC_BUSINESS_DAYS=1,2,3,4,5
+SYNC_ADAPTIVE_SCHEDULING=true
+SYNC_OFFLINE_GRACE_PERIOD=300
+
+# Health Check Configuration
+SYNC_HEALTH_CHECK_ENABLED=true
+SYNC_HEALTH_CHECK_TIMEOUT=10
+SYNC_HEALTH_CHECK_MAX_FAILED=3
+SYNC_HEALTH_CHECK_INTERVAL=300
+
+# Performance Monitoring
+SYNC_MONITORING_ENABLED=true
+SYNC_MAX_DURATION_SECONDS=600
+SYNC_MAX_MEMORY_USAGE_MB=1024
+SYNC_MAX_FAILURE_RATE=0.1
+
+# Notification Configuration
+SYNC_NOTIFICATIONS_ENABLED=true
+SYNC_NOTIFICATION_CHANNELS=mail
+SYNC_NOTIFICATION_RECIPIENTS=admin@example.com,tech@example.com
+SYNC_NOTIFY_STARTED=false
+SYNC_NOTIFY_COMPLETED=false
+SYNC_NOTIFY_FAILED=true
+SYNC_NOTIFY_HEALTH_FAILED=true
+
+# Email Configuration (for notifications)
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@example.com"
+MAIL_FROM_NAME="${APP_NAME} Sync System"
+
+# Queue Configuration (for background processing)
+QUEUE_CONNECTION=database
+QUEUE_FAILED_DRIVER=database-uuids
+
+# Cache Configuration (for sync metadata)
+CACHE_DRIVER=file
+CACHE_PREFIX=sync_
+CACHE_TTL=86400
+
+# Logging Configuration
+LOG_CHANNEL=stack
+LOG_LEVEL=info
+SYNC_LOG_LEVEL=info
+SYNC_LOG_CHANNEL=stack
+
+# Security Configuration
+SYNC_ENCRYPT_SENSITIVE_DATA=true
+SYNC_VALIDATE_CHECKSUMS=true
+SYNC_MAX_CONCURRENT_SYNCS=5
+SYNC_RATE_LIMIT_PER_MINUTE=100
+
+# =============================================================================
+# USAGE EXAMPLES
+# =============================================================================
+
+# 1. Basic Setup (minimal configuration)
+# SYNC_CENTRAL_HUB_URL=https://your-hub.com
+# SYNC_API_KEY=your_key
+# APP_LOCATION_ID=location_001
+# SYNC_NOTIFICATIONS_ENABLED=true
+# SYNC_NOTIFICATION_RECIPIENTS=admin@company.com
+
+# 2. High-Frequency Sync (for critical systems)
+# SYNC_HIGH_ACTIVITY_INTERVAL=2
+# SYNC_MEDIUM_ACTIVITY_INTERVAL=10
+# SYNC_LOW_ACTIVITY_INTERVAL=20
+
+# 3. Conservative Sync (for stable systems)
+# SYNC_HIGH_ACTIVITY_INTERVAL=15
+# SYNC_MEDIUM_ACTIVITY_INTERVAL=30
+# SYNC_LOW_ACTIVITY_INTERVAL=60
+
+# 4. 24/7 Operation (no business hours restriction)
+# SYNC_BUSINESS_HOURS_START=0
+# SYNC_BUSINESS_HOURS_END=24
+# SYNC_BUSINESS_DAYS=0,1,2,3,4,5,6
+
+# 5. Multiple Recipients
+# SYNC_NOTIFICATION_RECIPIENTS=admin@company.com,tech@company.com,manager@company.com
+
+# =============================================================================
+# COMMAND EXAMPLES
+# =============================================================================
+
+# Test the system:
+# php artisan sync:auto --health-check --detailed
+
+# Monitor in real-time:
+# php artisan sync:monitor --live
+
+# Test notifications:
+# php artisan sync:test-notification admin@example.com --type=push
+
+# Manual sync:
+# php artisan sync:data --push
+# php artisan sync:data --pull
+
+# View status:
+# php artisan sync:monitor --stats

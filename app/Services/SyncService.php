@@ -8,18 +8,21 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Exception;
+use App\Services\SyncNotificationService;
 
 class SyncService
 {
     protected $centralHubUrl;
     protected $locationId;
     protected $apiKey;
+    protected $notificationService;
 
-    public function __construct()
+    public function __construct(SyncNotificationService $notificationService)
     {
         $this->centralHubUrl = config('sync.central_hub_url');
         $this->locationId = config('app.location_id');
         $this->apiKey = config('sync.api_key');
+        $this->notificationService = $notificationService;
     }
 
     /**
@@ -53,6 +56,16 @@ class SyncService
                         'id' => $model->id,
                         'error' => $e->getMessage()
                     ]);
+                    
+                    // Send notification for critical failures
+                    if ($this->shouldNotifyForFailure($e->getMessage())) {
+                        $this->notificationService->notifySyncFailure([
+                            'model' => get_class($model),
+                            'id' => $model->id,
+                            'error' => $e->getMessage(),
+                            'operation' => 'push'
+                        ], 'push');
+                    }
                 }
             }
         } catch (Exception $e) {
@@ -186,6 +199,32 @@ class SyncService
     }
 
     /**
+     * Resolve model class name to full class path
+     */
+    protected function resolveModelClass(string $modelName): ?string
+    {
+        // If it's already a full class name, return it
+        if (class_exists($modelName)) {
+            return $modelName;
+        }
+        
+        // Try to resolve from common model names
+        $possibleClasses = [
+            'App\\Models\\' . $modelName,
+            'App\\Models\\' . ucfirst($modelName),
+            'App\\Models\\' . ucfirst($modelName),
+        ];
+        
+        foreach ($possibleClasses as $class) {
+            if (class_exists($class)) {
+                return $class;
+            }
+        }
+        
+        return null;
+    }
+
+    /**
      * Get models that need synchronization
      */
     protected function getModelsNeedingSync(string $modelType = null): array
@@ -193,7 +232,10 @@ class SyncService
         $models = [];
         
         if ($modelType) {
-            $models = $modelType::whereIn('sync_status', ['pending', 'deleted_pending'])->get()->all();
+            $modelClass = $this->resolveModelClass($modelType);
+            if ($modelClass) {
+                $models = $modelClass::whereIn('sync_status', ['pending', 'deleted_pending'])->get()->all();
+            }
         } else {
             // Get all syncable models
             $syncableModels = $this->getSyncableModels();
@@ -277,6 +319,28 @@ class SyncService
             ]);
             return false;
         }
+    }
+
+    /**
+     * Check if notification should be sent for this failure
+     */
+    protected function shouldNotifyForFailure(string $errorMessage): bool
+    {
+        // Don't notify for common/expected errors
+        $ignoredErrors = [
+            'cURL error 6: Could not resolve host',
+            '508 Resource Limit Is Reached',
+            'Connection timed out',
+            'Network is unreachable'
+        ];
+        
+        foreach ($ignoredErrors as $ignoredError) {
+            if (str_contains($errorMessage, $ignoredError)) {
+                return false;
+            }
+        }
+        
+        return true;
     }
 
     /**
