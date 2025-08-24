@@ -12,6 +12,30 @@ The synchronization system provides:
 - **Central hub coordination** for reliable data distribution
 - **Real-time status monitoring** and health checks
 
+## 🏗️ **Dual-Mode Architecture**
+
+This system is designed to support **TWO deployment scenarios** with the same codebase:
+
+### **Scenario 1: Regular Location**
+- Connects to an external central hub
+- Pushes local changes to the central hub
+- Pulls changes from the central hub
+- Requires external connectivity for sync operations
+
+### **Scenario 2: Central Hub**
+- Acts as the synchronization server for other locations
+- Receives changes from other locations
+- Distributes changes to requesting locations
+- No external dependencies for sync operations
+- Always considered "online" for sync purposes
+
+### **Key Benefits of Dual-Mode Design:**
+- ✅ **Single Codebase**: Deploy the same application to both central hub and locations
+- ✅ **Flexible Configuration**: Switch modes via environment variables
+- ✅ **No Code Changes**: Same application handles both scenarios
+- ✅ **Consistent API**: Same endpoints work in both modes
+- ✅ **Easy Migration**: Convert a location to central hub by changing config
+
 ## Architecture
 
 ```
@@ -67,21 +91,51 @@ The synchronization system provides:
 
 ### 1. Environment Configuration
 
-Add these variables to your `.env` file:
+#### **For Regular Locations (Connecting to External Central Hub):**
 
 ```env
 # Location identification
 APP_LOCATION_ID=store_001
 
-# Central hub configuration
+# Central hub configuration (external server)
 SYNC_CENTRAL_HUB_URL=https://sync.yourcompany.com
 SYNC_API_KEY=your_api_key_here
+
+# Central hub identification (set to false for regular locations)
+SYNC_IS_CENTRAL_HUB=false
+SYNC_CENTRAL_HUB_LOCATION_ID=1
 
 # Sync settings
 SYNC_BATCH_SIZE=50
 SYNC_MAX_RETRIES=3
 SYNC_RETRY_DELAY=60
 ```
+
+#### **For Central Hub (Acting as Sync Server):**
+
+```env
+# Central hub identification
+APP_LOCATION_ID=central_hub_001
+
+# Central hub configuration (this server's own URL)
+SYNC_CENTRAL_HUB_URL=https://this-server.com
+SYNC_API_KEY=central_hub_api_key_here
+
+# Central hub identification (set to true for central hub)
+SYNC_IS_CENTRAL_HUB=true
+SYNC_CENTRAL_HUB_LOCATION_ID=1
+
+# Sync settings
+SYNC_BATCH_SIZE=100
+SYNC_MAX_RETRIES=3
+SYNC_RETRY_DELAY=60
+```
+
+#### **Important Notes:**
+- Only **ONE** instance should be configured as `SYNC_IS_CENTRAL_HUB=true`
+- Regular locations should point to the central hub's URL
+- Central hub should point to its own URL or use a relative path
+- Each location needs a unique `APP_LOCATION_ID`
 
 ### 2. Database Migrations
 
@@ -191,7 +245,7 @@ php artisan sync:data
 #### Scheduled Synchronization
 
 Add to your `app/Console/Kernel.php`:
-
+S
 ```php
 protected function schedule(Schedule $schedule)
 {

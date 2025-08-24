@@ -26,8 +26,11 @@ trait Syncable
         });
 
         static::updating(function (Model $model) {
-            $model->sync_status = 'pending';
-            $model->sync_version = ($model->sync_version ?? 0) + 1;
+            // Only update sync status if it's not being explicitly set to 'synced'
+            if ($model->sync_status !== 'synced') {
+                $model->sync_status = 'pending';
+                $model->sync_version = ($model->sync_version ?? 0) + 1;
+            }
         });
 
         static::deleting(function (Model $model) {
@@ -68,10 +71,10 @@ trait Syncable
      */
     public function markAsSynced(): void
     {
-        $this->update([
-            'sync_status' => 'synced',
-            'last_synced_at' => now(),
-        ]);
+        // Use direct property assignment to avoid triggering updating event
+        $this->sync_status = 'synced';
+        $this->last_synced_at = now();
+        $this->saveQuietly(); // Save without triggering events
     }
 
     /**
