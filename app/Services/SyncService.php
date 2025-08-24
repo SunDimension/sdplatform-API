@@ -398,8 +398,14 @@ class SyncService
             
             foreach ($models as $model) {
                 try {
+                    // Format the data as a proper sync change that pullChanges expects
                     $syncData = $this->prepareModelForHub($model);
-                    $results['data'][] = $syncData;
+                    $change = [
+                        'model_type' => get_class($model),
+                        'action' => $this->determineModelAction($model),
+                        'data' => $syncData
+                    ];
+                    $results['data'][] = $change;
                 } catch (Exception $e) {
                     Log::error('Failed to prepare model for hub', [
                         'model' => get_class($model),
