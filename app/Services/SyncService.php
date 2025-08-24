@@ -90,6 +90,16 @@ class SyncService
         ];
 
         try {
+            // Debug: Log central hub detection
+            Log::info('Central hub detection check', [
+                'is_central_hub' => $this->isCentralHub(),
+                'config_sync_is_central_hub' => config('sync.is_central_hub'),
+                'current_host' => request()->getHost(),
+                'hub_host' => parse_url($this->centralHubUrl, PHP_URL_HOST),
+                'location_id' => $this->locationId,
+                'central_hub_location_id' => config('sync.central_hub_location_id')
+            ]);
+            
             // Check if this location IS the central hub
             if ($this->isCentralHub()) {
                 Log::info('Central hub detected - collecting local sync data for distribution');
@@ -104,6 +114,8 @@ class SyncService
                     'meta' => $results['meta']
                 ]);
                 
+                // Central hub doesn't process changes - it only provides data
+                // So we return the data without processing
                 return $results;
             }
 
@@ -131,9 +143,54 @@ class SyncService
                     'meta' => $meta
                 ]);
                 
+                // Debug: Log the structure of changes
+                Log::info('Changes array structure', [
+                    'changes_count' => count($changes),
+                    'changes_type' => gettype($changes),
+                    'first_change' => $changes[0] ?? 'no_changes',
+                    'first_change_type' => isset($changes[0]) ? gettype($changes[0]) : 'n/a'
+                ]);
+                
                 // Process each change
                 foreach ($changes as $change) {
                     try {
+                        // Debug: Log each change
+                        Log::info('Processing change', [
+                            'change' => $change,
+                            'change_type' => gettype($change)
+                        ]);
+                        
+                        // Validate change structure before processing
+                        if (!is_array($change)) {
+                            Log::warning('Invalid change structure received from central hub', [
+                                'change' => $change,
+                                'change_type' => gettype($change),
+                                'expected_type' => 'array'
+                            ]);
+                            
+                            $results['failed']++;
+                            $results['errors'][] = [
+                                'change' => $change,
+                                'error' => 'Invalid change structure: expected array, got ' . gettype($change)
+                            ];
+                            continue; // Skip this invalid change
+                        }
+                        
+                        // Validate required fields
+                        if (!isset($change['model_type']) || !isset($change['action']) || !isset($change['data'])) {
+                            Log::warning('Change missing required fields', [
+                                'change' => $change,
+                                'missing_fields' => array_diff(['model_type', 'action', 'data'], array_keys($change))
+                            ]);
+                            
+                            $results['failed']++;
+                            $results['errors'][] = [
+                                'change' => $change,
+                                'error' => 'Change missing required fields: model_type, action, or data'
+                            ];
+                            continue; // Skip this invalid change
+                        }
+                        
                         $this->applyChangeFromHub($change);
                         $results['success']++;
                     } catch (Exception $e) {
@@ -336,6 +393,7 @@ class SyncService
             $syncableModels = $this->getSyncableModels();
             foreach ($syncableModels as $modelClass) {
                 $pendingModels = $modelClass::whereIn('sync_status', ['pending', 'deleted_pending'])->get();
+                // Use all() to get the actual model objects
                 $models = array_merge($models, $pendingModels->all());
             }
         }

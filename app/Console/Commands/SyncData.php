@@ -108,7 +108,7 @@ class SyncData extends Command
         );
 
         // Show the actual data received from central hub
-        if (!empty($results['data'])) {
+        if (isset($results['data']) && is_array($results['data']) && !empty($results['data'])) {
             $this->info('Data received from central hub:');
             $this->line('Total changes: ' . count($results['data']));
             
@@ -121,8 +121,18 @@ class SyncData extends Command
             if ($sampleCount > 0) {
                 $this->line("Sample changes (showing {$sampleCount}):");
                 for ($i = 0; $i < $sampleCount; $i++) {
-                    $change = $results['data'][$i];
-                    $this->line("  " . ($i + 1) . ". Model: " . $change['model_type'] . ", Action: " . $change['action'] . ", ID: " . $change['model_id']);
+                    if (isset($results['data'][$i])) {
+                        $change = $results['data'][$i];
+                        
+                        // Safely display change information
+                        if (is_array($change) && isset($change['model_type']) && isset($change['action']) && isset($change['model_id'])) {
+                            $this->line("  " . ($i + 1) . ". Model: " . $change['model_type'] . ", Action: " . $change['action'] . ", ID: " . $change['model_id']);
+                        } else {
+                            $this->line("  " . ($i + 1) . ". Invalid change structure: " . json_encode($change));
+                        }
+                    } else {
+                        $this->line("  " . ($i + 1) . ". Change not accessible at index {$i}");
+                    }
                 }
             }
         } else {
