@@ -98,6 +98,7 @@ class SyncData extends Command
         
         $results = $syncService->pullChanges();
         
+        // Show processing results
         $this->table(
             ['Metric', 'Count'],
             [
@@ -105,6 +106,28 @@ class SyncData extends Command
                 ['Failed', $results['failed']],
             ]
         );
+
+        // Show the actual data received from central hub
+        if (!empty($results['data'])) {
+            $this->info('Data received from central hub:');
+            $this->line('Total changes: ' . count($results['data']));
+            
+            if (!empty($results['meta'])) {
+                $this->line('Meta information: ' . json_encode($results['meta']));
+            }
+            
+            // Show first few changes as examples
+            $sampleCount = min(3, count($results['data']));
+            if ($sampleCount > 0) {
+                $this->line("Sample changes (showing {$sampleCount}):");
+                for ($i = 0; $i < $sampleCount; $i++) {
+                    $change = $results['data'][$i];
+                    $this->line("  " . ($i + 1) . ". Model: " . $change['model_type'] . ", Action: " . $change['action'] . ", ID: " . $change['model_id']);
+                }
+            }
+        } else {
+            $this->line('No changes received from central hub');
+        }
 
         if ($results['failed'] > 0) {
             $this->warn("{$results['failed']} changes failed to apply");

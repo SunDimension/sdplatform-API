@@ -136,3 +136,45 @@ SYNC_RATE_LIMIT_PER_MINUTE=100
 
 # View status:
 # php artisan sync:monitor --stats
+
+# =============================================================================
+# CENTRAL HUB RESPONSE STRUCTURE
+# =============================================================================
+
+# When a location calls /api/sync/pull, the central hub should return:
+# {
+#   "success": true,
+#   "data": [
+#     {
+#       "model_type": "App\\Models\\Store",
+#       "model_id": 123,
+#       "sync_id": "store_123_uuid",
+#       "location_id": "central_hub",
+#       "sync_version": 2,
+#       "sync_status": "pending",
+#       "action": "update",
+#       "data": {
+#         "name": "Updated Store Name",
+#         "branch_id": 1,
+#         "store_type_id": 2,
+#         "location": "New Location",
+#         "status": "active"
+#       },
+#       "metadata": {
+#         "created_at": "2024-01-01T10:00:00Z",
+#         "updated_at": "2024-01-01T15:30:00Z",
+#         "last_synced_at": null,
+#         "last_sync_attempt_at": null
+#       }
+#     }
+#   ],
+#   "meta": {
+#     "location_id": "central_hub",
+#     "timestamp": "2024-01-01T16:00:00Z",
+#     "total_count": 1,
+#     "returned_count": 1
+#   }
+# }
+
+# IMPORTANT: The 'data' array contains the actual items that need syncing,
+# not just success/failure counts from the central hub's processing.

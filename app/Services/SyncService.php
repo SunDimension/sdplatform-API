@@ -84,13 +84,26 @@ class SyncService
         $results = [
             'success' => 0,
             'failed' => 0,
-            'errors' => []
+            'errors' => [],
+            'data' => [],
+            'meta' => []
         ];
 
         try {
             // Check if this location IS the central hub
             if ($this->isCentralHub()) {
-                Log::info('Central hub detected - skipping pull to prevent infinite loop');
+                Log::info('Central hub detected - collecting local sync data for distribution');
+                
+                // Central hub collects its own sync data instead of making HTTP calls
+                $centralHubData = $this->getCentralHubSyncData();
+                $results['data'] = $centralHubData['data'];
+                $results['meta'] = $centralHubData['meta'];
+                
+                Log::info('Central hub sync data collected', [
+                    'total_changes' => count($results['data']),
+                    'meta' => $results['meta']
+                ]);
+                
                 return $results;
             }
 
@@ -103,8 +116,22 @@ class SyncService
             ])->post($this->centralHubUrl . '/api/sync/pull');
 
             if ($response->successful()) {
-                $changes = $response->json('data', []);
+                $responseData = $response->json();
                 
+                // Extract the actual sync data from the response
+                $changes = $responseData['data'] ?? [];
+                $meta = $responseData['meta'] ?? [];
+                
+                // Store the raw data for reference
+                $results['data'] = $changes;
+                $results['meta'] = $meta;
+                
+                Log::info('Received changes from central hub', [
+                    'total_changes' => count($changes),
+                    'meta' => $meta
+                ]);
+                
+                // Process each change
                 foreach ($changes as $change) {
                     try {
                         $this->applyChangeFromHub($change);
@@ -449,6 +476,67 @@ class SyncService
         }
         
         return false;
+    }
+
+    /**
+     * Get sync data from central hub's own database
+     * This method is called when the central hub needs to provide sync data
+     */
+    protected function getCentralHubSyncData(): array
+    {
+        $results = [
+            'data' => [],
+            'meta' => [
+                'location_id' => $this->locationId,
+                'timestamp' => now()->toISOString(),
+                'total_count' => 0,
+                'returned_count' => 0,
+                'source' => 'central_hub_local'
+            ]
+        ];
+
+        try {
+            // Get models that need syncing from central hub's database
+            $models = $this->getModelsNeedingSync();
+            $results['meta']['total_count'] = count($models);
+            
+            // Limit results to prevent overwhelming responses
+            $limit = config('sync.batch_size', 100);
+            $models = array_slice($models, 0, $limit);
+            $results['meta']['returned_count'] = count($models);
+            
+            foreach ($models as $model) {
+                try {
+                    $syncData = $this->prepareModelForHub($model);
+                    $results['data'][] = $syncData;
+                } catch (Exception $e) {
+                    Log::error('Failed to prepare central hub model for sync', [
+                        'model' => get_class($model),
+                        'id' => $model->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    
+                    // Continue with other models
+                    continue;
+                }
+            }
+            
+            Log::info('Central hub sync data prepared', [
+                'total_models' => $results['meta']['total_count'],
+                'returned_models' => $results['meta']['returned_count']
+            ]);
+            
+        } catch (Exception $e) {
+            Log::error('Failed to get central hub sync data', [
+                'error' => $e->getMessage()
+            ]);
+            
+            // Return empty results on error
+            $results['data'] = [];
+            $results['meta']['error'] = $e->getMessage();
+        }
+
+        return $results;
     }
 
     /**
