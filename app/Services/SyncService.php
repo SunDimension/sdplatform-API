@@ -88,6 +88,12 @@ class SyncService
         ];
 
         try {
+            // Check if this location IS the central hub
+            if ($this->isCentralHub()) {
+                Log::info('Central hub detected - skipping pull to prevent infinite loop');
+                return $results;
+            }
+
             // Debug: Log the URL being used
             Log::info('Sync pull URL', ['url' => $this->centralHubUrl . '/api/sync/pull']);
             
@@ -121,6 +127,68 @@ class SyncService
         } catch (Exception $e) {
             Log::error('Sync pull process failed', ['error' => $e->getMessage()]);
             throw $e;
+        }
+
+        return $results;
+    }
+
+    /**
+     * Pull changes for central hub (incoming pull requests)
+     * This method is called by the central hub to retrieve local changes
+     * Central hub then distributes these changes to other locations
+     */
+    public function pullChangesForHub(string $modelType = null, int $limit = 100): array
+    {
+        $results = [
+            'success' => true,
+            'data' => [],
+            'meta' => [
+                'location_id' => $this->locationId,
+                'timestamp' => now()->toISOString(),
+                'total_count' => 0,
+                'returned_count' => 0
+            ]
+        ];
+
+        try {
+            // Get models that need syncing
+            $models = $this->getModelsNeedingSync($modelType);
+            $results['meta']['total_count'] = count($models);
+            
+            // Limit the results
+            $models = array_slice($models, 0, $limit);
+            $results['meta']['returned_count'] = count($models);
+            
+            foreach ($models as $model) {
+                try {
+                    $syncData = $this->prepareModelForHub($model);
+                    $results['data'][] = $syncData;
+                } catch (Exception $e) {
+                    Log::error('Failed to prepare model for hub', [
+                        'model' => get_class($model),
+                        'id' => $model->id,
+                        'error' => $e->getMessage()
+                    ]);
+                    
+                    // Continue with other models
+                    continue;
+                }
+            }
+            
+            Log::info('Central hub pull request processed', [
+                'location_id' => $this->locationId,
+                'total_models' => $results['meta']['total_count'],
+                'returned_models' => $results['meta']['returned_count']
+            ]);
+            
+        } catch (Exception $e) {
+            Log::error('Central hub pull request failed', [
+                'location_id' => $this->locationId,
+                'error' => $e->getMessage()
+            ]);
+            
+            $results['success'] = false;
+            $results['error'] = $e->getMessage();
         }
 
         return $results;
@@ -349,11 +417,38 @@ class SyncService
     public function isOnline(): bool
     {
         try {
-            $response = Http::timeout(5)->get($this->centralHubUrl . '/health');
+            $response = Http::timeout(5)->get($this->centralHubUrl . '/api/sync/status');
             return $response->successful();
         } catch (Exception $e) {
             return false;
         }
+    }
+
+    /**
+     * Check if this location IS the central hub
+     */
+    public function isCentralHub(): bool
+    {
+        // Method 1: Check if this location is configured as the central hub
+        if (config('sync.is_central_hub', false)) {
+            return true;
+        }
+        
+        // Method 2: Check if current host matches central hub host
+        $currentHost = request()->getHost();
+        $hubHost = parse_url($this->centralHubUrl, PHP_URL_HOST);
+        
+        if (strtolower($currentHost) === strtolower($hubHost)) {
+            return true;
+        }
+        
+        // Method 3: Check if current location ID matches central hub location ID
+        $centralHubLocationId = config('sync.central_hub_location_id');
+        if ($centralHubLocationId && $this->locationId == $centralHubLocationId) {
+            return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -424,6 +519,57 @@ class SyncService
         if ($model) {
             $model->delete();
         }
+    }
+
+    /**
+     * Prepare model data for central hub consumption
+     */
+    protected function prepareModelForHub($model): array
+    {
+        $syncData = [
+            'model_type' => get_class($model),
+            'model_id' => $model->id,
+            'sync_id' => $model->sync_id,
+            'location_id' => $model->location_id,
+            'sync_version' => $model->sync_version ?? 1,
+            'sync_status' => $model->sync_status,
+            'action' => $this->determineModelAction($model),
+            'data' => $model->getSyncData(),
+            'metadata' => [
+                'created_at' => $model->created_at?->toISOString(),
+                'updated_at' => $model->updated_at?->toISOString(),
+                'last_synced_at' => $model->last_synced_at?->toISOString(),
+                'last_sync_attempt_at' => $model->last_sync_attempt_at?->toISOString(),
+            ]
+        ];
+
+        // Add soft delete information if applicable
+        if (method_exists($model, 'trashed') && $model->trashed()) {
+            $syncData['action'] = 'delete';
+            $syncData['deleted_at'] = $model->deleted_at?->toISOString();
+        }
+
+        return $syncData;
+    }
+
+    /**
+     * Determine the action for a model based on its sync status
+     */
+    protected function determineModelAction($model): string
+    {
+        if (method_exists($model, 'trashed') && $model->trashed()) {
+            return 'delete';
+        }
+        
+        if ($model->sync_status === 'deleted_pending') {
+            return 'delete';
+        }
+        
+        if ($model->wasRecentlyCreated) {
+            return 'create';
+        }
+        
+        return 'update';
     }
 
     /**

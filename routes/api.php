@@ -543,9 +543,10 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
  // Synchronization Routes
- Route::prefix('sync')->group(function () {
+Route::prefix('sync')->group(function () {
     Route::post('/push', [SyncController::class, 'push']);
     Route::post('/pull', [SyncController::class, 'pull']);
+    Route::post('/pull-for-hub', [SyncController::class, 'pullForHub']); // Endpoint for central hub to pull local changes
     Route::post('/queue/process', [SyncController::class, 'processQueue']);
     Route::get('/status', [SyncController::class, 'status']);
     Route::post('/force', [SyncController::class, 'forceSync']);

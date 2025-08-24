@@ -7,6 +7,10 @@ SYNC_CENTRAL_HUB_URL=https://sync.bfcacademic.com
 SYNC_API_KEY=your_api_key_here
 APP_LOCATION_ID=store_001
 
+# Central Hub Identification (set to true if this location IS the central hub)
+SYNC_IS_CENTRAL_HUB=false
+SYNC_CENTRAL_HUB_LOCATION_ID=1
+
 # Synchronization Settings
 SYNC_BATCH_SIZE=100
 SYNC_MAX_MEMORY_MB=512
@@ -87,8 +91,13 @@ SYNC_RATE_LIMIT_PER_MINUTE=100
 # SYNC_CENTRAL_HUB_URL=https://your-hub.com
 # SYNC_API_KEY=your_key
 # APP_LOCATION_ID=location_001
+# SYNC_IS_CENTRAL_HUB=false
 # SYNC_NOTIFICATIONS_ENABLED=true
 # SYNC_NOTIFICATION_RECIPIENTS=admin@company.com
+
+# 1a. Central Hub Setup (if this location IS the central hub)
+# SYNC_IS_CENTRAL_HUB=true
+# SYNC_CENTRAL_HUB_LOCATION_ID=1
 
 # 2. High-Frequency Sync (for critical systems)
 # SYNC_HIGH_ACTIVITY_INTERVAL=2

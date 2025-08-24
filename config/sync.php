@@ -22,6 +22,10 @@ return [
     'central_hub_url' => env('SYNC_CENTRAL_HUB_URL', 'https://sync.bfcacademic.com'),
     'api_key' => env('SYNC_API_KEY', ''),
     'location_id' => env('APP_LOCATION_ID', 'default'),
+    
+    // Central hub identification
+    'is_central_hub' => env('SYNC_IS_CENTRAL_HUB', false),
+    'central_hub_location_id' => env('SYNC_CENTRAL_HUB_LOCATION_ID', null),
 
     /*
     |--------------------------------------------------------------------------

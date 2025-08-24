@@ -82,6 +82,47 @@ class SyncController extends Controller
     }
 
     /**
+     * Pull changes for central hub (incoming pull requests)
+     * This endpoint is called by the central hub to retrieve local changes
+     * Central hub then distributes these changes to other locations
+     */
+    public function pullForHub(Request $request): JsonResponse
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'model_type' => 'nullable|string',
+                'limit' => 'integer|min:1|max:1000'
+            ]);
+
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $validator->errors()
+                ], 422);
+            }
+
+            $modelType = $request->input('model_type');
+            $limit = $request->input('limit', 100);
+            
+            $results = $this->syncService->pullChangesForHub($modelType, $limit);
+
+            return response()->json($results);
+
+        } catch (\Exception $e) {
+            Log::error('Central hub pull request failed', [
+                'error' => $e->getMessage(),
+                'request' => $request->all()
+            ]);
+            
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to process central hub pull request',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
      * Process sync queue
      */
     public function processQueue(Request $request): JsonResponse
