@@ -5,16 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\Syncable;
 
 class Store extends Model
 {
-    use HasFactory;
+    use HasFactory, Syncable;
 
     protected $fillable = [
         'store_type_id',
         'name',
         'branch_id',
-
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
 
@@ -27,7 +34,11 @@ class Store extends Model
         'id' => 'integer',
         'store_type_id' => 'integer',
         'branch_id' => 'integer',
-
+        'sync_id' => 'string',
+        'location_id' => 'string',
+        'sync_version' => 'integer',
+        'last_synced_at' => 'datetime',
+        'last_sync_attempt_at' => 'datetime',
     ];
 
     public function storetype(): BelongsTo

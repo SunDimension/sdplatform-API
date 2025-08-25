@@ -174,7 +174,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
 
 
-
+   
     Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::class, 'cancelCredit']);
 
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
@@ -543,12 +543,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class, 'pending']);
     Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class, 'approve']);
 
-    // Synchronization Routes
-    Route::prefix('sync')->group(function () {
-        Route::post('/push', [SyncController::class, 'push']);
-        Route::post('/pull', [SyncController::class, 'pull']);
-        Route::post('/queue/process', [SyncController::class, 'processQueue']);
-        Route::get('/status', [SyncController::class, 'status']);
-        Route::post('/force', [SyncController::class, 'forceSync']);
-    });
+   
+});
+
+
+ // Synchronization Routes
+Route::prefix('sync')->group(function () {
+    Route::post('/push', [SyncController::class, 'push']);
+    Route::post('/pull', [SyncController::class, 'pull']);
+    Route::post('/pull-for-hub', [SyncController::class, 'pullForHub']); // Endpoint for central hub to pull local changes
+    Route::post('/queue/process', [SyncController::class, 'processQueue']);
+    Route::get('/status', [SyncController::class, 'status']);
+    Route::post('/force', [SyncController::class, 'forceSync']);
 });

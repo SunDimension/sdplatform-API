@@ -26,8 +26,31 @@ trait Syncable
         });
 
         static::updating(function (Model $model) {
-            $model->sync_status = 'pending';
-            $model->sync_version = ($model->sync_version ?? 0) + 1;
+            // Only update sync status if it's not being explicitly set to 'synced'
+            // and if this is not a sync-related update (to avoid infinite loops)
+            if ($model->sync_status !== 'synced' && 
+                !$model->isDirty('sync_status') && 
+                !$model->isDirty('last_synced_at')) {
+                
+                $model->sync_status = 'pending';
+                $model->sync_version = ($model->sync_version ?? 0) + 1;
+            }
+        });
+
+        static::updated(function (Model $model) {
+            // Fallback: if the updating event didn't work, check if we need to mark as pending
+            // This ensures that any model update (except sync-related ones) gets marked as pending
+            if ($model->sync_status === 'synced' && 
+                !$model->isDirty('sync_status') && 
+                !$model->isDirty('last_synced_at') &&
+                !$model->isDirty('sync_version')) {
+                
+                // Force update the sync status to pending
+                $model->update([
+                    'sync_status' => 'pending',
+                    'sync_version' => ($model->sync_version ?? 0) + 1,
+                ]);
+            }
         });
 
         static::deleting(function (Model $model) {
@@ -68,10 +91,10 @@ trait Syncable
      */
     public function markAsSynced(): void
     {
-        $this->update([
-            'sync_status' => 'synced',
-            'last_synced_at' => now(),
-        ]);
+        // Use direct property assignment to avoid triggering updating event
+        $this->sync_status = 'synced';
+        $this->last_synced_at = now();
+        $this->saveQuietly(); // Save without triggering events
     }
 
     /**
@@ -83,6 +106,17 @@ trait Syncable
             'sync_status' => 'failed',
             'sync_error' => $error,
             'last_sync_attempt_at' => now(),
+        ]);
+    }
+
+    /**
+     * Mark record as needing sync (for testing and manual operations)
+     */
+    public function markAsNeedingSync(): void
+    {
+        $this->update([
+            'sync_status' => 'pending',
+            'sync_version' => ($this->sync_version ?? 0) + 1,
         ]);
     }
 

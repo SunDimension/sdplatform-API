@@ -5,6 +5,7 @@ namespace App\Console;
 use App\Jobs\HoldingQuantityReturnJob;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -18,6 +19,35 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->job(new HoldingQuantityReturnJob())->dailyAt("00:01");
+        
+        // Data Synchronization Schedule
+        if (config('sync.scheduling.enabled', true)) {
+            // Run scheduled sync every 15 minutes during business hours
+            $schedule->command('sync:scheduled')
+                ->everyFifteenMinutes()
+                ->between('8:00', '18:00')
+                ->weekdays()
+                ->withoutOverlapping()
+                ->runInBackground()
+                ->onSuccess(function () {
+                    Log::info('Scheduled sync completed successfully');
+                })
+                ->onFailure(function () {
+                    Log::error('Scheduled sync failed');
+                });
+            
+            // Run sync health check every hour
+            $schedule->command('sync:auto --health-check')
+                ->hourly()
+                ->withoutOverlapping()
+                ->runInBackground();
+                
+            // Process failed items every 2 hours
+            $schedule->command('sync:auto --mode=queue-only --retry-failed')
+                ->everyTwoHours()
+                ->withoutOverlapping()
+                ->runInBackground();
+        }
     }
 
     /**

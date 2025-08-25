@@ -1,0 +1,223 @@
+# =============================================================================
+# SYNCHRONIZATION SYSTEM CONFIGURATION
+# =============================================================================
+
+# Central Hub Configuration
+SYNC_CENTRAL_HUB_URL=https://sync.bfcacademic.com
+SYNC_API_KEY=your_api_key_here
+APP_LOCATION_ID=store_001
+
+# =============================================================================
+# CENTRAL HUB vs REGULAR LOCATION CONFIGURATION
+# =============================================================================
+# 
+# This application supports TWO deployment modes:
+# 1. CENTRAL HUB: Acts as the synchronization server for other locations
+# 2. REGULAR LOCATION: Connects to an external central hub
+#
+# IMPORTANT: Only ONE instance should be configured as the central hub!
+# =============================================================================
+
+# =============================================================================
+# SCENARIO 1: REGULAR LOCATION (Connects to external central hub)
+# =============================================================================
+# Set these values for locations that need to sync with a central hub:
+
+# Central Hub Identification (set to false for regular locations)
+SYNC_IS_CENTRAL_HUB=false
+SYNC_CENTRAL_HUB_LOCATION_ID=1
+
+# External Central Hub URL (the server this location will sync with)
+SYNC_CENTRAL_HUB_URL=https://sync.bfcacademic.com
+
+# API Key for authentication with central hub
+SYNC_API_KEY=your_api_key_here
+
+# Unique identifier for this location
+APP_LOCATION_ID=location_001
+
+# =============================================================================
+# SCENARIO 2: CENTRAL HUB (Acts as sync server for other locations)
+# =============================================================================
+# Set these values for the instance that will act as the central hub:
+
+# Central Hub Identification (set to true for central hub)
+# SYNC_IS_CENTRAL_HUB=true
+# SYNC_CENTRAL_HUB_LOCATION_ID=1
+
+# Central Hub URL (should be this server's own URL)
+# SYNC_CENTRAL_HUB_URL=https://this-server.com
+
+# API Key for other locations to authenticate with this central hub
+# SYNC_API_KEY=central_hub_api_key_here
+
+# Unique identifier for this central hub
+# APP_LOCATION_ID=central_hub_001
+
+# Synchronization Settings
+SYNC_BATCH_SIZE=100
+SYNC_MAX_MEMORY_MB=512
+SYNC_MAX_RETRIES=3
+SYNC_RETRY_DELAY=300
+
+# Scheduling Configuration
+SYNC_SCHEDULING_ENABLED=true
+SYNC_SCHEDULING_INTERVAL_MINUTES=15
+SYNC_SCHEDULING_DEFAULT_MODE=full
+SYNC_HIGH_ACTIVITY_INTERVAL=5
+SYNC_MEDIUM_ACTIVITY_INTERVAL=15
+SYNC_LOW_ACTIVITY_INTERVAL=30
+SYNC_RETRY_INTERVAL=60
+SYNC_BUSINESS_HOURS_START=8
+SYNC_BUSINESS_HOURS_END=18
+SYNC_BUSINESS_DAYS=1,2,3,4,5
+SYNC_ADAPTIVE_SCHEDULING=true
+SYNC_OFFLINE_GRACE_PERIOD=300
+
+# Health Check Configuration
+SYNC_HEALTH_CHECK_ENABLED=true
+SYNC_HEALTH_CHECK_TIMEOUT=10
+SYNC_HEALTH_CHECK_MAX_FAILED=3
+SYNC_HEALTH_CHECK_INTERVAL=300
+
+# Performance Monitoring
+SYNC_MONITORING_ENABLED=true
+SYNC_MAX_DURATION_SECONDS=600
+SYNC_MAX_MEMORY_USAGE_MB=1024
+SYNC_MAX_FAILURE_RATE=0.1
+
+# Notification Configuration
+SYNC_NOTIFICATIONS_ENABLED=true
+SYNC_NOTIFICATION_CHANNELS=mail
+SYNC_NOTIFICATION_RECIPIENTS=admin@example.com,tech@example.com
+SYNC_NOTIFY_STARTED=false
+SYNC_NOTIFY_COMPLETED=false
+SYNC_NOTIFY_FAILED=true
+SYNC_NOTIFY_HEALTH_FAILED=true
+
+# Email Configuration (for notifications)
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=your_username
+MAIL_PASSWORD=your_password
+MAIL_ENCRYPTION=tls
+MAIL_FROM_ADDRESS="noreply@example.com"
+MAIL_FROM_NAME="${APP_NAME} Sync System"
+
+# Queue Configuration (for background processing)
+QUEUE_CONNECTION=database
+QUEUE_FAILED_DRIVER=database-uuids
+
+# Cache Configuration (for sync metadata)
+CACHE_DRIVER=file
+CACHE_PREFIX=sync_
+CACHE_TTL=86400
+
+# Logging Configuration
+LOG_CHANNEL=stack
+LOG_LEVEL=info
+SYNC_LOG_LEVEL=info
+SYNC_LOG_CHANNEL=stack
+
+# Security Configuration
+SYNC_ENCRYPT_SENSITIVE_DATA=true
+SYNC_VALIDATE_CHECKSUMS=true
+SYNC_MAX_CONCURRENT_SYNCS=5
+SYNC_RATE_LIMIT_PER_MINUTE=100
+
+# =============================================================================
+# USAGE EXAMPLES
+# =============================================================================
+
+# 1. Basic Setup (minimal configuration)
+# SYNC_CENTRAL_HUB_URL=https://your-hub.com
+# SYNC_API_KEY=your_key
+# APP_LOCATION_ID=location_001
+# SYNC_IS_CENTRAL_HUB=false
+# SYNC_NOTIFICATIONS_ENABLED=true
+# SYNC_NOTIFICATION_RECIPIENTS=admin@company.com
+
+# 1a. Central Hub Setup (if this location IS the central hub)
+# SYNC_IS_CENTRAL_HUB=true
+# SYNC_CENTRAL_HUB_LOCATION_ID=1
+
+# 2. High-Frequency Sync (for critical systems)
+# SYNC_HIGH_ACTIVITY_INTERVAL=2
+# SYNC_MEDIUM_ACTIVITY_INTERVAL=10
+# SYNC_LOW_ACTIVITY_INTERVAL=20
+
+# 3. Conservative Sync (for stable systems)
+# SYNC_HIGH_ACTIVITY_INTERVAL=15
+# SYNC_MEDIUM_ACTIVITY_INTERVAL=30
+# SYNC_LOW_ACTIVITY_INTERVAL=60
+
+# 4. 24/7 Operation (no business hours restriction)
+# SYNC_BUSINESS_HOURS_START=0
+# SYNC_BUSINESS_HOURS_END=24
+# SYNC_BUSINESS_DAYS=0,1,2,3,4,5,6
+
+# 5. Multiple Recipients
+# SYNC_NOTIFICATION_RECIPIENTS=admin@company.com,tech@company.com,manager@company.com
+
+# =============================================================================
+# COMMAND EXAMPLES
+# =============================================================================
+
+# Test the system:
+# php artisan sync:auto --health-check --detailed
+
+# Monitor in real-time:
+# php artisan sync:monitor --live
+
+# Test notifications:
+# php artisan sync:test-notification admin@example.com --type=push
+
+# Manual sync:
+# php artisan sync:data --push
+# php artisan sync:data --pull
+
+# View status:
+# php artisan sync:monitor --stats
+
+# =============================================================================
+# CENTRAL HUB RESPONSE STRUCTURE
+# =============================================================================
+
+# When a location calls /api/sync/pull, the central hub should return:
+# {
+#   "success": true,
+#   "data": [
+#     {
+#       "model_type": "App\\Models\\Store",
+#       "model_id": 123,
+#       "sync_id": "store_123_uuid",
+#       "location_id": "central_hub",
+#       "sync_version": 2,
+#       "sync_status": "pending",
+#       "action": "update",
+#       "data": {
+#         "name": "Updated Store Name",
+#         "branch_id": 1,
+#         "store_type_id": 2,
+#         "location": "New Location",
+#         "status": "active"
+#       },
+#       "metadata": {
+#         "created_at": "2024-01-01T10:00:00Z",
+#         "updated_at": "2024-01-01T15:30:00Z",
+#         "last_synced_at": null,
+#         "last_sync_attempt_at": null
+#       }
+#     }
+#   ],
+#   "meta": {
+#     "location_id": "central_hub",
+#     "timestamp": "2024-01-01T16:00:00Z",
+#     "total_count": 1,
+#     "returned_count": 1
+#   }
+# }
+
+# IMPORTANT: The 'data' array contains the actual items that need syncing,
+# not just success/failure counts from the central hub's processing.
