@@ -27,9 +27,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+Route::post('/login', [AuthController::class, 'login'])->name('login'); // Add this name
 Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
 // routes/api.php
 Route::middleware('auth:sanctum')->group(function () {
@@ -115,6 +114,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/receipts-blocking/search', [SalesReceiptController::class, 'searchForBlocking'])
         ->name('sales.receipts.searchForBlocking');
 
+    ///////////////////////////////////////////////////
+
+    // Route::get('/branches', [\App\Http\Controllers\BranchController::class, 'index']);
+
 
     Route::apiResource('measurements', App\Http\Controllers\MeasurementController::class);
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
@@ -171,8 +174,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
 
 
-   
-Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::class, 'cancelCredit']);
+
+    Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::class, 'cancelCredit']);
 
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
 
@@ -273,7 +276,7 @@ Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::cl
     Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
 
     Route::apiResource('post-outflows', App\Http\Controllers\PostOutflowController::class);
-    
+
     // Accounting entries routes for post outflows
     Route::post('post-outflows/{id}/generate-accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'generateAccountingEntries']);
     Route::post('post-outflows/generate-bulk-accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'generateBulkAccountingEntries']);
@@ -282,17 +285,19 @@ Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::cl
     Route::apiResource('settle-credits', App\Http\Controllers\SettleCreditController::class);
 
     Route::apiResource('post-inflows', App\Http\Controllers\PostInflowController::class);
-    
+
     // Accounting entries routes for post inflows
     Route::post('post-inflows/{id}/generate-accounting-entries', [App\Http\Controllers\PostInflowController::class, 'generateAccountingEntries']);
     Route::post('post-inflows/generate-bulk-accounting-entries', [App\Http\Controllers\PostInflowController::class, 'generateBulkAccountingEntries']);
     Route::get('post-inflows/{id}/accounting-entries', [App\Http\Controllers\PostInflowController::class, 'getAccountingEntries']);
 
+
+    /////////////////////////////////////////////////////
     Route::apiResource('branches', App\Http\Controllers\BranchController::class);
 
     Route::apiResource('customer-types', App\Http\Controllers\CustomerTypeController::class);
 
-    
+
 
     Route::apiResource('units', App\Http\Controllers\UnitController::class);
 
@@ -355,7 +360,7 @@ Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::cl
     Route::get('new-release-order-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class, 'pendingReleaseOrder']);
 
     Route::apiResource('sales-receipts', App\Http\Controllers\SalesReceiptController::class);
-    
+
     // Accounting entries routes for sales receipts
     Route::post('sales-receipts/{id}/generate-accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'generateAccountingEntries']);
     Route::post('sales-receipts/generate-bulk-accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'generateBulkAccountingEntries']);

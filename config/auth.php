@@ -14,7 +14,7 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        'guard' => 'web', // Use 'api' guard for API authentication
         'passwords' => 'users',
     ],
 
@@ -71,7 +71,7 @@ return [
             'model' => App\Models\User::class,
         ],
 
-        
+
 
         // 'users' => [
         //     'driver' => 'database',
