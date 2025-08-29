@@ -90,11 +90,24 @@ class SyncController extends Controller
         try {
             $results = $this->syncService->pullChanges();
 
-            return response()->json([
-                'success' => true,
-                'message' => 'Changes pulled successfully',
-                'data' => $results
-            ]);
+            // Check if this is a central hub response
+            if (config('sync.is_central_hub')) {
+                // For central hub, return the data directly without extra wrapping
+                // This prevents the nested data.data structure that causes validation errors
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Changes pulled successfully',
+                    'data' => $results['data'] ?? [],
+                    'meta' => $results['meta'] ?? []
+                ]);
+            } else {
+                // For regular locations, return the full results structure
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Changes pulled successfully',
+                    'data' => $results
+                ]);
+            }
 
         } catch (\Exception $e) {
             Log::error('Sync pull failed', ['error' => $e->getMessage()]);

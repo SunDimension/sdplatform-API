@@ -24,8 +24,8 @@ return [
     'location_id' => env('APP_LOCATION_ID', 'default'),
     
     // Central hub identification
-    'is_central_hub' => env('SYNC_IS_CENTRAL_HUB', false),
-    'central_hub_location_id' => env('SYNC_CENTRAL_HUB_LOCATION_ID', null),
+    'is_central_hub' => env('SYNC_IS_CENTRAL_HUB', true), // Temporarily set to true for testing
+    'central_hub_location_id' => env('SYNC_CENTRAL_HUB_LOCATION_ID', 'CENTRAL_HUB_TEST'),
 
     /*
     |--------------------------------------------------------------------------

@@ -726,12 +726,22 @@ class SyncService
             return true;
         }
         
-        // Method 2: Check if current host matches central hub host
+        // Method 2: Check if current host matches central hub host (including localhost variations)
         $currentHost = request()->getHost();
         $hubHost = parse_url($this->centralHubUrl, PHP_URL_HOST);
         
+        // Check exact match
         if (strtolower($currentHost) === strtolower($hubHost)) {
             return true;
+        }
+        
+        // Check for localhost variations
+        $localhostVariations = ['localhost', '127.0.0.1', '::1'];
+        if (in_array(strtolower($currentHost), $localhostVariations)) {
+            // If we're on localhost and this is configured as central hub, treat it as central hub
+            if (config('sync.is_central_hub', false)) {
+                return true;
+            }
         }
         
         // Method 3: Check if current location ID matches central hub location ID
