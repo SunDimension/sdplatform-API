@@ -38,12 +38,12 @@ class StoreTransferOrder extends Model
      */
     protected $casts = [
         'transfer_date' => 'datetime',
-        'source_store_id' => 'integer',
-        'destination_store_id' => 'integer',
+        'source_store_id' => 'string',
+        'destination_store_id' => 'string',
         'approved_at' => 'timestamp',
-        'created_by' => 'integer',
-        'modified_by' => 'integer',
-        'deleted_by' => 'integer',
+        'created_by' => 'string',
+        'modified_by' => 'string',
+        'deleted_by' => 'string',
     ];
 
     protected static function boot()

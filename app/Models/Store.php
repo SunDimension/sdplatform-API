@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use App\Models\Concerns\Syncable;
 
 class Store extends Model
@@ -31,9 +32,9 @@ class Store extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'store_type_id' => 'integer',
-        'branch_id' => 'integer',
+        'id' => 'string',
+        'store_type_id' => 'string',
+        'branch_id' => 'string',
         'sync_id' => 'string',
         'location_id' => 'string',
         'sync_version' => 'integer',

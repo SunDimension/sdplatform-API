@@ -35,12 +35,12 @@ class StoreTransferItem extends Model
      */
     protected $casts = [
         'unit_price' => 'double',
-        'product_id' => 'integer',
+        'product_id' => 'string',
         'quantity' => 'integer',
         'quantity_pieces' => 'integer',
-        'created_by' => 'integer',
-        'modified_by' => 'integer',
-        'deleted_by' => 'integer',
+        'created_by' => 'string',
+        'modified_by' => 'string',
+        'deleted_by' => 'string',
     ];
 
     public function transferOrder(): BelongsTo

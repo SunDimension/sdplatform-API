@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -45,8 +46,8 @@ class ReceiveOrder extends Model
      */
     protected $casts = [
         'receive_date' => 'date',
-        'branch_id' => 'integer',
-        'store_id' => 'integer',
+        'branch_id' => 'string',
+        'store_id' => 'string',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',

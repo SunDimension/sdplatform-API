@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Vendor extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
     public $table = "vendors";
     /**
      * The attributes that are mass assignable.
@@ -39,9 +44,9 @@ class Vendor extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'vendor_type_id' => 'integer',
-        'bank_id' => 'integer',
+        'id' => 'string',
+        'vendor_type_id' => 'string',
+        'bank_id' => 'string',
     ];
 
     public function vendorType(): BelongsTo

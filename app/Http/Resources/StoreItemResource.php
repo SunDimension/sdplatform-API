@@ -29,6 +29,7 @@ class StoreItemResource extends JsonResource
             'quantity_actual' => StockUtil::getActualQuantity($this->create_item_id, $this->store_id),
             'quantity_request' => StockUtil::getQuantityForRequest($this->create_item_id, $this->store_id),
             'store_id' => $this->store_id,
+            // 'store_name' => $this->store->name,
             'branch_id' => $this->branch_id,
             'discount' => $this->discount,
             'set_limit' => $this->set_limit,

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
@@ -15,7 +15,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasApiTokens, HasRoles;
+    use HasFactory, HasApiTokens, HasRoles, HasUuids;
 
     /**
      * The attributes that are mass assignable.
@@ -49,11 +49,10 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-
-        'branch_id' => 'integer',
+        'id' => 'string',
+        'branch_id' => 'string',
         'password' => 'hashed',
-        'store_id' => 'integer'
+        'store_id' => 'string'
     ];
 
 

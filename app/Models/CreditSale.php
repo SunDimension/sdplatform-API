@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CreditSale extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -31,11 +36,11 @@ class CreditSale extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'customer_id' => 'integer',
-        'branch_id' => 'integer',
-        'warehouse_id' => 'integer',
-        'product_id' => 'integer',
+        'id' => 'string',
+        'customer_id' => 'string',
+        'branch_id' => 'string',
+        'warehouse_id' => 'string',
+        'product_id' => 'string',
         'credit_limit' => 'integer',
     ];
 

@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Branch extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -32,10 +37,10 @@ class Branch extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'state_id' => 'integer',
-        'region_id' => 'integer',
-        'country_id' => 'integer',
+        'id' => 'string',
+        'state_id' => 'string',
+        'region_id' => 'string',
+        'country_id' => 'string',
     ];
 
     public function state(): BelongsTo

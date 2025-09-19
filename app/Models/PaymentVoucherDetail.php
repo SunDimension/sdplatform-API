@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaymentVoucherDetail extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -29,8 +34,8 @@ class PaymentVoucherDetail extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'item_id' => 'integer',
+        'id' => 'string',
+        'item_id' => 'string',
     ];
 
     public function item(): BelongsTo

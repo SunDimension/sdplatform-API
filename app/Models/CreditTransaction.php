@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -41,11 +42,11 @@ class CreditTransaction extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'branch_id' => 'integer',
-        'customer_id' => 'integer',
-        'sales_order_id' => 'integer',
-        'sales_receipt_id' => 'integer',
+        'id' => 'string',
+        'branch_id' => 'string',
+        'customer_id' => 'string',
+        'sales_order_id' => 'string',
+        'sales_receipt_id' => 'string',
         'created_by' => 'integer',
         'modified_by' => 'integer',
         'deleted_by' => 'integer',

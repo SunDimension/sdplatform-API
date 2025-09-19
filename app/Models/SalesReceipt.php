@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -42,12 +43,12 @@ class SalesReceipt extends Model
      **/
 
     protected $casts = [
-        'id' => 'integer',
-        'customer_id' => 'integer',
-        'store_id' => 'integer',
-        'branch_id' => 'integer',
-        'item_sold_id' => 'integer',
-        'sales_order_id' => 'integer',
+        'id' => 'string',
+        'customer_id' => 'string',
+        'store_id' => 'string',
+        'branch_id' => 'string',
+        'item_sold_id' => 'string',
+        'sales_order_id' => 'string',
         'payment_detail' => 'array',
     ];
     protected static function boot()

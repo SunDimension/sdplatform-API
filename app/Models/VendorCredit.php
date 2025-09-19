@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VendorCredit extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -29,9 +34,9 @@ class VendorCredit extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'vendor_id' => 'integer',
-        'warehouse_id' => 'integer',
+        'id' => 'string',
+        'vendor_id' => 'string',
+        'warehouse_id' => 'string',
         'vendor_credit_date' => 'date',
     ];
 

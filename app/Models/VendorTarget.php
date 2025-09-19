@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class VendorTarget extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -29,10 +34,10 @@ class VendorTarget extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'vendor_id' => 'integer',
+        'id' => 'string',
+        'vendor_id' => 'string',
         'year' => 'integer',
-        'product_id' => 'integer',
+        'product_id' => 'string',
     ];
 
     public function vendor(): BelongsTo

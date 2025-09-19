@@ -6,10 +6,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 
 class CashierRemittance extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The attributes that are mass assignable.
@@ -38,12 +43,12 @@ class CashierRemittance extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'branch_id' => 'integer',
-        'user_id' => 'integer',
-        'store_id' => 'integer',
+        'id' => 'string',
+        'branch_id' => 'string',
+        'user_id' => 'string',
+        'store_id' => 'string',
         'approved_by' => 'integer',
-        'cash_discrepancy_id' => 'integer'
+        'cash_discrepancy_id' => 'string'
     ];
     public function branch(): BelongsTo
     {

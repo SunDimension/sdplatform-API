@@ -5,10 +5,11 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 
 class PostOutflow extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
 
     protected $fillable = [
         
@@ -25,12 +26,12 @@ class PostOutflow extends Model
         "sales_receipt_id"    
     ];
 
-    protected $cast =[
-        "id"=>"integer",
+    protected $casts =[
+        "id"=>"string",
         "org_bank"=>"integer",
         "bene_bank"=>"integer",
-        "customer_id"=>"integer",
-        "sales_receipt_id"=>"integer"
+        "customer_id"=>"string",
+        "sales_receipt_id"=>"string"
     ];
 
     public function bank(): BelongsTo

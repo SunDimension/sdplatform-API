@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
@@ -43,10 +44,10 @@ class ItemSold extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'sales_order_id' => 'integer',
-        'store_id' => 'integer',
-        'product_id' => 'integer',
+        'id' => 'string',
+        'sales_order_id' => 'string',
+        'store_id' => 'string',
+        'product_id' => 'string',
         'quantity' => 'integer',
         'quantity_pieces' => 'integer',
         'unit_price' => 'decimal:2',

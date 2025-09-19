@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Concerns\Syncable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
@@ -13,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class CreateItem extends Model
 {
-    use HasFactory, Syncable;
+    use HasFactory, Syncable, HasUuid;
 
 
     //   public function getRouteKeyName()
@@ -59,22 +60,22 @@ class CreateItem extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'item_category_id' => 'integer',
-        'item_type_id' => 'integer',
-        'unit_id' => 'integer',
-        'brand_id' => 'integer',
+        'id' => 'string',
+        'item_category_id' => 'string',
+        'item_type_id' => 'string',
+        'unit_id' => 'string',
+        'brand_id' => 'string',
         'batch_number'=>'string',
         'cost_price' => 'float',
         'selling_price' => 'float',
-        'dimension_id' => 'integer',
-        'weight_id' => 'integer',
-        'branch_id' => 'integer',
+        'dimension_id' => 'string',
+        'weight_id' => 'string',
+        'branch_id' => 'string',
         'warehouse' => 'integer',
-        'vendor_id' => 'integer',
-        'store_id' => 'integer',
-        'user_id' => 'integer',
-        'tax_id' => 'integer',
+        'vendor_id' => 'string',
+        // 'store_id' => 'string',
+        'user_id' => 'string',
+        'tax_id' => 'string',
         'is_tax_inclusive' => 'boolean',
         'tax_amount' => 'float'
     ];

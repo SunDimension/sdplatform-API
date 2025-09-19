@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -24,13 +25,13 @@ class Release extends Model
 
     protected $cast = [
 
-        'id' => 'integer',
-        'branch_id' => 'integer',
-        'sales_receipt_id' => 'integer',
-        'store_id' => 'integer',
-        'customer_id' => 'integer',
+        'id' => 'string',
+        'branch_id' => 'string',
+        'sales_receipt_id' => 'string',
+        'store_id' => 'string',
+        'customer_id' => 'string',
         'release_date' => 'date',
-        'user_id' => 'integer'
+        'user_id' => 'string'
 
 
     ];

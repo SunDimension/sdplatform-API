@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasUuid;
 
 class ReturnItem extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuid;
 
     protected $fillable = [
 
@@ -30,14 +31,15 @@ class ReturnItem extends Model
 
     ];
 
-    protected $cast = [
-        'id' => 'integer',
-        'release_id' => 'integer',
-        'sales_receipt_id' => 'integer',
-        'branch_id' => 'integer',
-        // 'store_id'=>'integer',
-        'created_by' => 'integer',
-        'approved_by' => 'integer',
+    protected $casts = [
+        'id' => 'string',
+        'release_id' => 'string',
+        'sales_receipt_id' => 'string',
+        'branch_id' => 'string',
+        'customer_id' => 'string',
+        'store_id' => 'string',
+        'created_by' => 'string',
+        'approved_by' => 'string',
 
     ];
 

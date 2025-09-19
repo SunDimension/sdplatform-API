@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Customer extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuid;
 
     /**
      * The attributes that are mass assignable.
@@ -38,9 +39,9 @@ class Customer extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
-        'customer_type_id' => 'integer',
-        'title_id' => 'integer',
+        'id' => 'string',
+        'customer_type_id' => 'string',
+        'title_id' => 'string',
         'credit_limit' => 'decimal:2',
         'credit_balance' => 'decimal:2'
     ];

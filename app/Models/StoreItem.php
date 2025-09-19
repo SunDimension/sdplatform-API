@@ -4,11 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StoreItem extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuid;
+
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     /**
      * The table associated with the model.
@@ -39,11 +44,11 @@ class StoreItem extends Model
     ];
 
     protected $cast = [
-        'id' => 'integer',
-        'item_category_id' => 'integer',
-        'create_item_id' => 'integer',
-        'branch_id' => 'integer',
-        'store_id' => 'integer',
+        'id' => 'string',
+        'item_category_id' => 'string',
+        'create_item_id' => 'string',
+        'branch_id' => 'string',
+        'store_id' => 'string',
         'quantity_holding' => 'integer',
         'set_limit' => 'integer', // or 'float' if it can be a decimal value
     ];
@@ -55,7 +60,7 @@ class StoreItem extends Model
 
     public function store()
     {
-        return $this->belongsTo(Store::class);
+        return $this->belongsTo(Store::class, 'store_id');
     }
 
     public static function getCurrentQuantity($productId, $storeId)

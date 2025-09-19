@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -37,7 +38,7 @@ class ReceiveItem extends Model
      */
     protected $casts = [
         'unit_price' => 'double',
-        'product_id' => 'integer',
+        'product_id' => 'string',
         'quantity' => 'integer',
         'created_by' => 'integer',
         'modified_by' => 'integer',

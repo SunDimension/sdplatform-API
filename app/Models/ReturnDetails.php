@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\HasUuid;
 
 class ReturnDetails extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuid;
 
     protected $fillable = [
         'return_id',
@@ -24,11 +25,11 @@ class ReturnDetails extends Model
     ];
 
     protected $casts = [ // Changed from 'cast' to 'casts'
-        'id' => 'integer',
-        'return_id' => 'integer',
-        'product_id' => 'integer',
-        'item_sold_id' => 'integer',
-        'store_id' => 'integer',
+        'id' => 'string',
+        'return_id' => 'string',
+        'product_id' => 'string',
+        'item_sold_id' => 'string',
+        'store_id' => 'string',
         'unit_measurement' => 'integer',
     ];
 
