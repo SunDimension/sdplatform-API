@@ -61,21 +61,21 @@ class CreateItem extends Model
      */
     protected $casts = [
         'id' => 'string',
-        'item_category_id' => 'string',
-        'item_type_id' => 'string',
-        'unit_id' => 'string',
-        'brand_id' => 'string',
+        'item_category_id' => 'integer',
+        'item_type_id' => 'integer',
+        'unit_id' => 'integer',
+        'brand_id' => 'integer',
         'batch_number'=>'string',
         'cost_price' => 'float',
         'selling_price' => 'float',
-        'dimension_id' => 'string',
-        'weight_id' => 'string',
+        'dimension_id' => 'integer',
+        'weight_id' => 'integer',
         'branch_id' => 'string',
         'warehouse' => 'integer',
         'vendor_id' => 'string',
         // 'store_id' => 'string',
         'user_id' => 'string',
-        'tax_id' => 'string',
+        'tax_id' => 'integer',
         'is_tax_inclusive' => 'boolean',
         'tax_amount' => 'float'
     ];
