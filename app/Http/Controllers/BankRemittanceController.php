@@ -17,8 +17,8 @@ public function index(Request $request): BankRemittanceCollection
     {
         $validated = $request->validate([
         'bank_id' => 'nullable|integer|exists:banks,id',
-        'store_id' => 'nullable|integer|exists:stores,id',
-        'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+        'store_id' => 'nullable|string|exists:stores,id',
+        'branch_id' => 'nullable|string|exists:stores,branch_id', // Ensure branch_id exists in stores
         'from_date' => 'nullable|date',
         'to_date' => 'nullable|date',
     ]);

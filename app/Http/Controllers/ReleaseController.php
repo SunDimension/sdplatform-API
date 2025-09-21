@@ -29,8 +29,8 @@ class ReleaseController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:stores,branch_id',
+            'store_id' => 'nullable|string|exists:stores,id',
+            'branch_id' => 'nullable|string|exists:stores,branch_id',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
             'product_id' => 'nullable|integer|exists:create_items,id', // Add product_id filter

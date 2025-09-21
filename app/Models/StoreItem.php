@@ -45,7 +45,7 @@ class StoreItem extends Model
 
     protected $cast = [
         'id' => 'string',
-        'item_category_id' => 'string',
+        'item_category_id' => 'integer',
         'create_item_id' => 'string',
         'branch_id' => 'string',
         'store_id' => 'string',

@@ -191,10 +191,6 @@ public function tax(): BelongsTo
         return $this->belongsTo(Branch::class,'branch_id');
     }
 
-    public function warehouse(): BelongsTo
-    {
-        return $this->belongsTo(Warehouse::class);
-    }
 
     public function vendor(): BelongsTo
     {

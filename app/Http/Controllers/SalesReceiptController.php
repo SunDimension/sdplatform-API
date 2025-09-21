@@ -38,8 +38,8 @@ class SalesReceiptController extends Controller
     // {
     //     // Validate and retrieve query parameters from the request
     //     $validated = $request->validate([
-    //         'store_id' => 'nullable|integer|exists:stores,id',
-    //         'branch_id' => 'nullable|integer|exists:stores,branch_id',
+    //         'store_id' => 'nullable|string|exists:stores,id',
+    //         'branch_id' => 'nullable|string|exists:stores,branch_id',
     //         'from_date' => 'nullable|date',
     //         'to_date' => 'nullable|date',
     //         'with_returns' => 'nullable|boolean'
@@ -184,8 +184,8 @@ class SalesReceiptController extends Controller
     {
         // Validate and retrieve query parameters from the request
         $validated = $request->validate([
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:stores,branch_id',
+            'store_id' => 'nullable|string|exists:stores,id',
+            'branch_id' => 'nullable|string|exists:stores,branch_id',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
             'with_returns' => 'nullable|boolean'
@@ -340,8 +340,8 @@ class SalesReceiptController extends Controller
     {
 
         $validated = $request->validate([
-            // 'store_id' => 'nullable|integer|exists:stores,id',
-            // 'branch_id' => 'nullable|integer|exists:stores,branch_id', // Ensure branch_id exists in stores
+            // 'store_id' => 'nullable|string|exists:stores,id',
+            // 'branch_id' => 'nullable|string|exists:stores,branch_id', // Ensure branch_id exists in stores
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
         ]);

@@ -29,8 +29,8 @@ class PeriodicFinancialReportController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'financial_period_id' => 'required|uuid|exists:financial_periods,id',
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:branches,id',
+            'store_id' => 'nullable|string|exists:stores,id',
+            'branch_id' => 'nullable|string|exists:branches,id',
             'region_id' => 'nullable|integer|exists:regions,id',
             'report_types' => 'nullable|array',
             'report_types.*' => 'in:profit_loss,balance_sheet,trial_balance',
@@ -77,8 +77,8 @@ class PeriodicFinancialReportController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'report_type' => 'nullable|in:profit_loss,balance_sheet,trial_balance',
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:branches,id',
+            'store_id' => 'nullable|string|exists:stores,id',
+            'branch_id' => 'nullable|string|exists:branches,id',
             'region_id' => 'nullable|integer|exists:regions,id',
             'financial_period_id' => 'nullable|uuid|exists:financial_periods,id',
             'status' => 'nullable|in:draft,final,archived',
@@ -206,7 +206,7 @@ class PeriodicFinancialReportController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'financial_period_id' => 'required|uuid|exists:financial_periods,id',
-            'branch_id' => 'required|integer|exists:branches,id',
+            'branch_id' => 'required|string|exists:branches,id',
             'report_types' => 'nullable|array',
             'report_types.*' => 'in:profit_loss,balance_sheet,trial_balance',
         ]);
@@ -294,8 +294,8 @@ class PeriodicFinancialReportController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'report_type' => 'nullable|in:profit_loss,balance_sheet,trial_balance',
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:branches,id',
+            'store_id' => 'nullable|string|exists:stores,id',
+            'branch_id' => 'nullable|string|exists:branches,id',
             'region_id' => 'nullable|integer|exists:regions,id',
             'financial_period_id' => 'nullable|uuid|exists:financial_periods,id',
         ]);

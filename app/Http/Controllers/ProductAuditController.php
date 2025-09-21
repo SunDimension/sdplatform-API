@@ -57,7 +57,7 @@ class ProductAuditController extends Controller
     //     $validated = $request->validate([
     //         'from_date' => 'nullable|date',
     //         'to_date' => 'nullable|date|after_or_equal:from_date',
-    //         'store_id' => 'nullable|integer|exists:stores,id',
+    //         'store_id' => 'nullable|string|exists:stores,id',
     //         'product_id' => 'nullable|integer|exists:create_items,id',
     //         'action_type' => 'nullable|string|in:' . implode(',', $availableActionTypes),
     //         'page' => 'nullable|integer|min:1',
@@ -152,7 +152,7 @@ class ProductAuditController extends Controller
         $validated = $request->validate([
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date|after_or_equal:from_date',
-            'store_id' => 'nullable|integer|exists:stores,id',
+            'store_id' => 'nullable|string|exists:stores,id',
             'product_id' => 'nullable|integer|exists:create_items,id',
             'action_type' => 'nullable|string|in:' . implode(',', $availableActionTypes),
             'page' => 'nullable|integer|min:1',
@@ -288,7 +288,7 @@ class ProductAuditController extends Controller
     public function getStoreProducts($store_id)
     {
         $validated = validator(['store_id' => $store_id], [
-            'store_id' => 'required|integer|exists:stores,id',
+            'store_id' => 'required|string|exists:stores,id',
         ])->validate();
 
         $products = ProductAudit::where('store_id', $validated['store_id'])
