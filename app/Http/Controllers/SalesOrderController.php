@@ -323,7 +323,7 @@ class SalesOrderController extends Controller
             'items.*.quantity' => 'required|integer',
             'items.*.unit_measurement' => 'required|integer',
             'items.*.unit_price' => 'required|numeric',
-            'items.*.store_id' => 'required|integer',
+            'items.*.store_id' => 'required|string|exists:stores,id',
             'items.*.discount' => 'nullable|numeric',
             'total_amount' => 'required|numeric',
             'invoice' => 'nullable|array',
