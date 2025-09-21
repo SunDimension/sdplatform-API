@@ -33,13 +33,13 @@ class CreateItemUpdateRequest extends FormRequest
             'reorder_level' => ['string'],
             'dimension_id' => ['required', 'integer', 'exists:dimensions,id'],
             'weight_id' => ['required', 'integer', 'exists:weights,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'warehouse' => ['required','integer','exists:warehouses,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'image_url' => ['string'],
             'barcode' => ['string','nullable'],
             'store_id' => ['required','integer', 'exists:stores,id'],
-            'user_id' => ['required', 'integer','exists:users,id'],
+            'user_id' => ['required', 'string','exists:users,id'],
             'tax_id' => ['nullable', 'integer', 'exists:taxes,id'],
             'is_tax_inclusive' => ['boolean']
         ];

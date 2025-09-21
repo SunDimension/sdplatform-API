@@ -21,8 +21,8 @@ class BankRemittanceStoreRequest extends FormRequest
     {
         return [
            
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'bank_id' => ['required', 'integer', 'exists:banks,id'],
             'amount' => ['required'],

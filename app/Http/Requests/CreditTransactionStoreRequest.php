@@ -20,7 +20,7 @@ class CreditTransactionStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'sales_order_id' => ['nullable', 'integer', 'exists:sales_orders,id'],
             'sales_receipt_id' => ['nullable', 'integer', 'exists:sales_receipts,id'],

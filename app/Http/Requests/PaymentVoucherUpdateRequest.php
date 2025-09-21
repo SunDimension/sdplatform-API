@@ -24,7 +24,7 @@ class PaymentVoucherUpdateRequest extends FormRequest
             'expense_date' => ['required'],
             'amount' => ['required', 'string'],
             'description' => ['required', 'string'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'tax_id' => ['required', 'integer', 'exists:taxes,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],

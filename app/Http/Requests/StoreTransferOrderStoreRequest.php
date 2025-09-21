@@ -21,10 +21,10 @@ class StoreTransferOrderStoreRequest extends FormRequest
     {
         return [
             'transfer_date' => ['required'],
-            'source_store_id' => ['required', 'integer', 'exists:stores,id'],
-            'destination_store_id' => ['required', 'integer', 'exists:stores,id'],
+            'source_store_id' => ['required', 'string', 'exists:stores,id'],
+            'destination_store_id' => ['required', 'string', 'exists:stores,id'],
             'items' => ['required', 'array'],
-            'items.*.product_id' => ['required', 'integer', 'exists:create_items,id'],
+            'items.*.product_id' => ['required', 'string', 'exists:create_items,id'],
             'items.*.quantity' => ['required', 'integer'],
             'items.*.quantity_pieces' => ['required', 'integer'],
             'items.*.unit_price' => ['required', 'numeric'],

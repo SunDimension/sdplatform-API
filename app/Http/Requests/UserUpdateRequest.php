@@ -23,8 +23,8 @@ class UserUpdateRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
         ];
     }
 }

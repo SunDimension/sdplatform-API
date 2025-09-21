@@ -23,7 +23,7 @@ class NewPurchaseOrderStoreRequest extends FormRequest
             'item_category_id' => ['required', 'integer', 'exists:item_categories,id'],
             'item_id' => ['required', 'integer', 'exists:items,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'payment_mode_id' => ['required', 'integer', 'exists:payment_modes,id'],
             'purchase_order_number' => ['required', 'string'],
             'purchase_amount' => ['required', 'string'],

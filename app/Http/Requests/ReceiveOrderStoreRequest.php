@@ -22,9 +22,9 @@ class ReceiveOrderStoreRequest extends FormRequest
         return [
             'purchase_order_number' => ['nullable', 'string'],
             'receive_date' => ['required'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
-            'vendor_id' => ['required', 'integer'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
+            'vendor_id' => ['required', 'string'],
             'status' => ['nullable', 'string'],
             'driver_name' => ['nullable', 'string'],
             'waybill_number' => ['nullable', 'string'],
@@ -36,7 +36,7 @@ class ReceiveOrderStoreRequest extends FormRequest
             'items' => ['required'],
             'items.*.quantity' => ['required', 'numeric'],
             'items.*.unit_price' => ['required', 'numeric'],
-            'items.*.product_id' => ['required', 'integer', 'exists:create_items,id'],
+            'items.*.product_id' => ['required', 'string', 'exists:create_items,id'],
             'items.*.description' => ['nullable', 'string'],
             'items.*.unit_measurement' => ['nullable', 'integer'],
         ];

@@ -21,7 +21,7 @@ class NewPaymentUpdateRequest extends FormRequest
     {
         return [
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'payment_amount' => ['required', 'string'],
             'payment_mode_id' => ['required', 'integer', 'exists:payment_modes,id'],

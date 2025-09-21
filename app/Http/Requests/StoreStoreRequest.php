@@ -25,7 +25,7 @@ class StoreStoreRequest extends FormRequest
         return [
             'store_type_id' => ['required', 'integer', 'exists:store_types,id'],
             'name' => ['required', 'string'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
            
         ];
     }

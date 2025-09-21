@@ -24,9 +24,9 @@ class UserStoreRequest extends FormRequest
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'string', 'min:8'],
             // 'status_id' => ['required', 'integer', 'exists:statuses,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             // 'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
         ];
     }
 }
