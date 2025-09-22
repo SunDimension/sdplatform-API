@@ -39,13 +39,13 @@ class StoreItem extends Model
         'quantity_holding',
         'set_limit',
         'quantity_in_package', // Add this line
-        'selling_price_per_unit', 
+        'selling_price_per_unit',
 
     ];
 
     protected $cast = [
         'id' => 'string',
-        'item_category_id' => 'string',
+        'item_category_id' => 'integer',
         'create_item_id' => 'string',
         'branch_id' => 'string',
         'store_id' => 'string',
@@ -55,7 +55,7 @@ class StoreItem extends Model
 
     public function createItem()
     {
-        return $this->belongsTo(CreateItem::class,'create_item_id');
+        return $this->belongsTo(CreateItem::class, 'create_item_id');
     }
 
     public function store()
@@ -64,13 +64,13 @@ class StoreItem extends Model
     }
 
     public static function getCurrentQuantity($productId, $storeId)
-{
-    $item = self::where('create_item_id', $productId)
-        ->where('store_id', $storeId)
-        ->first();
-        
-    return $item ? $item->quantity : 0;
-}
+    {
+        $item = self::where('create_item_id', $productId)
+            ->where('store_id', $storeId)
+            ->first();
+
+        return $item ? $item->quantity : 0;
+    }
 
     public function branch()
     {

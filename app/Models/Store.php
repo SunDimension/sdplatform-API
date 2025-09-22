@@ -33,7 +33,7 @@ class Store extends Model
      */
     protected $casts = [
         'id' => 'string',
-        'store_type_id' => 'string',
+        'store_type_id' => 'integer',
         'branch_id' => 'string',
         'sync_id' => 'string',
         'location_id' => 'string',
@@ -44,7 +44,7 @@ class Store extends Model
 
     public function storetype(): BelongsTo
     {
-        return $this->belongsTo(StoreType::class);
+        return $this->belongsTo(StoreType::class, 'store_type_id');
     }
 
     public function branch(): BelongsTo
@@ -54,7 +54,7 @@ class Store extends Model
 
     public function storeItems()
     {
-        return $this->hasMany(StoreItem::class);
+        return $this->hasMany(StoreItem::class, 'store_id');
     }
 
     public function itemSolds()
@@ -63,11 +63,11 @@ class Store extends Model
     }
 
 
-/**
- * Get all product audits for this store
- */
-public function productAudits()
-{
-    return $this->hasMany(ProductAudit::class);
-}
+    /**
+     * Get all product audits for this store
+     */
+    public function productAudits()
+    {
+        return $this->hasMany(ProductAudit::class);
+    }
 }
