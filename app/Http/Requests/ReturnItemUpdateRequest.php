@@ -24,8 +24,8 @@ class ReturnItemUpdateRequest extends FormRequest
          return [
             
             'release_id' => ['required', 'integer', 'exists:release,id'],
-            'branch_id' => ['required', 'integer','exists:branches,id'],
-            'store_id' => ['required', 'integer','exists:stores,id'],
+            'branch_id' => ['required', 'string','exists:branches,id'],
+            'store_id' => ['required', 'string','exists:stores,id'],
             'sales_receipt_id' => ['required', 'integer','exists:sales_receipts,id'],
             'return_date' => ['date'],
         ];

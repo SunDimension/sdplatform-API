@@ -25,7 +25,7 @@ class AccountOpeningBalanceUpdateRequest extends FormRequest
             'debit' => ['required', 'numeric'],
             'credit' => ['required', 'numeric'],
             'amount' => ['required', 'numeric'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
             'account_no' => ['required', 'string'],
             'account_id' => ['required'],
             'created_by' => ['nullable'],

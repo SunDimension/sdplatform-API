@@ -20,9 +20,9 @@ class CashierExpenseStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'expense_line_id' => ['required', 'integer', 'exists:expense_lines,id'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
             'user_id' => ['required', 'integer', 'exists:users,id'],
             'amount' => ['required'],
             'narration'=>['nullable'],

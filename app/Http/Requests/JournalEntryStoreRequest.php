@@ -22,8 +22,8 @@ class JournalEntryStoreRequest extends FormRequest
         return [
             'description' => ['required', 'string'],
             'payment_date' => ['required', 'date'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'vendor_id' => ['required', 'integer', 'exists:vendors,id'],
             'created_by' => ['nullable'],
             'modified_by' => ['nullable'],

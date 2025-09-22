@@ -22,7 +22,7 @@ class ReceiveOrderUpdateRequest extends FormRequest
         return [
             'purchase_order_number' => ['required', 'string'],
             'receive_date' => ['required'],
-            'store_id' => ['required', 'integer', 'exists:stores,id'],
+            'store_id' => ['required', 'string', 'exists:stores,id'],
             'vendor_id' => ['required', 'string'],
             'status' => ['required', 'string'],
             'created_by' => ['nullable'],

@@ -47,8 +47,8 @@ class SalesOrderController extends Controller
     {
         // Validate and retrieve query parameters from the request
         $validated = $request->validate([
-            'store_id' => 'nullable|integer|exists:stores,id',
-            'branch_id' => 'nullable|integer|exists:stores,branch_id',
+            'store_id' => 'nullable|string|exists:stores,id',
+            'branch_id' => 'nullable|string|exists:stores,branch_id',
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date',
         ]);
@@ -323,7 +323,7 @@ class SalesOrderController extends Controller
             'items.*.quantity' => 'required|integer',
             'items.*.unit_measurement' => 'required|integer',
             'items.*.unit_price' => 'required|numeric',
-            'items.*.store_id' => 'required|integer',
+            'items.*.store_id' => 'required|string|exists:stores,id',
             'items.*.discount' => 'nullable|numeric',
             'total_amount' => 'required|numeric',
             'invoice' => 'nullable|array',
@@ -1094,7 +1094,7 @@ class SalesOrderController extends Controller
     {
         // Validate request parameters
         $validated = $request->validate([
-            'store_id' => 'required|integer|exists:stores,id',
+            'store_id' => 'required|string|exists:stores,id',
             'product_id' => 'nullable|integer|exists:create_items,id',
             'from_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:from_date',
@@ -1234,7 +1234,7 @@ class SalesOrderController extends Controller
     public function getStoreProducts(Request $request, $storeId): JsonResponse
     {
         $validated = $request->validate([
-            'store_id' => 'required|integer|exists:stores,id'
+            'store_id' => 'required|string|exists:stores,id'
         ]);
 
         try {
@@ -1265,7 +1265,7 @@ class SalesOrderController extends Controller
     public function getSalesSummary(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'store_id' => 'required|integer|exists:stores,id',
+            'store_id' => 'required|string|exists:stores,id',
             'from_date' => 'required|date',
             'to_date' => 'required|date|after_or_equal:from_date',
         ]);

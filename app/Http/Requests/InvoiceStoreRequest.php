@@ -20,7 +20,7 @@ class InvoiceStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'branch_id' => ['required', 'integer', 'exists:branches,id'],
+            'branch_id' => ['required', 'string', 'exists:branches,id'],
             'warehouse_id' => ['required', 'integer', 'exists:warehouses,id'],
             'customer_id' => ['required', 'integer', 'exists:customers,id'],
             'invoice_number' => ['required', 'string'],
