@@ -443,13 +443,12 @@ class SalesReceiptController extends Controller
         //Log::debug($user);
 
         $salesReceipts = SalesReceipt::where("sales_receipt_number", $orderno)->whereHas('salesOrder.itemSold', function ($query) use ($user) {
-            // Add your specific criteria for ItemSold here
+           
             $query->where('store_id', $user->store_id); // Example condition
         })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($user) {
-            // Only retrieve specific fields from ItemSold
             $query->where('store_id', $user->store_id)->where('status', 'pending');
         }])
-            // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
+           
             ->first();
         //Log::debug($salesReceipts);
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
@@ -462,15 +461,13 @@ class SalesReceiptController extends Controller
         //Log::debug($user);
 
         $salesReceipts = SalesReceipt::where("sales_receipt_number", $orderno)->whereHas('salesOrder.itemSold', function ($query) use ($storeId) {
-            // Add your specific criteria for ItemSold here
+         
             $query->where('store_id', $storeId); // Example condition
         })->with(['salesOrder', 'salesOrder.itemSold' => function ($query) use ($storeId) {
-            // Only retrieve specific fields from ItemSold
+            
             $query->where('store_id', $storeId)->where('status', 'pending');
         }])
-            // ->select('id', 'sales_order_id', 'receipt_number') // Select specific fields from SalesReceipt
             ->first();
-        //Log::debug($salesReceipts);
         return response()->json(['data' => new SalesReceiptResource($salesReceipts)]);
     }
 

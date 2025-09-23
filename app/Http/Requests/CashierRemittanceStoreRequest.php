@@ -20,17 +20,17 @@ class CashierRemittanceStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'cash_discrepancy_id' => ['required', 'integer', 'exists:cash_discrepancies,id'],
+            'cash_discrepancy_id' => ['required', 'string', 'exists:cash_discrepancies,id'],
             'branch_id' => ['required', 'string', 'exists:branches,id'],
             'store_id' => ['required', 'string', 'exists:stores,id'],
-            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'user_id' => ['required', 'string', 'exists:users,id'],
             'approved_by' => ['nullable'],
             'amount' => ['required'],
             'date' => ['required', 'date'],
             'approval_date' => ['nullable'],
             'discrepancy_amount' => ['nullable'],
 
-           
+
         ];
     }
 }

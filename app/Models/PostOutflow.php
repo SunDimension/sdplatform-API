@@ -10,9 +10,11 @@ use App\Traits\HasUuid;
 class PostOutflow extends Model
 {
     use HasFactory, HasUuid;
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
-        
+
         "org_bank",
         // "beneficiary",
         "amount",
@@ -23,15 +25,15 @@ class PostOutflow extends Model
         "outflow_date",
         "outflow_mode",
         "customer_id",
-        "sales_receipt_id"    
+        "sales_receipt_id"
     ];
 
-    protected $casts =[
-        "id"=>"string",
-        "org_bank"=>"integer",
-        "bene_bank"=>"integer",
-        "customer_id"=>"string",
-        "sales_receipt_id"=>"string"
+    protected $casts = [
+        "id" => "string",
+        "org_bank" => "integer",
+        "bene_bank" => "integer",
+        "customer_id" => "string",
+        "sales_receipt_id" => "string"
     ];
 
     public function bank(): BelongsTo
@@ -42,9 +44,9 @@ class PostOutflow extends Model
     // Outflow.php
     public function customer()
     {
-        return $this->belongsTo(Customer::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
-       protected $appends = ['error', 'message'];
+    protected $appends = ['error', 'message'];
 
     public function getErrorAttribute()
     {

@@ -10,6 +10,9 @@ class Bank extends Model
 {
     use HasFactory, HasUuid;
 
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *

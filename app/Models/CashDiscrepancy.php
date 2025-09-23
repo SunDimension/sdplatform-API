@@ -24,6 +24,6 @@ class CashDiscrepancy extends Model
      * @var array
      */
     protected $casts = [
-        'id' => 'integer',
+        'id' => 'string',
     ];
 }

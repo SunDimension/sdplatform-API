@@ -23,14 +23,14 @@ class PostOutflowStoreRequest extends FormRequest
     {
         return [
             'org_bank' => 'nullable|exists:banks,id', // Changed from required to nullable
-            'customer_id' => 'required|exists:customers,id',
+            'customer_id' => ['required', 'string', 'exists:customers,id'],
             'amount' => 'nullable|numeric',
             'account_name' => 'nullable|string',
             'account_number' => 'nullable|numeric', // Changed from required to nullable
             'bene_bank' => 'nullable|exists:banks,id', // Changed from required to nullable
             'narration' => 'nullable|string',
             'outflow_date' => 'required|date',
-            'outflow_mode' => 'required|exists:banks,id',
+            'outflow_mode' => 'required|exists:outflow_mode,id',
         ];
     }
 }

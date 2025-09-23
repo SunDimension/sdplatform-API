@@ -13,9 +13,12 @@ use Illuminate\Support\Facades\DB;
 
 class ItemSold extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, HasUuid, SoftDeletes;
 
     public $table = "item_solds";
+
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.

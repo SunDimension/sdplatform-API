@@ -11,8 +11,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class SalesReceipt extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes, HasUuid;
 
+    protected $keyType = 'string';
+    public $incrementing = false;
     /**
      * The attributes that are mass assignable.
      *
@@ -128,9 +130,9 @@ class SalesReceipt extends Model
         return $this->belongsTo(User::class, 'canceled_by');
     }
 
-   
-public function releases()
-{
-    return $this->hasMany(Release::class, 'sales_receipt_id');
-}
+
+    public function releases()
+    {
+        return $this->hasMany(Release::class, 'sales_receipt_id');
+    }
 }

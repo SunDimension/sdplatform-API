@@ -21,16 +21,16 @@ class CashierExpenseStoreRequest extends FormRequest
     {
         return [
             'branch_id' => ['required', 'string', 'exists:branches,id'],
-            'expense_line_id' => ['required', 'integer', 'exists:expense_lines,id'],
+            'expense_line_id' => ['required', 'string', 'exists:expense_lines,id'],
             'store_id' => ['required', 'string', 'exists:stores,id'],
-            'user_id' => ['required', 'integer', 'exists:users,id'],
+            'user_id' => ['required', 'string', 'exists:users,id'],
             'amount' => ['required'],
-            'narration'=>['nullable'],
+            'narration' => ['nullable'],
             'date' => ['required', 'date'],
             'approved_by' => ['nullable'],
             'approval_date' => ['nullable'],
             'status' => ['nullable', 'string'],
-           
+
         ];
     }
 }

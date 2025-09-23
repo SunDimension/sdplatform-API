@@ -40,6 +40,8 @@ class PriceChange extends Model
     protected $casts = [
         'id' => 'string',
         'details' => 'array',
+        'store_id' => 'string',
+        'branch_id' => 'string',
         // 'approval_date' => 'timestamp',
         // 'created_at' => 'timestamp',
         // 'updated_at' => 'timestamp',

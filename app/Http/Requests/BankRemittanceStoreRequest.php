@@ -20,17 +20,17 @@ class BankRemittanceStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-           
+
             'branch_id' => ['required', 'string', 'exists:branches,id'],
             'store_id' => ['required', 'string', 'exists:stores,id'],
-            'user_id' => ['required', 'integer', 'exists:users,id'],
-            'bank_id' => ['required', 'integer', 'exists:banks,id'],
+            'user_id' => ['required', 'string', 'exists:users,id'],
+            'bank_id' => ['required', 'string', 'exists:banks,id'],
             'amount' => ['required'],
             'account_number' => ['required', 'numeric'],
             'date' => ['required', 'date'],
-            
 
-           
+
+
         ];
     }
 }

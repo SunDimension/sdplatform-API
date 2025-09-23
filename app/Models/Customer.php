@@ -13,6 +13,10 @@ class Customer extends Model
 {
     use HasFactory, SoftDeletes, HasUuid;
 
+
+    protected $keyType = 'string';
+    public $incrementing = false;
+
     /**
      * The attributes that are mass assignable.
      *
@@ -76,7 +80,6 @@ class Customer extends Model
 
     public function creditTransactions()
     {
-        return $this->hasMany(CreditTransaction::class,"customer_id");
+        return $this->hasMany(CreditTransaction::class, "customer_id");
     }
-    
 }

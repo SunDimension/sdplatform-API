@@ -14,11 +14,11 @@ class PostInflowStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'bank_id'      => 'required|exists:banks,id',
+            'bank_id'      => 'required|string|exists:banks,id',
             'amount'       => 'nullable|numeric',
             'narration'     => 'nullable|string',
             'inflow_date'  => 'nullable|date',
-            'customer_id'   => 'nullable|exists:customers,id', // Add this line
+            'customer_id'   => 'nullable|string|exists:customers,id', // Add this line
         ];
     }
 }

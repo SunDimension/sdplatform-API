@@ -9,6 +9,7 @@ use App\Http\Requests\ReleaseUpdateRequest;
 use App\Http\Resources\ReleaseCollection;
 use App\Http\Resources\ReleaseResource;
 use App\Models\Release;
+use App\Models\ItemSold;
 use App\Models\CreateItem;
 use App\Models\Measurement;
 use App\Models\ReleaseDetails;
@@ -164,8 +165,11 @@ class ReleaseController extends Controller
         }
 
         $order = SalesReceipt::where('id', $request->sales_receipt_id)->first();
-        $sql = "update item_solds set status ='released' where sales_order_id=" . $order->sales_order_id . " and store_id = " . $request->store_id . " and product_id in (" . implode(",", $items) . ")";
-        DB::update($sql);
+
+        ItemSold::where('sales_order_id', $order->sales_order_id)
+            ->where('store_id', $request->store_id)
+            ->whereIn('product_id', $items)
+            ->update(['status' => 'released']);
 
         return response()->json(['message' => 'Release Created Successfully', 'data' => $release], 200);
     }

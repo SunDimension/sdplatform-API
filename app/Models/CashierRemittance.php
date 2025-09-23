@@ -47,7 +47,7 @@ class CashierRemittance extends Model
         'branch_id' => 'string',
         'user_id' => 'string',
         'store_id' => 'string',
-        'approved_by' => 'integer',
+        'approved_by' => 'string',
         'cash_discrepancy_id' => 'string'
     ];
     public function branch(): BelongsTo
@@ -56,7 +56,7 @@ class CashierRemittance extends Model
     }
     public function store()
     {
-        return $this->belongsTo(Store::class,'store_id');
+        return $this->belongsTo(Store::class, 'store_id');
     }
     public function user()
     {
@@ -70,10 +70,10 @@ class CashierRemittance extends Model
 
     public function discrepancy()
     {
-        return $this->belongsTo(CashDiscrepancy::class,'cash_discrepancy_id');
+        return $this->belongsTo(CashDiscrepancy::class, 'cash_discrepancy_id');
     }
 
-       public function getCashDiscrepancyNameAttribute()
+    public function getCashDiscrepancyNameAttribute()
     {
         return $this->discrepancy ? $this->discrepancy->name : null;
     }

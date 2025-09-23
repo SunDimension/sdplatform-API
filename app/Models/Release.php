@@ -11,7 +11,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Release extends Model
 {
-    use HasFactory, SoftDeletes;
+
+    use HasFactory, SoftDeletes, HasUuid;
+
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
 
@@ -51,10 +55,10 @@ class Release extends Model
     }
 
 
-public function salesReceipt()
-{
-    return $this->belongsTo(SalesReceipt::class, 'sales_receipt_id');
-}
+    public function salesReceipt()
+    {
+        return $this->belongsTo(SalesReceipt::class, 'sales_receipt_id');
+    }
 
     public function releasedetail(): HasMany
     {
