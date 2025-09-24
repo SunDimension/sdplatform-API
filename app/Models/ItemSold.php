@@ -10,10 +10,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Builder;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-
+use App\Models\Concerns\Syncable;
 class ItemSold extends Model
 {
-    use HasFactory, HasUuid, SoftDeletes;
+    use HasFactory, HasUuid, SoftDeletes, Syncable;
 
     public $table = "item_solds";
 

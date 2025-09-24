@@ -39,8 +39,13 @@ return [
     'models' => [
         'App\Models\JournalEntry' => [
             'batch_size' => 50,
-            'sync_fields' => ['description', 'payment_date', 'store_id', 'branch_id', 'vendor_id'],
-            'exclude_fields' => ['created_by', 'modified_by', 'deleted_by'],
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\JournalEntryDetail' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
         ],
         'App\Models\Transaction' => [
             'batch_size' => 100,
@@ -48,15 +53,146 @@ return [
             'exclude_fields' => [],
         ],
         'App\Models\PaymentVoucher' => [
-            'batch_size' => 75,
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\CreateItem' => [
+            'batch_size' => 50,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\Store' => [
             'batch_size' => 50,
             'sync_fields' => ['*'],
-            'exclude_fields' => ['created_by', 'modified_by', 'deleted_by'],
+            'exclude_fields' => [],
         ],
+        'App\Models\StoreItem' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\Customer' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\Vendor' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\SalesOrder' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\SalesReceipt' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\ItemSold' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\ReceiveOrder' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\ReceiveItem' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\StoreTransferOrder' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\StoreTransferItem' => [
+            'batch_size' => 100,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\BankRemittance' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\PostOutflow' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\PostInflow' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\Release' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\ReleaseDetail' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\ReturnItem' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\ReturnDetail' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\PriceChange' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\CashierRemittance' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\CashierExpense' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\User' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\CreditTransaction' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\Branch' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\TransactionJournalEntry' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        'App\Models\TransactionJournalEntryDetail' => [
+            'batch_size' => 50,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+
     ],
 
     /*

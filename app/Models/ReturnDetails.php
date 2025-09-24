@@ -7,10 +7,10 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasUuid;
-
+use App\Models\Concerns\Syncable;
 class ReturnDetails extends Model
-{
-    use HasFactory, SoftDeletes, HasUuid;
+{       
+    use HasFactory, SoftDeletes, HasUuid, Syncable;
 
     protected $fillable = [
         'return_id',

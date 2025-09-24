@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Models\Concerns\Syncable;
 class ReceiveItem extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, Syncable ;
 
     /**
      * The attributes that are mass assignable.

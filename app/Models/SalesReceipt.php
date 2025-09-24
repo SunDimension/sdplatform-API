@@ -8,10 +8,10 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
-
+use App\Models\Concerns\Syncable;
 class SalesReceipt extends Model
 {
-    use HasFactory, SoftDeletes, HasUuid;
+    use HasFactory, SoftDeletes, HasUuid, Syncable;
 
     protected $keyType = 'string';
     public $incrementing = false;
