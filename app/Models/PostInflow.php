@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
 use App\Models\Concerns\Syncable;
+
 class PostInflow extends Model
 {
     use HasFactory, HasUuid, Syncable;
@@ -17,7 +18,7 @@ class PostInflow extends Model
 
     protected $table = "post_inflows";
 
-    protected $fillable =[
+    protected $fillable = [
 
         "bank_id",
         "amount",
@@ -27,25 +28,24 @@ class PostInflow extends Model
         'customer_id'
     ];
 
-    protected $casts =[
-        "id"=>"integer",
-        "bank_id"=>"integer",
-        "inflow_status"=>"integer",
-        "customer_id"=>"integer"
+    protected $casts = [
+        "id" => "string",
+        "bank_id" => "string",
+        "inflow_status" => "integer",
+        "customer_id" => "string"
     ];
 
     public function bank(): BelongsTo
-{
-    return $this->belongsTo(Bank::class);
-}
-
-       public function inflowStatus(): BelongsTo
     {
-        return $this->belongsTo(InflowStatus::class);
-
+        return $this->belongsTo(Bank::class);
     }
 
-       public function customer(): BelongsTo
+    public function inflowStatus(): BelongsTo
+    {
+        return $this->belongsTo(InflowStatus::class);
+    }
+
+    public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);
     }
