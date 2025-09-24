@@ -10,12 +10,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Hash;
-
+use App\Models\Concerns\Syncable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
 {
-    use HasFactory, HasApiTokens, HasRoles, HasUuids;
+    use HasFactory, HasApiTokens, HasRoles, HasUuids, Syncable;
 
     /**
      * The attributes that are mass assignable.

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Concerns\Syncable;
-
+    
 class Transaction extends Model
 {
     use HasFactory, HasUuids, SoftDeletes, Syncable;

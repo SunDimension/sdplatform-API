@@ -6,10 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
-
+use App\Models\Concerns\Syncable;
 class PostInflow extends Model
 {
-    use HasFactory, HasUuid;
+    use HasFactory, HasUuid, Syncable;
 
     protected $primaryKey = 'id';
     public $incrementing = false;
