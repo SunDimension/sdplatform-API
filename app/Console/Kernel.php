@@ -18,8 +18,8 @@ class Kernel extends ConsoleKernel
     protected function schedule(Schedule $schedule)
     {
         // $schedule->command('inspire')->hourly();
-        $schedule->job(new HoldingQuantityReturnJob())->dailyAt("00:01");
-        
+        //$schedule->job(new HoldingQuantityReturnJob())->dailyAt("00:01");
+
         // Data Synchronization Schedule
         if (config('sync.scheduling.enabled', true)) {
             // Run scheduled sync every 15 minutes during business hours
@@ -35,13 +35,13 @@ class Kernel extends ConsoleKernel
                 ->onFailure(function () {
                     Log::error('Scheduled sync failed');
                 });
-            
+
             // Run sync health check every hour
             $schedule->command('sync:auto --health-check')
                 ->hourly()
                 ->withoutOverlapping()
                 ->runInBackground();
-                
+
             // Process failed items every 2 hours
             $schedule->command('sync:auto --mode=queue-only --retry-failed')
                 ->everyTwoHours()
@@ -57,7 +57,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

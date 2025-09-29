@@ -27,7 +27,7 @@ class StoreItemStoreRequest extends FormRequest
             'reorder_level' => ['string'],
             'discount' => ['numeric'],
             'set_limit' => ['numeric'],
-            'create_item_id' => ['required', 'integer', 'exists:create_items,id'],
+            'create_item_id' => ['required', 'string', 'exists:create_items,id'],
             'store_id' => ['required', 'string', 'exists:stores,id'],
             'branch_id' => ['required', 'string', 'exists:branches,id'],
             'quantity_in_package' => ['required', 'numeric', 'min:1'], // Add this line
