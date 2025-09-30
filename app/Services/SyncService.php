@@ -848,6 +848,29 @@ class SyncService
             'App\Models\Vendor',
             'App\Models\Store',
             'App\Models\Branch',
+            'App\Models\SalesOrder',
+            'App\Models\StoreTransferOrder',
+            'App\Models\StoreTransferItem',
+            'App\Models\StoreItem',
+            'App\Models\SalesReceipt',
+            'App\Models\ReturnItem',
+            'App\Models\ReturnDetails',
+            'App\Models\Release',
+            'App\Models\ReleaseDetails',
+            'App\Models\ReceiveOrder',
+            'App\Models\ReceiveItem',
+            'App\Models\PriceChange',
+            'App\Models\PostOutflow',
+            'App\Models\PostInflow',
+            'App\Models\CreditTransaction',
+            'App\Models\CashierRemittance',
+            'App\Models\CashierExpense',
+            'App\Models\BankRemittance',
+            'App\Models\TransactionJournalEntry',
+            'App\Models\TransactionJournalEntryDetail',
+            'App\Models\User',
+            'App\Models\ItemSold',
+            
             // Add more models as needed
         ];
     }
@@ -1025,12 +1048,17 @@ class SyncService
      */
     protected function prepareModelForHub($model): array
     {
-        $syncData = [
-            'id' => $model->id,
-            'name' => $model->name,
-            // Include other model fields that should be synced
-            // The central hub will extract these for model creation/update
-        ];
+        // Get all fillable attributes from the model
+        $syncData = $model->toArray();
+        
+        // Remove sync-related fields that will be handled separately
+        unset($syncData['sync_id']);
+        unset($syncData['location_id']);
+        unset($syncData['sync_status']);
+        unset($syncData['sync_version']);
+        unset($syncData['last_synced_at']);
+        unset($syncData['last_sync_attempt_at']);
+        unset($syncData['sync_error']);
         
         // Ensure location_id is always set to a valid value
         $locationId = $model->location_id ?? config('app.location_id', 'unknown');
