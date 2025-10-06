@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\Syncable;
+
 class StoreItem extends Model
 {
     use HasFactory, HasUuid, Syncable;
@@ -33,6 +34,7 @@ class StoreItem extends Model
         'selling_price',
         'reorder_level',
         'discount',
+        'store_id',
         'user_id',
         'branch_id',
         'discount',

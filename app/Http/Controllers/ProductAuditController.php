@@ -153,7 +153,7 @@ class ProductAuditController extends Controller
             'from_date' => 'nullable|date',
             'to_date' => 'nullable|date|after_or_equal:from_date',
             'store_id' => 'nullable|string|exists:stores,id',
-            'product_id' => 'nullable|integer|exists:create_items,id',
+            'product_id' => 'nullable|string|exists:create_items,id',
             'action_type' => 'nullable|string|in:' . implode(',', $availableActionTypes),
             'page' => 'nullable|integer|min:1',
             'per_page' => 'nullable|integer|min:1|max:100',
