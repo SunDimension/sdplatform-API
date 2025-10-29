@@ -26,11 +26,20 @@ class ReceiveOrderController extends Controller
         return new ReceiveOrderCollection($receiveOrders);
     }
 
+    // public function pending(Request $request)
+    // {
+    //     $receiveOrders = ReceiveOrder::where('status', 'Pending')
+    //         ->where('store_id', auth()->user()->store_id)
+    //         ->get();
+    //     return new ReceiveOrderCollection($receiveOrders);
+    // }
+
     public function pending(Request $request)
     {
         $receiveOrders = ReceiveOrder::where('status', 'Pending')
             ->where('store_id', auth()->user()->store_id)
-            ->get();
+            ->orderBy('created_at', 'desc')
+            ->paginate(50); // Adjust per page as needed
         return new ReceiveOrderCollection($receiveOrders);
     }
 
