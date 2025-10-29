@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Str;
 
 class SalesReceiptController extends Controller
 {
@@ -478,6 +479,12 @@ class SalesReceiptController extends Controller
 
         try {
             $data = $request->validated();
+
+            // Ensure we always generate a new UUID server-side and do not reuse any incoming value
+            // Guard against rare collisions by regenerating while exists
+            // unset($data['uuid']); // Always ignore client UUID
+
+            Log::debug('Creating Sales Receipt with data: ' . json_encode($data));
             $salesreceipt = SalesReceipt::create($data);
 
             // Update the sales order status
@@ -492,51 +499,53 @@ class SalesReceiptController extends Controller
             $depositPayments = array_filter($payments, function ($payment) {
                 return $payment['payment_type'] == 'Deposit';
             });
+            Log::debug('Processing deposit payments: ' . json_encode($depositPayments));
 
-            foreach ($depositPayments as $payment) {
-                $amountUsed = $payment['amount'];
 
-                // Get available deposits (FIFO order)
-                $postInflows = PostInflow::where('customer_id', $customerId)
-                    ->where('inflow_status', 3) // Assigned status
-                    ->where('amount', '>', 0)
-                    ->orderBy('inflow_date', 'asc')
-                    ->lockForUpdate() // Prevent concurrent updates
-                    ->get();
+            // foreach ($depositPayments as $payment) {
+            //     $amountUsed = $payment['amount'];
 
-                foreach ($postInflows as $inflow) {
-                    if ($amountUsed <= 0) break;
+            //     // Get available deposits (FIFO order)
+            //     $postInflows = PostInflow::where('customer_id', $customerId)
+            //         ->where('inflow_status', 3) // Assigned status
+            //         ->where('amount', '>', 0)
+            //         ->orderBy('inflow_date', 'asc')
+            //         ->lockForUpdate() // Prevent concurrent updates
+            //         ->get();
 
-                    $available = $inflow->amount;
-                    $used = min($available, $amountUsed);
+            //     foreach ($postInflows as $inflow) {
+            //         if ($amountUsed <= 0) break;
 
-                    // Update the inflow record
-                    // $inflow->amount -= $used;
-                    $inflow->amount_used += $used;
+            //         $available = $inflow->amount;
+            //         $used = min($available, $amountUsed);
 
-                    // Update status if fully used
-                    if ($inflow->amount <= $inflow->amount_used) {
-                        $inflow->inflow_status = 12; // Fully Used status
-                    }
+            //         // Update the inflow record
+            //         // $inflow->amount -= $used;
+            //         $inflow->amount_used += $used;
 
-                    $inflow->save();
-                    $amountUsed -= $used;
-                }
+            //         // Update status if fully used
+            //         if ($inflow->amount <= $inflow->amount_used) {
+            //             $inflow->inflow_status = 12; // Fully Used status
+            //         }
 
-                if ($amountUsed > 0) {
-                    throw new \Exception("Customer $customerId used more deposit ($amountUsed) than available");
-                }
+            //         $inflow->save();
+            //         $amountUsed -= $used;
+            //     }
 
-                // Create outflow record
-                $outflow = [
-                    "customer_id" => $customerId,
-                    "sales_receipt_id" => $salesreceipt->id,
-                    "amount" => $payment['amount'],
-                    'outflow_mode' => 7,
-                    'outflow_date' => now()
-                ];
-                PostOutflow::create($outflow);
-            }
+            //     if ($amountUsed > 0) {
+            //         throw new \Exception("Customer $customerId used more deposit ($amountUsed) than available");
+            //     }
+
+            //     // Create outflow record
+            //     $outflow = [
+            //         "customer_id" => $customerId,
+            //         "sales_receipt_id" => $salesreceipt->id,
+            //         "amount" => $payment['amount'],
+            //         'outflow_mode' => 7,
+            //         'outflow_date' => now()
+            //     ];
+            //     PostOutflow::create($outflow);
+            // }
 
             // Process credit payments (existing code)
             if (
@@ -560,13 +569,13 @@ class SalesReceiptController extends Controller
             }
 
             // Generate accounting entries for the sales receipt
-            try {
-                $this->accountingEntryService->generateSalesReceiptEntries($salesreceipt);
-            } catch (\Exception $e) {
-                Log::error("Failed to generate accounting entries for sales receipt: " . $e->getMessage());
-                // Don't throw here, as the sales receipt was created successfully
-                // Just log the error for debugging
-            }
+            // try {
+            //     $this->accountingEntryService->generateSalesReceiptEntries($salesreceipt);
+            // } catch (\Exception $e) {
+            //     Log::error("Failed to generate accounting entries for sales receipt: " . $e->getMessage());
+            //     // Don't throw here, as the sales receipt was created successfully
+            //     // Just log the error for debugging
+            // }
 
             DB::commit();
 

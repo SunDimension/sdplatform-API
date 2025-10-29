@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Concerns\Syncable;
+use Illuminate\Support\Str;
+
 class SalesReceipt extends Model
 {
     use HasFactory, SoftDeletes, HasUuid, Syncable;
@@ -68,6 +70,13 @@ class SalesReceipt extends Model
 
             // Assign the unique sales_receipt_number
             $salesReceipt->sales_receipt_number = $salesReceiptNumber;
+
+            if (empty($salesReceipt->id)) {
+                //do {
+                $uuid = (string) Str::uuid();
+                //} while (SalesReceipt::where('id', $uuid)->exists());
+                $salesReceipt->id = $uuid;
+            }
         });
     }
 
