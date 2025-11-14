@@ -3,7 +3,7 @@
 # =============================================================================
 
 # Central Hub Configuration
-SYNC_CENTRAL_HUB_URL=https://sync.bfcacademic.com
+SYNC_CENTRAL_HUB_URL=https://sync.hamirglobal.com
 SYNC_API_KEY=your_api_key_here
 APP_LOCATION_ID=store_001
 
@@ -28,7 +28,7 @@ SYNC_IS_CENTRAL_HUB=false
 SYNC_CENTRAL_HUB_LOCATION_ID=1
 
 # External Central Hub URL (the server this location will sync with)
-SYNC_CENTRAL_HUB_URL=https://sync.bfcacademic.com
+SYNC_CENTRAL_HUB_URL=https://sync.hamirglobal.com
 
 # API Key for authentication with central hub
 SYNC_API_KEY=your_api_key_here

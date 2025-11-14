@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Concerns\Syncable;
 class ReceiveOrder extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
+    use HasFactory, HasUuids, SoftDeletes, Syncable;
 
     /**
      * The attributes that are mass assignable.
@@ -36,7 +36,15 @@ class ReceiveOrder extends Model
         'deleted_by',
         'approval_date',
         'approved_by',
-        'approval_comment'
+        'approval_comment',
+             'id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
     /**
@@ -66,8 +74,14 @@ class ReceiveOrder extends Model
             } while (static::where('purchase_order_number', $number)->exists());
 
             // $receiveOrder->purchase_order_number = $number;
-            $receiveOrder->created_by = auth()->user()->id;
-            $receiveOrder->status = 'Pending';
+            // Only set created_by from auth when available (sync runs without auth)
+            if (function_exists('auth') && auth()->check()) {
+                $receiveOrder->created_by = auth()->user()->id;
+            }
+            // Default status if not already set by sync payload
+            if (empty($receiveOrder->status)) {
+                $receiveOrder->status = 'Pending';
+            }
             
         });
 

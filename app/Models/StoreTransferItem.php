@@ -26,6 +26,14 @@ class StoreTransferItem extends Model
         'created_by',
         'modified_by',
         'deleted_by',
+           'id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
     /**

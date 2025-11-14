@@ -19,10 +19,10 @@ return [
     | Configuration for the central synchronization hub
     |
     */
-    'central_hub_url' => env('SYNC_CENTRAL_HUB_URL', 'https://sync.bfcacademic.com'),
+    'central_hub_url' => env('SYNC_CENTRAL_HUB_URL', 'https://sync.hamirglobal.com'),
     'api_key' => env('SYNC_API_KEY', ''),
     'location_id' => env('APP_LOCATION_ID', 'default'),
-    
+
     // Central hub identification
     'is_central_hub' => env('SYNC_IS_CENTRAL_HUB', true), // Temporarily set to true for testing
     'central_hub_location_id' => env('SYNC_CENTRAL_HUB_LOCATION_ID', 'CENTRAL_HUB_TEST'),
@@ -378,4 +378,53 @@ return [
         'adaptive_scheduling' => env('SYNC_ADAPTIVE_SCHEDULING', true),
         'offline_grace_period' => env('SYNC_OFFLINE_GRACE_PERIOD', 300), // 5 minutes
     ],
-]; 
+
+
+    // ... existing sync configuration ...
+
+    /*
+    |--------------------------------------------------------------------------
+    | Auto-Update Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Configure automatic code updates from remote repository
+    |
+    */
+    'auto_updates' => [
+        // Enable/disable auto-updates
+        'enabled' => env('AUTO_UPDATE_ENABLED', true),
+
+        // Git branch to pull from
+        'branch' => env('AUTO_UPDATE_BRANCH', 'main'),
+
+        // Update immediately when changes detected (not recommended for production)
+        'immediate' => env('AUTO_UPDATE_IMMEDIATE', false),
+
+        // Update window (when updates are allowed)
+        'update_window' => [
+            // Days of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+            'days' => [0, 1, 2, 3, 4, 5, 6], // All days
+
+            // Hours of day (24-hour format)
+            'start_hour' => env('AUTO_UPDATE_START_HOUR', 2), // 2 AM
+            'end_hour' => env('AUTO_UPDATE_END_HOUR', 6), // 6 AM
+        ],
+
+        // How often to check for updates (in minutes)
+        'check_interval' => env('AUTO_UPDATE_CHECK_INTERVAL', 30), // Every 30 minutes
+
+        // Bypass key for accessing site during update
+        'bypass_key' => env('AUTO_UPDATE_BYPASS_KEY', 'update-in-progress'),
+
+        // Notifications
+        'notify_available' => env('AUTO_UPDATE_NOTIFY_AVAILABLE', true),
+        'notify_success' => env('AUTO_UPDATE_NOTIFY_SUCCESS', true),
+        'notify_failure' => env('AUTO_UPDATE_NOTIFY_FAILURE', true),
+
+        // Automatic rollback on failure
+        'auto_rollback' => env('AUTO_UPDATE_AUTO_ROLLBACK', true),
+
+        // Require manual approval for major version changes
+        'require_approval_major' => env('AUTO_UPDATE_REQUIRE_APPROVAL_MAJOR', false),
+    ],
+];

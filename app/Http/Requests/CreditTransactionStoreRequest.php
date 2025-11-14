@@ -21,9 +21,9 @@ class CreditTransactionStoreRequest extends FormRequest
     {
         return [
             'branch_id' => ['required', 'string', 'exists:branches,id'],
-            'customer_id' => ['required', 'integer', 'exists:customers,id'],
-            'sales_order_id' => ['nullable', 'integer', 'exists:sales_orders,id'],
-            'sales_receipt_id' => ['nullable', 'integer', 'exists:sales_receipts,id'],
+            'customer_id' => ['required', 'string', 'exists:customers,id'],
+            'sales_order_id' => ['nullable', 'string', 'exists:sales_orders,id'],
+            'sales_receipt_id' => ['nullable', 'string', 'exists:sales_receipts,id'],
             'amount' => ['required', 'string'],
             'credit_limit' => ['nullable', 'string'],
             'credit_balance_before' => ['nullable', 'string'],

@@ -8,8 +8,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasUuid;
 use App\Models\Concerns\Syncable;
+
 class ReturnDetails extends Model
-{       
+{
     use HasFactory, SoftDeletes, HasUuid, Syncable;
 
     protected $fillable = [
@@ -22,6 +23,14 @@ class ReturnDetails extends Model
         'discount',
         'store_id',
         'unit_measurement',
+        'id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
     protected $casts = [ // Changed from 'cast' to 'casts'

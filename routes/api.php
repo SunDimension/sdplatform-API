@@ -113,7 +113,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/receipts-blocking/search', [SalesReceiptController::class, 'searchForBlocking'])
         ->name('sales.receipts.searchForBlocking');
-
     ///////////////////////////////////////////////////
 
     // Route::get('/branches', [\App\Http\Controllers\BranchController::class, 'index']);

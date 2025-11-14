@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\Syncable;
+use Illuminate\Support\Str;
 
 class StoreItem extends Model
 {
@@ -42,6 +43,14 @@ class StoreItem extends Model
         'set_limit',
         'quantity_in_package', // Add this line
         'selling_price_per_unit',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
+        'id'
 
     ];
 
@@ -54,6 +63,18 @@ class StoreItem extends Model
         'quantity_holding' => 'integer',
         'set_limit' => 'integer', // or 'float' if it can be a decimal value
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
 
     public function createItem()
     {

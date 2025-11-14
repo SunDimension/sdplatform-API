@@ -473,125 +473,91 @@ class SalesReceiptController extends Controller
     }
 
     // In your SalesReceiptController's store method
-    public function store(SalesReceiptStoreRequest $request)
-    {
-        DB::beginTransaction();
+   public function store(SalesReceiptStoreRequest $request)
+{
+    DB::beginTransaction();
 
-        try {
-            $data = $request->validated();
+    try {
+        $data = $request->validated();
 
-            // Ensure we always generate a new UUID server-side and do not reuse any incoming value
-            // Guard against rare collisions by regenerating while exists
-            // unset($data['uuid']); // Always ignore client UUID
+        // Remove sales_receipt_number from data if present (let model generate it)
+        unset($data['sales_receipt_number']);
+        
+        // Remove any 'id' or 'uuid' keys to ensure model generates UUID
+        unset($data['id']);
+        unset($data['uuid']);
 
-            Log::debug('Creating Sales Receipt with data: ' . json_encode($data));
-            $salesreceipt = SalesReceipt::create($data);
-
-            // Update the sales order status
-            $order = SalesOrder::where('id', $salesreceipt->sales_order_id)->first();
-            $order->status = 'Paid';
-            $order->save();
-
-            $payments = $data['payment_detail'];
-            $customerId = $salesreceipt->customer_id;
-
-            // Process deposit payments
-            $depositPayments = array_filter($payments, function ($payment) {
-                return $payment['payment_type'] == 'Deposit';
-            });
-            Log::debug('Processing deposit payments: ' . json_encode($depositPayments));
-
-
-            // foreach ($depositPayments as $payment) {
-            //     $amountUsed = $payment['amount'];
-
-            //     // Get available deposits (FIFO order)
-            //     $postInflows = PostInflow::where('customer_id', $customerId)
-            //         ->where('inflow_status', 3) // Assigned status
-            //         ->where('amount', '>', 0)
-            //         ->orderBy('inflow_date', 'asc')
-            //         ->lockForUpdate() // Prevent concurrent updates
-            //         ->get();
-
-            //     foreach ($postInflows as $inflow) {
-            //         if ($amountUsed <= 0) break;
-
-            //         $available = $inflow->amount;
-            //         $used = min($available, $amountUsed);
-
-            //         // Update the inflow record
-            //         // $inflow->amount -= $used;
-            //         $inflow->amount_used += $used;
-
-            //         // Update status if fully used
-            //         if ($inflow->amount <= $inflow->amount_used) {
-            //             $inflow->inflow_status = 12; // Fully Used status
-            //         }
-
-            //         $inflow->save();
-            //         $amountUsed -= $used;
-            //     }
-
-            //     if ($amountUsed > 0) {
-            //         throw new \Exception("Customer $customerId used more deposit ($amountUsed) than available");
-            //     }
-
-            //     // Create outflow record
-            //     $outflow = [
-            //         "customer_id" => $customerId,
-            //         "sales_receipt_id" => $salesreceipt->id,
-            //         "amount" => $payment['amount'],
-            //         'outflow_mode' => 7,
-            //         'outflow_date' => now()
-            //     ];
-            //     PostOutflow::create($outflow);
-            // }
-
-            // Process credit payments (existing code)
-            if (
-                $order->payment_type == "Credit" &&
-                !array_filter($payments, fn($p) => $p['payment_type'] == 'Credit')
-            ) {
-                $customer = Customer::findOrFail($customerId);
-                $data1 = [
-                    'branch_id' => $salesreceipt->branch_id,
-                    'customer_id' => $customerId,
-                    'sales_receipt_id' => $salesreceipt->id,
-                    'amount' => $salesreceipt->amount_paid,
-                    'credit_limit' => $customer->credit_limit,
-                    'credit_balance_before' => $customer->credit_balance,
-                    'type' => 'payment',
-                    'created_by' => auth()->user()->id
-                ];
-                $creditTransaction = CreditTransaction::create($data1);
-                $customer->credit_balance -= $creditTransaction->amount;
-                $customer->save();
-            }
-
-            // Generate accounting entries for the sales receipt
-            // try {
-            //     $this->accountingEntryService->generateSalesReceiptEntries($salesreceipt);
-            // } catch (\Exception $e) {
-            //     Log::error("Failed to generate accounting entries for sales receipt: " . $e->getMessage());
-            //     // Don't throw here, as the sales receipt was created successfully
-            //     // Just log the error for debugging
-            // }
-
-            DB::commit();
-
-            return response()->json([
-                'message' => 'Sales Receipt Created Successfully',
-                'data' => $salesreceipt
-            ], 200);
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error("Sales receipt creation failed: " . $e->getMessage());
-            return response()->json([
-                'message' => 'Failed to create sales receipt',
-                'error' => $e->getMessage()
-            ], 500);
+        Log::debug('Creating Sales Receipt with data: ' . json_encode($data));
+        
+        // Create the sales receipt - model will auto-generate ID and receipt number
+        $salesreceipt = SalesReceipt::create($data);
+        
+        // Verify the receipt was created with an ID
+        if (!$salesreceipt || !$salesreceipt->id) {
+            throw new \Exception('Failed to generate sales receipt ID');
         }
+
+        Log::debug('Sales Receipt created with ID: ' . $salesreceipt->id . ' and Number: ' . $salesreceipt->sales_receipt_number);
+
+        // Update the sales order status
+        $order = SalesOrder::findOrFail($salesreceipt->sales_order_id);
+        $order->status = 'Paid';
+        $order->save();
+
+        $payments = $data['payment_detail'];
+        $customerId = $salesreceipt->customer_id;
+
+        // Process credit payments
+        if (
+            $order->payment_type == "Credit" &&
+            !array_filter($payments, fn($p) => $p['payment_type'] == 'Credit')
+        ) {
+            $customer = Customer::findOrFail($customerId);
+            $data1 = [
+                'branch_id' => $salesreceipt->branch_id,
+                'customer_id' => $customerId,
+                'sales_receipt_id' => $salesreceipt->id,
+                'amount' => $salesreceipt->amount_paid,
+                'credit_limit' => $customer->credit_limit,
+                'credit_balance_before' => $customer->credit_balance,
+                'type' => 'payment',
+                'created_by' => auth()->user()->id
+            ];
+            $creditTransaction = CreditTransaction::create($data1);
+            $customer->credit_balance -= $creditTransaction->amount;
+            $customer->save();
+        }
+
+        DB::commit();
+
+        return response()->json([
+            'message' => 'Sales Receipt Created Successfully',
+            'data' => $salesreceipt
+        ], 200);
+        
+    } catch (\Illuminate\Database\QueryException $e) {
+        DB::rollBack();
+        Log::error("Database error creating sales receipt: " . $e->getMessage());
+        Log::error("SQL State: " . $e->errorInfo[0]);
+        Log::error("Error Code: " . $e->errorInfo[1]);
+        
+        return response()->json([
+            'message' => 'Database error creating sales receipt',
+            'error' => $e->getMessage(),
+            'sql_state' => $e->errorInfo[0] ?? null
+        ], 500);
+        
+    } catch (\Exception $e) {
+        DB::rollBack();
+        Log::error("Sales receipt creation failed: " . $e->getMessage());
+        Log::error("Stack trace: " . $e->getTraceAsString());
+        
+        return response()->json([
+            'message' => 'Failed to create sales receipt',
+            'error' => $e->getMessage()
+        ], 500);
     }
+}
 
     public function show(Request $request, SalesReceipt $salesreceipt): SalesReceiptResource
     {

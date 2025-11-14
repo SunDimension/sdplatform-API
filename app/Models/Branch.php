@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\Concerns\Syncable;
+use Illuminate\Support\Str;
+
 class Branch extends Model
 {
     use HasFactory, HasUuid, Syncable;
@@ -29,6 +31,14 @@ class Branch extends Model
         'state_id',
         'region_id',
         'country_id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
+        'id'
     ];
 
     /**
@@ -43,6 +53,18 @@ class Branch extends Model
         'country_id' => 'string',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
+
     public function state(): BelongsTo
     {
         return $this->belongsTo(State::class);
@@ -52,6 +74,4 @@ class Branch extends Model
     {
         return $this->belongsTo(Country::class);
     }
-
-   
 }

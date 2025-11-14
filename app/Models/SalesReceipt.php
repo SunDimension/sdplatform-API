@@ -56,29 +56,30 @@ class SalesReceipt extends Model
         'payment_detail' => 'array',
     ];
     protected static function boot()
-    {
-        parent::boot();
+{
+    parent::boot();
 
-        // Automatically generate sales_receipt_number when a new SalesReceipt is created
-        static::creating(function ($salesReceipt) {
+    static::creating(function ($salesReceipt) {
+        // Generate unique UUID with collision check
+        if (empty($salesReceipt->id)) {
             do {
-                // Generate a random 7-digit number
-                $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
-                // Prefix the random number with 'HGV-SR-'
-                $salesReceiptNumber = 'HGV-SR-' . $randomNumber;
-            } while (static::where('sales_receipt_number', $salesReceiptNumber)->exists()); // Check uniqueness in the database
-
-            // Assign the unique sales_receipt_number
-            $salesReceipt->sales_receipt_number = $salesReceiptNumber;
-
-            if (empty($salesReceipt->id)) {
-                //do {
                 $uuid = (string) Str::uuid();
-                //} while (SalesReceipt::where('id', $uuid)->exists());
-                $salesReceipt->id = $uuid;
-            }
-        });
-    }
+            } while (static::where('id', $uuid)->exists());
+            
+            $salesReceipt->id = $uuid;
+        }
+
+        // Generate unique sales_receipt_number with collision check
+        if (empty($salesReceipt->sales_receipt_number)) {
+            do {
+                $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+                $salesReceiptNumber = 'HGV-SR-' . $randomNumber;
+            } while (static::where('sales_receipt_number', $salesReceiptNumber)->exists());
+            
+            $salesReceipt->sales_receipt_number = $salesReceiptNumber;
+        }
+    });
+}
 
 
     public function customer(): BelongsTo

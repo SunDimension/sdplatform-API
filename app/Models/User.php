@@ -11,6 +11,9 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Support\Facades\Hash;
 use App\Models\Concerns\Syncable;
+use App\Models\Branch;
+use App\Models\Store;
+use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class User extends Authenticatable
@@ -30,6 +33,14 @@ class User extends Authenticatable
         'password',
         'store_id',
         'branch_id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
+        'id'
 
     ];
 
@@ -56,9 +67,19 @@ class User extends Authenticatable
     ];
 
 
-   
 
-  
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
+
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'role_user');

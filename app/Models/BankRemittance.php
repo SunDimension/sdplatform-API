@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
+use Illuminate\Support\Str;
 use App\Models\Concerns\Syncable;
 class BankRemittance extends Model
 {
@@ -32,6 +33,14 @@ class BankRemittance extends Model
         'account_number',
         'approval_comment',
         'status',
+         'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
+        'id'
         
         
 
@@ -50,6 +59,18 @@ class BankRemittance extends Model
         'store_id' => 'string',
         
 ];
+
+   protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
           public function branch(): BelongsTo
     {
         return $this->belongsTo(Branch::class);

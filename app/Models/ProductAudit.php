@@ -4,10 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasUuid;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Concerns\Syncable;
+use Illuminate\Support\Str;
 
 class ProductAudit extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes, Syncable, HasUuid;
+
+
+    protected $table = 'product_audits';
+
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     protected $fillable = [
         'action_type',
@@ -22,7 +34,15 @@ class ProductAudit extends Model
         'new_price',
         'reference_type',
         'reference_id',
-        'notes'
+        'notes',
+        'id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
     protected $casts = [
@@ -33,7 +53,9 @@ class ProductAudit extends Model
         'previous_price' => 'decimal:2',
         'new_price' => 'decimal:2',
         'created_at' => 'datetime',
-        'updated_at' => 'datetime'
+        'updated_at' => 'datetime',
+        'id' => 'string',
+
     ];
 
     // Action types constants
@@ -53,6 +75,20 @@ class ProductAudit extends Model
     const ACTION_TRANSFER_OUT = 'transfer_out';
     const ACTION_TRANSFER_IN = 'transfer_in';
     const ACTION_TRANSFER_CANCELLED = 'transfer_cancelled';
+
+
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
 
     /**
      * Get the user who performed the action

@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\HasUuid;
+use Illuminate\Support\Str;
 use App\Models\Concerns\Syncable;
 
 class Store extends Model
 {
-    use HasFactory, Syncable;
+    use HasFactory, Syncable, HasUuid;
 
     protected $fillable = [
         'store_type_id',
@@ -23,6 +24,7 @@ class Store extends Model
         'last_synced_at',
         'last_sync_attempt_at',
         'sync_error',
+        'id'
     ];
 
 
@@ -42,6 +44,18 @@ class Store extends Model
         'last_sync_attempt_at' => 'datetime',
     ];
 
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
     public function storetype(): BelongsTo
     {
         return $this->belongsTo(StoreType::class, 'store_type_id');

@@ -27,7 +27,15 @@ class ReturnItem extends Model
         'approved_at',
         
         'return_status',
-        'approval_comment'
+        'approval_comment',
+          'id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
 
     ];
 

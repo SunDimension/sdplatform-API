@@ -6,13 +6,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Traits\HasUuid;
 use App\Models\Concerns\Syncable;
+use Illuminate\Support\Str;
+
 class CashierExpense extends Model
 {
-    use HasFactory, HasUuid, Syncable;
+    use HasFactory, SoftDeletes, Syncable, HasUuid;
 
-    protected $primaryKey = 'id';
+
     public $incrementing = false;
     protected $keyType = 'string';
 
@@ -32,7 +35,15 @@ class CashierExpense extends Model
         'approval_date',
         'approval_comment',
         'status',
-        'narration'
+        'narration',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
+        'id'
 
     ];
 
@@ -47,8 +58,20 @@ class CashierExpense extends Model
         'user_id' => 'string',
         'store_id' => 'string',
         'expense_line_id' => 'string',
-        'approved_by' => 'integer',
+        'approved_by' => 'string',
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($model) {
+            // Generate UUID for id if not set
+            if (empty($model->id)) {
+                $model->id = (string) Str::uuid();
+            }
+        });
+    }
 
     public function branch(): BelongsTo
     {
@@ -65,6 +88,6 @@ class CashierExpense extends Model
 
     public function expense()
     {
-        return $this->belongsTo(ExpenseLine::class,'expense_line_id');
+        return $this->belongsTo(ExpenseLine::class, 'expense_line_id');
     }
 }

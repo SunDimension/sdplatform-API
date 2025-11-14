@@ -9,9 +9,10 @@ use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Concerns\Syncable;
+
 class ReceiveItem extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, Syncable ;
+    use HasFactory, HasUuids, SoftDeletes, Syncable;
 
     /**
      * The attributes that are mass assignable.
@@ -29,6 +30,14 @@ class ReceiveItem extends Model
         'created_by',
         'modified_by',
         'deleted_by',
+        'id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
     /**
@@ -52,26 +61,26 @@ class ReceiveItem extends Model
 
     public function product(): BelongsTo
     {
-        return $this->belongsTo(CreateItem::class,'product_id');
+        return $this->belongsTo(CreateItem::class, 'product_id');
     }
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,"created_by");
+        return $this->belongsTo(User::class, "created_by");
     }
 
     public function modifiedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'modified_by');
+        return $this->belongsTo(User::class, 'modified_by');
     }
 
     public function deletedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class,'deleted_by');
+        return $this->belongsTo(User::class, 'deleted_by');
     }
 
-     public function measurement()
+    public function measurement()
     {
-        return $this->belongsTo(Measurement::class,"unit_measurement");
+        return $this->belongsTo(Measurement::class, "unit_measurement");
     }
 }

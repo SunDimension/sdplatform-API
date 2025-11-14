@@ -9,12 +9,19 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\Models\Concerns\Syncable;
+
 class CreditTransaction extends Model
 {
-    use HasFactory, SoftDeletes, Syncable;
+    use HasFactory, SoftDeletes, Syncable, HasUuid;
+
+
+    protected $keyType = 'string';
+    public $incrementing = false;
 
     /**
      * The attributes that are mass assignable.
+
+     
      *
      * @var array
      */
@@ -33,6 +40,14 @@ class CreditTransaction extends Model
         'deleted_by',
         'transaction_date',
         'notes',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
+        'id'
 
     ];
 
@@ -53,19 +68,19 @@ class CreditTransaction extends Model
     ];
 
 
-        protected static function boot()
-{
-    parent::boot();
+    protected static function boot()
+    {
+        parent::boot();
 
-    static::creating(function ($creditOrder) {
-        do {
-            $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
-            $creditOrderNumber = 'HGV-CR-' . $randomNumber;
-        } while (static::where('credit_order_number', $creditOrderNumber)->exists());
+        static::creating(function ($creditOrder) {
+            do {
+                $randomNumber = str_pad(mt_rand(0, 9999999), 7, '0', STR_PAD_LEFT);
+                $creditOrderNumber = 'HGV-CR-' . $randomNumber;
+            } while (static::where('credit_order_number', $creditOrderNumber)->exists());
 
-        $creditOrder->credit_order_number = $creditOrderNumber;
-    });
-}
+            $creditOrder->credit_order_number = $creditOrderNumber;
+        });
+    }
 
     public function branch(): BelongsTo
     {

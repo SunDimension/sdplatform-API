@@ -39,6 +39,13 @@ class ItemSold extends Model
         'status',
         'return_quantity',
         'return_quantity_pieces',
+         'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
     /**
