@@ -10,11 +10,21 @@ use App\Http\Controllers\PostOutflowController;
 use App\Http\Controllers\ReturnItemController;
 use App\Http\Controllers\ProductAuditController;
 use App\Http\Controllers\SalesReceiptController;
-use App\Http\Controllers\StoreTransferItemController;
+use App\Http\Controllers\LedgerAccountController;
+use App\Http\Controllers\TrialBalanceController;
 use App\Http\Controllers\CreditTransactionController;
 use App\Http\Controllers\SyncController;
 use App\Models\CreditTransaction;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\MonthlyFinancialPositionController;
+use App\Http\Controllers\BalanceSheetController;
+use App\Http\Controllers\ProfitLossController;
+use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\JournalEntryController;
+use App\Http\Controllers\JournalLineController;
+use App\Http\Controllers\AccountTypeController;
+use App\Http\Controllers\ChartOfAccountController;
+use App\Http\Controllers\LedgerPostingController;
 
 /*
 |--------------------------------------------------------------------------
@@ -148,6 +158,31 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::put('/sales-orders/{id}', [SalesOrderController::class, 'update']);
     ///////////////
 
+
+    // Route::prefix('reports')->group(function () {
+    Route::get('/profit-loss', [ProfitLossController::class, 'index']);
+    Route::get('/profit-loss/comparative', [ProfitLossController::class, 'comparative']);
+    Route::post('/profit-loss/export', [ProfitLossController::class, 'export']);
+    // });
+
+
+
+    // In routes/api.php
+
+    Route::get('/balance-sheet', [BalanceSheetController::class, 'index']);
+    Route::get('/balance-sheet/comparative', [BalanceSheetController::class, 'comparative']);
+    Route::get('/balance-sheet/trend', [BalanceSheetController::class, 'trend']);
+    Route::post('/balance-sheet/export', [BalanceSheetController::class, 'export']);
+
+
+
+    // In routes/api.php
+
+    Route::get('/monthly-financial-position', [MonthlyFinancialPositionController::class, 'index']);
+    Route::get('/{yearMonth}', [MonthlyFinancialPositionController::class, 'show'])
+        ->where('yearMonth', '\d{4}-\d{1,2}');
+    Route::get('/year-to-date', [MonthlyFinancialPositionController::class, 'yearToDate']);
+
     Route::apiResource('sales-orders', App\Http\Controllers\SalesOrderController::class);
 
     Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class, 'index']);
@@ -173,7 +208,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
 
 
-   
+
     Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::class, 'cancelCredit']);
 
     Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
@@ -523,6 +558,14 @@ Route::middleware('auth:sanctum')->group(function () {
     // Sales Receipt Routes (if not already there)
     Route::get('sales-receipts/{id}/with-returns', [SalesReceiptController::class, 'showWithReturns']);
 
+    Route::get('/trial-balance', [TrialBalanceController::class, 'index']);
+    Route::get('/transactions', [TransactionController::class, 'index']);
+    Route::get('/journal-entries', [JournalEntryController::class, 'index']);
+    Route::get('/journal-lines', [JournalLineController::class, 'index']);
+    Route::get('/ledger-posting', [LedgerPostingController::class, 'index']);
+    Route::apiResource('account-types', AccountTypeController::class);
+    Route::apiResource('chart-of-accounts', ChartOfAccountController::class);
+
     Route::apiResource('receive-orders', App\Http\Controllers\ReceiveOrderController::class);
     Route::get('pending-receive-orders', [App\Http\Controllers\ReceiveOrderController::class, 'pending']);
     Route::post('approve-receive-order', [App\Http\Controllers\ReceiveOrderController::class, 'approve']);
@@ -530,6 +573,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
     Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
 
+
+    Route::apiResource('ledger-accounts', App\Http\Controllers\LedgerAccountController::class);
     Route::get('pending-transfer-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'pending']);
     Route::get('pending-transfer-branch-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'branch_pending']);
     Route::post('approve-transfer-order', [App\Http\Controllers\StoreTransferOrderController::class, 'approve']);
@@ -541,12 +586,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('change-reasons', App\Http\Controllers\ChangeReasonController::class);
     Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class, 'pending']);
     Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class, 'approve']);
-
-   
 });
 
 
- // Synchronization Routes
+// Synchronization Routes
 Route::prefix('sync')->group(function () {
     Route::post('/push', [SyncController::class, 'push']);
     Route::post('/pull', [SyncController::class, 'pull']);

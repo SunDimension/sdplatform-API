@@ -25,7 +25,7 @@ class CashierExpense extends Model
      * @var array
      */
     protected $fillable = [
-        'expense_line_id',
+        'account_id',
         'branch_id',
         'amount',
         'user_id',
@@ -43,7 +43,8 @@ class CashierExpense extends Model
         'last_synced_at',
         'last_sync_attempt_at',
         'sync_error',
-        'id'
+        'id',
+        'payment_method',
 
     ];
 
@@ -57,7 +58,7 @@ class CashierExpense extends Model
         'branch_id' => 'string',
         'user_id' => 'string',
         'store_id' => 'string',
-        'expense_line_id' => 'string',
+        'account_id' => 'string',
         'approved_by' => 'string',
     ];
 
@@ -84,6 +85,11 @@ class CashierExpense extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function account()
+    {
+        return $this->belongsTo(LedgerAccount::class, 'account_id');
     }
 
     public function expense()

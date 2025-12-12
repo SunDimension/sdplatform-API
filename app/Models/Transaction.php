@@ -2,92 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\Concerns\Syncable;
-    
+
 class Transaction extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes, Syncable;
+    use HasFactory;
 
     /**
      * The attributes that are mass assignable.
      *
-     * @var array
+     * @var array<int, string>
      */
     protected $fillable = [
-        'transaction_type_id',
-        'amount',
+        'transaction_type',
         'description',
         'transaction_date',
-        'store_id',
-        'branch_id',
-        'created_by',
-        'modified_by',
-        'deleted_by',
-        'sync_id',
-        'location_id',
-        'sync_status',
-        'sync_version',
-        'last_synced_at',
-        'last_sync_attempt_at',
-        'sync_error'
+        'total_amount',
     ];
 
     /**
-     * The attributes that should be cast to native types.
+     * The attributes that should be cast.
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $casts = [
-        'amount' => 'decimal:2',
-        'transaction_date' => 'date',
-        'store_id' => 'integer',
-        'branch_id' => 'integer',
-        'created_by' => 'integer',
-        'modified_by' => 'integer',
-        'deleted_by' => 'integer',
-        'last_synced_at' => 'datetime',
-        'last_sync_attempt_at' => 'datetime',
-        'sync_version' => 'integer'
+        'transaction_date' => 'datetime',
+        'total_amount' => 'decimal:2',
     ];
-
-    public function financialPeriod(): BelongsTo
-    {
-        return $this->belongsTo(FinancialPeriod::class);
-    }
-
-    public function store(): BelongsTo
-    {
-        return $this->belongsTo(Store::class);
-    }
-
-    public function branch(): BelongsTo
-    {
-        return $this->belongsTo(Branch::class);
-    }
-
-    public function account(): BelongsTo
-    {
-        return $this->belongsTo(Account::class);
-    }
-
-    public function createdBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function modifiedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
-
-    public function deletedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
-    }
 }

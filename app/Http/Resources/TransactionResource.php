@@ -9,25 +9,20 @@ class TransactionResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
             'id' => $this->id,
-            'financial_period_id' => $this->financial_period_id,
+            'transaction_type' => $this->transaction_type,
+            'description' => $this->description,
             'transaction_date' => $this->transaction_date,
-            'transcode' => $this->transcode,
-            'transtype' => $this->transtype,
-            'naration' => $this->naration,
-            'debit' => $this->debit,
-            'credit' => $this->credit,
-            'amount' => $this->amount,
-            'store_id' => $this->store_id,
-            'account_no' => $this->account_no,
-            'account_id' => $this->account_id,
-            'created_by' => $this->created_by,
-            'modified_by' => $this->modified_by,
-            'deleted_by' => $this->deleted_by,
+            'total_amount' => $this->total_amount,
+            // Add any additional fields you need
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

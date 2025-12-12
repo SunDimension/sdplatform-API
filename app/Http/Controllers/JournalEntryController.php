@@ -14,12 +14,22 @@ use Illuminate\Support\Facades\Log;
 
 class JournalEntryController extends Controller
 {
-    public function index(Request $request)
-    {
-        $journalEntries = JournalEntry::all();
+   public function index(Request $request)
+{
+    // Validate the date inputs
+    $validated = $request->validate([
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+    ]);
+    
+    // Query with date filters
+    $journalEntries = JournalEntry::whereBetween('entry_date', [
+        $validated['from_date'],
+        $validated['to_date']
+    ])->get();
 
-        return new JournalEntryCollection($journalEntries);
-    }
+    return new JournalEntryCollection($journalEntries);
+}
 
     public function pending(Request $request)
     {

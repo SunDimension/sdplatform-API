@@ -35,6 +35,8 @@ use App\Models\Measurement;
 use App\Models\ReturnDetails;
 use App\Models\ReturnItem;
 
+use Illuminate\Support\Str;
+
 class SalesOrderController extends Controller
 {
 
@@ -158,247 +160,97 @@ class SalesOrderController extends Controller
     }
 
 
-    // Method to create a new Sales Order
-    // public function store(Request $request)
-    // {
-    //     // Validate incoming request data
-    //     $validated = $request->validate([
-    //         'customer_id' => 'required|exists:customers,id',
-    //         'branch_id' => 'required|exists:branches,id',
-    //         'store_id' => 'required|exists:stores,id',
-    //         'user_id' => 'required|exists:users,id',
-    //         'credit_limit' => 'nullable|numeric',
-    //         'items' => 'required|array',
-    //         'items.*.product_id' => 'required|exists:create_items,id',
-    //         'items.*.quantity' => 'required|integer',
-    //         'items.*.unit_measurement' => 'required|integer',
-    //         'items.*.unit_price' => 'required|numeric',
-    //         'items.*.store_id' => 'required|integer',
-    //         'items.*.discount' => 'nullable|numeric',
-    //         'total_amount' => 'required|numeric',
-    //         'invoice' => 'nullable|array',
-    //         'payment' => 'nullable|array',
-    //         'payment.total_amount' => 'required|numeric',
-    //         'payment.amount_paid' => 'required|numeric',
-    //         'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit',
-    //     ]);
-
-    //     $errors = [];
-
-    //     foreach ($validated['items'] as $item) {
-    //         $storeItem = StoreItem::where('create_item_id', $item['product_id'])
-    //             ->where('store_id', $item['store_id'])
-    //             ->first();
-
-    //         $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
-
-    //         if (!$storeItem) {
-    //             $errors[] = "Item not found in store.";
-    //             continue;
-    //         }
-
-    //         $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'], $item['store_id']);
-    //         $item['quantity_pieces'] = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
-
-    //         // Check if requested quantity exceeds available stock
-    //         if ($quantityAvailable < $item['quantity_pieces']) {
-    //             $storeItem->load('createItem');
-    //             $errors[] = "Insufficient stock for " . $storeItem->createItem->name;
-    //         }
-
-    //         //Enforce set_limit restriction
-    //         if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
-    //             $storeItem->load('createItem');
-    //             $errors[] = "Sale quantity for " . $storeItem->createItem->name .
-    //                 " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
-    //         }
-
-    //         $previousQuantity = $quantityAvailable;
-    //         $quantityChange = $item['quantity_pieces'];
-    //         $newQuantity = $previousQuantity - $quantityChange;
-
-    //         $auditLogs[] = [
-    //             'action_type' => 'sold',
-    //             'product_id' => $item['product_id'],
-    //             'user_id' => auth()->id(),
-    //             'store_id' => $item['store_id'],
-    //             'quantity_change' => -$quantityChange,
-    //             'previous_quantity' => $previousQuantity,
-    //             'new_quantity' => $newQuantity,
-    //             'reference_type' => 'SalesOrder',
-    //             'notes' => 'Product sold via sales order'
-    //         ];
-    //     }
-
-    //     // If any errors were found, return a bad request response
-    //     if (count($errors) > 0) {
-    //         return response()->json(['error' => implode(", ", $errors)], 400);
-    //     }
-
-    //     // Generate Sales Order Number
-    //     $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
-
-    //     // Create a new Sales Order
-    //     $order = [
-    //         'sales_order_number' => $salesOrderNumber,
-    //         'customer_id' => $validated['customer_id'],
-    //         'branch_id' => $validated['branch_id'],
-    //         'store_id' => $validated['store_id'],
-    //         'user_id' => $validated['user_id'],
-    //         'total_amount' => $validated['total_amount'],
-    //         'payment_type' => $validated['payment']['payment_type'],
-    //     ];
-
-    //     if ($validated['payment']['payment_type'] == 'Credit') {
-    //         $order["status"] = 'Credit Pending';
-    //     }
-
-    //     $salesOrder = SalesOrder::create($order);
-
-    //     // Now, insert ProductAudit logs with the correct reference_id
-    //     foreach ($auditLogs as $log) {
-    //         $log['reference_id'] = $salesOrder->id;
-    //         ProductAudit::create($log);
-    //     }
-
-    //     // Process Each Item in the Order
-    //     $itemSoldIds = [];
-
-    //     foreach ($validated['items'] as $item) {
-    //         $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
-    //         $createItem = StoreItem::where('create_item_id', $item['product_id'])->where('store_id', $request->store_id)->first();
-    //         $itemSold = ItemSold::create([
-    //             'sales_order_id' => $salesOrder->id,
-    //             'product_id' => $item['product_id'],
-    //             'quantity' => $item['quantity'],
-    //             'unit_price' => $item['unit_price'],
-    //             'amount' => $item['quantity'] * ($item['unit_price'] - $item['discount']),
-    //             'store_id' => $item['store_id'],
-    //             'discount' => $item['discount'],
-    //             'quantity_pieces' => StockUtil::getPieceQuivalent($unit, $createItem['quantity_in_package'], $item['quantity']),
-    //             'unit_measurement' => $item['unit_measurement'],
-    //             'sales_date' => now(),
-    //         ]);
-
-    //         $itemSoldIds[] = $itemSold->id;
-
-    //         // Update Stock: Increase quantity_holding
-    //         $storeItem = StoreItem::where('create_item_id', $item['product_id'])
-    //             ->where('store_id', $item['store_id'])
-    //             ->first();
-
-    //         // $storeItem->quantity_holding += $item['quantity'];
-    //         $storeItem->save();
-    //     }
-
-    //     // Find related sales receipts
-    //     $salesReceipts = SalesReceipt::where('sales_order_id', $salesOrder->id)->get();
-
-    //     foreach ($salesReceipts as $receipt) {
-    //         // You can decide how to recalculate amount_paid and total_paid.
-    //         // For example, set to the new total_amount of the order:
-    //         $receipt->amount_paid = $salesOrder->total_amount;
-    //         $receipt->total_amount = $salesOrder->total_amount;
-    //         $receipt->save();
-    //     }
-
-    //     return response()->json([
-    //         'message' => 'Sales Order Created Successfully',
-    //         'data' => $salesOrder
-    //     ], 200);
-    // }
-
 
     public function store(Request $request)
     {
-        // Validate incoming request data
         $validated = $request->validate([
             'customer_id' => 'required|exists:customers,id',
             'branch_id' => 'required|exists:branches,id',
             'store_id' => 'required|exists:stores,id',
             'user_id' => 'required|exists:users,id',
-            'credit_limit' => 'nullable|numeric',
-            'items' => 'required|array',
-            'items.*.product_id' => 'required|exists:create_items,id',
-            'items.*.quantity' => 'required|integer',
-            'items.*.unit_measurement' => 'required|integer',
-            'items.*.unit_price' => 'required|numeric',
-            'items.*.store_id' => 'required|string|exists:stores,id',
-            'items.*.discount' => 'nullable|numeric',
             'total_amount' => 'required|numeric',
-            'invoice' => 'nullable|array',
-            'payment' => 'nullable|array',
-            'payment.total_amount' => 'required|numeric',
-            'payment.amount_paid' => 'required|numeric',
+            'items' => 'required|array|min:1',
+            'items.*.product_id' => 'required|exists:create_items,id',
+            'items.*.quantity' => 'required|integer|min:1',
+            'items.*.unit_measurement' => 'required|exists:measurements,id',
+            'items.*.unit_price' => 'required|numeric|min:0',
+            'items.*.store_id' => 'required|string|exists:stores,id',
+            'items.*.discount' => 'nullable|numeric|min:0',
             'payment.payment_type' => 'required|string|in:Cash,Bank,Paylater,Credit',
+            'payment.amount_paid' => 'required|numeric',
+            'payment.total_amount' => 'required|numeric',
         ]);
 
         $errors = [];
         $auditLogs = [];
 
-        // Start a database transaction
         DB::beginTransaction();
 
         try {
             foreach ($validated['items'] as $item) {
                 $storeItem = StoreItem::where('create_item_id', $item['product_id'])
                     ->where('store_id', $item['store_id'])
-                    ->lockForUpdate() // Lock the row to prevent race conditions
                     ->first();
 
                 if (!$storeItem) {
-                    $errors[] = "Item not found in store for product ID: {$item['product_id']}.";
+                    $errors[] = "Product not found in selected store.";
                     continue;
                 }
 
-                $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
-                $quantityInPieces = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
-                $quantityAvailable = StockUtil::getQuantityForRequest($item['product_id'], $item['store_id']);
-
-                // Check if requested quantity exceeds available stock
-                if ($quantityAvailable < $quantityInPieces) {
-                    $storeItem->load('createItem');
-                    $errors[] = "Insufficient stock for " . $storeItem->createItem->name . ". Available: $quantityAvailable, Requested: $quantityInPieces.";
+                $measurement = Measurement::find($item['unit_measurement']);
+                if (!$measurement) {
+                    $errors[] = "Invalid measurement unit.";
                     continue;
                 }
 
-                // Enforce set_limit restriction
+                $quantityInPieces = StockUtil::getPieceQuivalent(
+                    $measurement->name,
+                    $storeItem->quantity_in_package ?? 1,
+                    $item['quantity']
+                );
+
+                $availablePieces = StockUtil::getQuantityForRequest(
+                    $item['product_id'],
+                    $item['store_id']
+                );
+
+                if ($availablePieces < $quantityInPieces) {
+                    $productName = $storeItem->createItem?->name ?? 'Unknown Product';
+                    $errors[] = "Insufficient stock for {$productName}. Available: {$availablePieces} pieces, Requested: {$quantityInPieces} pieces.";
+                    continue;
+                }
+
                 if ($storeItem->set_limit !== null && $item['quantity'] > $storeItem->set_limit) {
-                    $storeItem->load('createItem');
-                    $errors[] = "Sale quantity for " . $storeItem->createItem->name .
-                        " exceeds the allowed limit of " . $storeItem->set_limit . " per transaction.";
+                    $productName = $storeItem->createItem?->name ?? 'Unknown';
+                    $errors[] = "Sale exceeds limit ({$storeItem->set_limit}) for {$productName}.";
                     continue;
                 }
-
-                // Log the stock change for audit
-                $previousQuantity = $quantityAvailable;
-                $quantityChange = $quantityInPieces;
-                $newQuantity = max(0, $previousQuantity - $quantityChange); // Ensure new quantity is non-negative
 
                 $auditLogs[] = [
                     'action_type' => 'sold',
                     'product_id' => $item['product_id'],
                     'user_id' => auth()->id(),
                     'store_id' => $item['store_id'],
-                    'quantity_change' => -$quantityChange,
-                    'previous_quantity' => $previousQuantity,
-                    'new_quantity' => $newQuantity,
+                    'quantity_change' => -$quantityInPieces,
+                    'previous_quantity' => $availablePieces,
+                    'new_quantity' => $availablePieces - $quantityInPieces,
                     'reference_type' => 'SalesOrder',
-                    'notes' => 'Product sold via sales order'
+                    'notes' => 'Sold via sales order',
+                    'created_at' => now(),
+                    'updated_at' => now(),
                 ];
             }
 
-            // If any errors were found, rollback and return
-            if (count($errors) > 0) {
+            if (!empty($errors)) {
                 DB::rollBack();
-                return response()->json(['error' => implode(", ", $errors)], 400);
+                return response()->json([
+                    'error' => implode(" | ", $errors)
+                ], 400);
             }
 
-            // Generate Sales Order Number
+            // Create Sales Order
             $salesOrderNumber = 'HGV-SO-' . strtoupper(uniqid());
-
-            // Create a new Sales Order
-            $order = [
+            $salesOrder = SalesOrder::create([
                 'sales_order_number' => $salesOrderNumber,
                 'customer_id' => $validated['customer_id'],
                 'branch_id' => $validated['branch_id'],
@@ -406,59 +258,189 @@ class SalesOrderController extends Controller
                 'user_id' => $validated['user_id'],
                 'total_amount' => $validated['total_amount'],
                 'payment_type' => $validated['payment']['payment_type'],
-                'status' => $validated['payment']['payment_type'] == 'Credit' ? 'Credit Pending' : 'Pending',
-            ];
+                'status' => $validated['payment']['payment_type'] === 'Credit' ? 'Credit Pending' : 'Pending',
+            ]);
 
-            $salesOrder = SalesOrder::create($order);
-
-            // Insert ProductAudit logs with the correct reference_id
+            // Save audit logs with reference
             foreach ($auditLogs as $log) {
                 $log['reference_id'] = $salesOrder->id;
                 ProductAudit::create($log);
             }
 
-            // Process Each Item in the Order
-            $itemSoldIds = [];
-
+            // Create ItemSold records
             foreach ($validated['items'] as $item) {
-                $unit = Measurement::where('id', $item['unit_measurement'])->first()->name;
-                $storeItem = StoreItem::where('create_item_id', $item['product_id'])
-                    ->where('store_id', $item['store_id'])
-                    ->first();
+                $measurement = Measurement::find($item['unit_measurement']);
+                $quantityInPieces = StockUtil::getPieceQuivalent(
+                    $measurement->name,
+                    StoreItem::where('create_item_id', $item['product_id'])
+                        ->where('store_id', $item['store_id'])
+                        ->first()?->quantity_in_package ?? 1,
+                    $item['quantity']
+                );
 
-                $quantityInPieces = StockUtil::getPieceQuivalent($unit, $storeItem['quantity_in_package'], $item['quantity']);
-
-                $itemSold = ItemSold::create([
+                ItemSold::create([
                     'sales_order_id' => $salesOrder->id,
                     'product_id' => $item['product_id'],
                     'quantity' => $item['quantity'],
+                    'quantity_pieces' => $quantityInPieces,
                     'unit_price' => $item['unit_price'],
+                    'discount' => $item['discount'] ?? 0,
                     'amount' => $item['quantity'] * ($item['unit_price'] - ($item['discount'] ?? 0)),
                     'store_id' => $item['store_id'],
-                    'discount' => $item['discount'] ?? 0,
-                    'quantity_pieces' => $quantityInPieces,
                     'unit_measurement' => $item['unit_measurement'],
                     'sales_date' => now(),
                 ]);
-
-                $itemSoldIds[] = $itemSold->id;
             }
 
+            // ======================================================
+            // POST ACCOUNTING ENTRIES
+            // ======================================================
+            $this->postAccountingEntries(
+                $salesOrder->id,
+                $validated['customer_id'],
+                $validated['total_amount'],
+                $validated['payment']['payment_type'],
+                $salesOrder->created_at
+            );
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Sales Order Created Successfully',
-                'data' => $salesOrder
-            ], 200);
+                'data' => new SalesOrderResource($salesOrder)
+            ], 201);
         } catch (\Exception $e) {
-            // Rollback transaction on error
             DB::rollBack();
-            Log::error("Error creating sales order: " . $e->getMessage());
-            return response()->json(['error' => 'An error occurred while creating the sales order.'], 500);
+            Log::error('Sales Order Creation Failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'payload' => $request->all()
+            ]);
+
+            return response()->json([
+                'error' => 'An error occurred while creating the sales order.',
+                'debug' => app()->environment('local') ? $e->getMessage() : null
+            ], 500);
         }
     }
 
+    /**
+     * Post accounting entries for sales order
+     */
+    private function postAccountingEntries(
+        string $saleId,
+        string $customerId,
+        float $totalAmount,
+        string $paymentType,
+        $saleDate
+    ) {
+        // Get account IDs from chart of accounts
+        $cashAccount = DB::table('ledger_accounts')
+            ->where('account_code', '1000')
+            ->value('account_id');
+
+        $receivableAccount = DB::table('ledger_accounts')
+            ->where('account_code', '1020')
+            ->value('account_id');
+
+        $salesAccount = DB::table('ledger_accounts')
+            ->where('account_code', '4000')
+            ->value('account_id');
+
+        // Validate accounts exist
+        if (!$cashAccount || !$receivableAccount || !$salesAccount) {
+            throw new \Exception('Required accounting accounts not found in chart of accounts');
+        }
+
+        $transactionId = Str::uuid()->toString();
+        $journalId = Str::uuid()->toString();
+
+        // Determine description based on payment type
+        $description = ($paymentType === 'Credit')
+            ? "Credit Sale #{$saleId}"
+            : "{$paymentType} Sale #{$saleId}";
+
+        // 1. Create Transaction Record
+        DB::table('transactions')->insert([
+            'transaction_id' => $transactionId,
+            'transaction_type' => 'SALE',
+            'reference_id' => $saleId,
+            'transaction_date' => date('Y-m-d', strtotime($saleDate)),
+            'total_amount' => $totalAmount,
+            'description' => $description,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 2. Create Journal Entry Header
+        DB::table('journal_entry')->insert([
+            'journal_id' => $journalId,  // Use journal_id instead of id
+            'transaction_id' => $transactionId,
+            'entry_date' => date('Y-m-d', strtotime($saleDate)),
+            'description' => $description,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 3. Create Journal Lines (Double Entry)
+
+        // DEBIT: Cash or Accounts Receivable
+        if ($paymentType === 'Credit') {
+            // Debit Accounts Receivable
+            DB::table('journal_lines')->insert([
+                'line_id' => Str::uuid()->toString(),
+                'journal_id' => $journalId,
+                'account_id' => $receivableAccount,
+                'debit_amount' => $totalAmount,
+                'credit_amount' => 0,
+                // 'description' => "A/R - Customer ID: {$customerId}",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        } else {
+            // Debit Cash/Bank
+            DB::table('journal_lines')->insert([
+                'line_id' => Str::uuid()->toString(),
+                'journal_id' => $journalId,
+                'account_id' => $cashAccount,
+                'debit_amount' => $totalAmount,
+                'credit_amount' => 0,
+                // 'description' => "{$paymentType} Receipt",
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        // CREDIT: Sales Revenue
+        DB::table('journal_lines')->insert([
+            'line_id' => Str::uuid()->toString(),
+            'journal_id' => $journalId,
+            'account_id' => $salesAccount,
+            'debit_amount' => 0,
+            'credit_amount' => $totalAmount,
+            // 'description' => 'Sales Revenue',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 4. Post to General Ledger
+        $journalLines = DB::table('journal_lines')
+            ->where('journal_id', $journalId)
+            ->get();
+
+        foreach ($journalLines as $line) {
+            DB::table('ledger_postings')->insert([
+                'posting_id' => Str::uuid()->toString(),
+                'line_id' => $line->line_id,
+                'account_id' => $line->account_id,
+                'posting_date' => date('Y-m-d', strtotime($saleDate)),
+                'debit_amount' => $line->debit_amount,
+                'credit_amount' => $line->credit_amount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
 
 
 
@@ -604,6 +586,68 @@ class SalesOrderController extends Controller
             ], 500);
         }
     }
+    // public function cancel($id)
+    // {
+    //     // Start a database transaction
+    //     DB::beginTransaction();
+
+    //     try {
+    //         // Find the sales order
+    //         $salesOrder = SalesOrder::with('itemSold')->findOrFail($id);
+
+    //         // Check if the sales order is already canceled
+    //         if ($salesOrder->status === 'Canceled') {
+    //             return response()->json(['message' => 'Sales Order is already canceled.'], 400);
+    //         }
+
+    //         // Loop through items in the sales order and restore stock
+    //         foreach ($salesOrder->itemSold as $itemSold) {
+    //             $storeItem = StoreItem::where('create_item_id', $itemSold->product_id)
+    //                 ->where('store_id', $salesOrder->store_id)
+    //                 ->first();
+
+    //             if ($storeItem) {
+    //                 // Calculate previous quantity using StockUtil
+    //                 $previousQuantity = StockUtil::getQuantityForRequest($itemSold->product_id, $itemSold->store_id);
+    //                 $quantityChange = $itemSold->quantity_pieces;
+    //                 $newQuantity = $previousQuantity + $quantityChange;
+
+    //                 // Optionally update the storeItem's available quantity here if needed
+    //                 // $storeItem->quantity_available = $newQuantity;
+    //                 // $storeItem->save();
+
+    //                 // Log the restoration in ProductAudit
+    //                 ProductAudit::create([
+    //                     'action_type' => 'restored',
+    //                     'product_id' => $itemSold->product_id,
+    //                     'user_id' => auth()->id(),
+    //                     'quantity_change' => $quantityChange,
+    //                     'previous_quantity' => $previousQuantity,
+    //                     'new_quantity' => $newQuantity,
+    //                     'reference_type' => 'SalesOrder',
+    //                     'reference_id' => $salesOrder->id,
+    //                     'store_id' => $salesOrder->store_id,
+    //                     'notes' => 'Stock restored due to order cancellation'
+    //                 ]);
+    //             } else {
+    //                 Log::warning("StoreItem for product {$itemSold->product_id} not found in store {$salesOrder->store_id}");
+    //             }
+    //         }
+
+    //         // Update the order status to 'Canceled' instead of deleting it
+    //         $salesOrder->update(['status' => 'Canceled']);
+
+    //         // Commit the transaction
+    //         DB::commit();
+
+    //         return response()->json(['message' => 'Sales Order Canceled Successfully.'], 200);
+    //     } catch (\Exception $e) {
+    //         DB::rollBack();
+    //         Log::error('Error canceling sales order: ' . $e->getMessage());
+    //         return response()->json(['message' => 'An error occurred while canceling the order.'], 500);
+    //     }
+    // }
+
     public function cancel($id)
     {
         // Start a database transaction
@@ -630,10 +674,6 @@ class SalesOrderController extends Controller
                     $quantityChange = $itemSold->quantity_pieces;
                     $newQuantity = $previousQuantity + $quantityChange;
 
-                    // Optionally update the storeItem's available quantity here if needed
-                    // $storeItem->quantity_available = $newQuantity;
-                    // $storeItem->save();
-
                     // Log the restoration in ProductAudit
                     ProductAudit::create([
                         'action_type' => 'restored',
@@ -652,6 +692,11 @@ class SalesOrderController extends Controller
                 }
             }
 
+            // ======================================================
+            // REVERSE ACCOUNTING ENTRIES
+            // ======================================================
+            $this->reverseAccountingEntries($salesOrder->id, $salesOrder->created_at);
+
             // Update the order status to 'Canceled' instead of deleting it
             $salesOrder->update(['status' => 'Canceled']);
 
@@ -664,6 +709,98 @@ class SalesOrderController extends Controller
             Log::error('Error canceling sales order: ' . $e->getMessage());
             return response()->json(['message' => 'An error occurred while canceling the order.'], 500);
         }
+    }
+
+    /**
+     * Reverse accounting entries for a canceled sales order
+     */
+    private function reverseAccountingEntries(string $saleId, $saleDate)
+    {
+        // Find the original transaction
+        $transaction = DB::table('transactions')
+            ->where('reference_id', $saleId)
+            ->where('transaction_type', 'SALE')
+            ->first();
+
+        if (!$transaction) {
+            Log::warning("No accounting transaction found for sale ID: {$saleId}");
+            return; // Exit gracefully if no transaction exists
+        }
+
+        // Find the journal entry
+        $journalEntry = DB::table('journal_entry')
+            ->where('transaction_id', $transaction->transaction_id)
+            ->first();
+
+        if (!$journalEntry) {
+            Log::warning("No journal entry found for transaction ID: {$transaction->transaction_id}");
+            return;
+        }
+
+        // Get all journal lines for this entry
+        $journalLines = DB::table('journal_lines')
+            ->where('journal_id', $journalEntry->journal_id)
+            ->get();
+
+        if ($journalLines->isEmpty()) {
+            Log::warning("No journal lines found for journal ID: {$journalEntry->journal_id}");
+            return;
+        }
+
+        // Create reversal transaction
+        $reversalTransactionId = Str::uuid()->toString();
+        $reversalJournalId = Str::uuid()->toString();
+
+        // 1. Create Reversal Transaction Record
+        DB::table('transactions')->insert([
+            'transaction_id' => $reversalTransactionId,
+            'transaction_type' => 'SALE_REVERSAL',
+            'reference_id' => $saleId,
+            'transaction_date' => date('Y-m-d'),
+            'total_amount' => $transaction->total_amount,
+            'description' => "Reversal: {$transaction->description}",
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 2. Create Reversal Journal Entry Header
+        DB::table('journal_entry')->insert([
+            'journal_id' => $reversalJournalId,
+            'transaction_id' => $reversalTransactionId,
+            'entry_date' => date('Y-m-d'),
+            'description' => "Reversal: {$journalEntry->description}",
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 3. Create Reversed Journal Lines (swap debit and credit)
+        foreach ($journalLines as $line) {
+            $reversalLineId = Str::uuid()->toString();
+
+            DB::table('journal_lines')->insert([
+                'line_id' => $reversalLineId,
+                'journal_id' => $reversalJournalId,
+                'account_id' => $line->account_id,
+                'debit_amount' => $line->credit_amount,  // Swap credit to debit
+                'credit_amount' => $line->debit_amount,  // Swap debit to credit
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            // 4. Post Reversal to General Ledger
+            DB::table('ledger_postings')->insert([
+                'posting_id' => Str::uuid()->toString(),
+                'line_id' => $reversalLineId,
+                'account_id' => $line->account_id,
+                'posting_date' => date('Y-m-d'),
+                'debit_amount' => $line->credit_amount,  // Reversed amounts
+                'credit_amount' => $line->debit_amount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        Log::info("Accounting entries reversed for sale ID: {$saleId}");
     }
 
 

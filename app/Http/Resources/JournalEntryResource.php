@@ -9,19 +9,15 @@ class JournalEntryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
+            'journal_id' => $this->journal_id,
             'description' => $this->description,
-            'payment_date' => $this->payment_date,
-            'store_id' => $this->store_id,
-            'vendor_id' => $this->vendor_id,
-            'created_by' => $this->created_by,
-            'modified_by' => $this->modified_by,
-            'deleted_by' => $this->deleted_by,
-            'journalEntryDetails' => JournalEntryDetailCollection::make($this->whenLoaded('journalEntryDetails')),
+            'entry_date' => $this->entry_date?->format('Y-m-d') ?? null,
         ];
     }
 }

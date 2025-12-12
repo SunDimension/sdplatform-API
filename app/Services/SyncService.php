@@ -44,11 +44,16 @@ class SyncService
                 'data_size' => count($syncData)
             ]);
 
-            // Extract sync metadata
             $syncMetadata = $syncData['sync_metadata'] ?? [];
+
+            // Check if this is an accounting record
+            if (isset($syncMetadata['accounting_type'])) {
+                return $this->processAccountingRecord($syncData, $syncMetadata);
+            }
+
+            // Regular model processing (existing code)
             $modelData = array_diff_key($syncData, ['sync_metadata' => '']);
 
-            // Determine the action with better semantics across locations
             $action = $syncMetadata['action'] ?? null;
             if ($action === null) {
                 if (($syncMetadata['sync_status'] ?? null) === 'deleted_pending') {
@@ -56,17 +61,14 @@ class SyncService
                 } else {
                     $syncId = $syncMetadata['sync_id'] ?? null;
                     if (!$syncId) {
-                        // Without sync_id, treat as create
                         $action = 'create';
                     } else {
-                        // If record with sync_id exists locally on hub, update; otherwise create
                         $exists = class_exists($modelType) ? (bool) $modelType::where('sync_id', $syncId)->exists() : false;
                         $action = $exists ? 'update' : 'create';
                     }
                 }
             }
 
-            // Process based on action
             switch ($action) {
                 case 'create':
                     $this->createModelFromSyncData($modelType, $modelData, $syncMetadata);
@@ -103,6 +105,125 @@ class SyncService
         }
 
         return $results;
+    }
+    /**
+     * Process accounting record (non-Eloquent)
+     */
+    protected function processAccountingRecord(array $syncData, array $syncMetadata): array
+    {
+        $results = [
+            'success' => 0,
+            'failed' => 0,
+            'errors' => []
+        ];
+
+        try {
+            $tableName = $syncMetadata['table_name'] ?? null;
+            $accountingType = $syncMetadata['accounting_type'] ?? null;
+
+            if (!$tableName || !$accountingType) {
+                throw new \Exception('Missing table_name or accounting_type in sync metadata');
+            }
+
+            $modelData = array_diff_key($syncData, ['sync_metadata' => '', 'relation_sync' => '']);
+            $relationSync = $syncData['relation_sync'] ?? [];
+
+            // Remap foreign keys using relation_sync
+            if (!empty($relationSync)) {
+                $modelData = $this->remapAccountingForeignKeys($modelData, $relationSync);
+            }
+
+            // Get primary key for this table
+            $primaryKey = $this->getAccountingPrimaryKey($tableName);
+
+            // Check if record exists
+            $existingRecord = DB::table($tableName)
+                ->where('sync_id', $syncMetadata['sync_id'])
+                ->first();
+
+            if ($existingRecord) {
+                // Update existing record
+                DB::table($tableName)
+                    ->where('sync_id', $syncMetadata['sync_id'])
+                    ->update(array_merge($modelData, [
+                        'updated_at' => now()
+                    ]));
+
+                Log::info('Updated accounting record', [
+                    'table' => $tableName,
+                    'type' => $accountingType,
+                    'sync_id' => $syncMetadata['sync_id']
+                ]);
+            } else {
+                // Insert new record
+                DB::table($tableName)->insert(array_merge($modelData, [
+                    'sync_id' => $syncMetadata['sync_id'],
+                    'location_id' => $syncMetadata['location_id'],
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]));
+
+                Log::info('Created accounting record', [
+                    'table' => $tableName,
+                    'type' => $accountingType,
+                    'sync_id' => $syncMetadata['sync_id']
+                ]);
+            }
+
+            $results['success']++;
+        } catch (\Exception $e) {
+            $results['failed']++;
+            $results['errors'][] = $e->getMessage();
+            Log::error('Failed to process accounting record', [
+                'table' => $syncMetadata['table_name'] ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return $results;
+    }
+    protected function remapAccountingForeignKeys(array $data, array $relationSync): array
+    {
+        foreach ($relationSync as $foreignKey => $relationInfo) {
+            $tableName = $relationInfo['table_name'] ?? null;
+            $syncId = $relationInfo['sync_id'] ?? null;
+
+            if ($tableName && $syncId) {
+                try {
+                    $related = DB::table($tableName)
+                        ->where('sync_id', $syncId)
+                        ->first();
+
+                    if ($related) {
+                        // Get the primary key for this table
+                        $primaryKey = $this->getAccountingPrimaryKey($tableName);
+                        $data[$foreignKey] = $related->$primaryKey;
+                    }
+                } catch (\Throwable $e) {
+                    Log::warning('Failed to remap accounting FK', [
+                        'foreign_key' => $foreignKey,
+                        'table' => $tableName,
+                        'error' => $e->getMessage()
+                    ]);
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get primary key column name for accounting table
+     */
+    protected function getAccountingPrimaryKey(string $tableName): string
+    {
+        return match ($tableName) {
+            'transactions' => 'transaction_id',
+            'journal_entry' => 'journal_id',
+            'journal_lines' => 'line_id',
+            'ledger_postings' => 'posting_id',
+            default => 'id'
+        };
     }
 
     /**
@@ -577,6 +698,84 @@ class SyncService
     /**
      * Resolve and collect dependent models that should be synced with the provided primary models.
      */
+    // protected function getDependentModelsFor(string $primaryClass, array $primaryModels): array
+    // {
+    //     if (empty($primaryModels)) {
+    //         return [];
+    //     }
+
+    //     $dependencies = [
+    //         // When pushing SalesOrder, also push its ItemSold rows
+    //         'App\\Models\\SalesOrder' => [
+    //             [
+    //                 'class' => 'App\\Models\\ItemSold',
+    //                 'foreign_key' => 'sales_order_id',
+    //             ],
+    //         ],
+    //         // When pushing Release, also push its ReleaseDetails rows
+    //         'App\\Models\\Release' => [
+    //             [
+    //                 'class' => 'App\\Models\\ReleaseDetails',
+    //                 'foreign_key' => 'release_id',
+    //             ],
+    //         ],
+    //         // When pushing ReturnItem (return header), also push its ReturnDetails rows
+    //         'App\\Models\\ReturnItem' => [
+    //             [
+    //                 'class' => 'App\\Models\\ReturnDetails',
+    //                 'foreign_key' => 'return_id',
+    //             ],
+    //         ],
+    //         // When pushing StoreTransferOrder (transfer header), also push its StoreTransferItem rows
+    //         'App\\Models\\StoreTransferOrder' => [
+    //             [
+    //                 'class' => 'App\\Models\\StoreTransferItem',
+    //                 'foreign_key' => 'transfer_order_id',
+    //             ],
+    //         ],
+    //         // When pushing ReceiveOrder (receive header), also push its ReceiveItem rows
+    //         'App\\Models\\ReceiveOrder' => [
+    //             [
+    //                 'class' => 'App\\Models\\ReceiveItem',
+    //                 'foreign_key' => 'receive_order_id',
+    //             ],
+    //         ],
+    //     ];
+
+    //     if (!isset($dependencies[$primaryClass])) {
+    //         return [];
+    //     }
+
+    //     $dependentModels = [];
+
+    //     // Collect primary IDs once
+    //     $primaryIds = array_values(array_filter(array_map(function ($model) {
+    //         return $model->id ?? null;
+    //     }, $primaryModels)));
+
+    //     if (empty($primaryIds)) {
+    //         return [];
+    //     }
+
+    //     foreach ($dependencies[$primaryClass] as $dependency) {
+    //         $dependentClass = $dependency['class'];
+    //         $fk = $dependency['foreign_key'];
+
+    //         if (class_exists($dependentClass)) {
+    //             // Only include child rows that need syncing
+    //             $rows = $dependentClass::whereIn($fk, $primaryIds)
+    //                 ->whereIn('sync_status', ['pending', 'deleted_pending'])
+    //                 ->get()
+    //                 ->all();
+    //             if (!empty($rows)) {
+    //                 $dependentModels = array_merge($dependentModels, $rows);
+    //             }
+    //         }
+    //     }
+
+    //     return $dependentModels;
+    // }
+
     protected function getDependentModelsFor(string $primaryClass, array $primaryModels): array
     {
         if (empty($primaryModels)) {
@@ -584,11 +783,26 @@ class SyncService
         }
 
         $dependencies = [
-            // When pushing SalesOrder, also push its ItemSold rows
+            // When pushing SalesOrder, also push its ItemSold rows AND accounting records
             'App\\Models\\SalesOrder' => [
                 [
                     'class' => 'App\\Models\\ItemSold',
                     'foreign_key' => 'sales_order_id',
+                ],
+                // NEW: Include accounting records for sales orders
+                [
+                    'type' => 'accounting',
+                    'reference_column' => 'id', // The column in SalesOrder that maps to transactions.reference_id
+                    'transaction_type' => 'SALES', // The transaction_type value to filter by
+                ],
+            ],
+            // When pushing CashierExpense, also push its accounting records
+            'App\\Models\\CashierExpense' => [
+                // NEW: Include accounting records for expenses
+                [
+                    'type' => 'accounting',
+                    'reference_column' => 'id', // The column in CashierExpense that maps to transactions.reference_id
+                    'transaction_type' => 'EXPENSE', // The transaction_type value to filter by
                 ],
             ],
             // When pushing Release, also push its ReleaseDetails rows
@@ -637,23 +851,162 @@ class SyncService
         }
 
         foreach ($dependencies[$primaryClass] as $dependency) {
-            $dependentClass = $dependency['class'];
-            $fk = $dependency['foreign_key'];
+            // Handle regular model dependencies
+            if (isset($dependency['class']) && isset($dependency['foreign_key'])) {
+                $dependentClass = $dependency['class'];
+                $fk = $dependency['foreign_key'];
 
-            if (class_exists($dependentClass)) {
-                // Only include child rows that need syncing
-                $rows = $dependentClass::whereIn($fk, $primaryIds)
-                    ->whereIn('sync_status', ['pending', 'deleted_pending'])
-                    ->get()
-                    ->all();
-                if (!empty($rows)) {
-                    $dependentModels = array_merge($dependentModels, $rows);
+                if (class_exists($dependentClass)) {
+                    // Only include child rows that need syncing
+                    $rows = $dependentClass::whereIn($fk, $primaryIds)
+                        ->whereIn('sync_status', ['pending', 'deleted_pending'])
+                        ->get()
+                        ->all();
+                    if (!empty($rows)) {
+                        $dependentModels = array_merge($dependentModels, $rows);
+                    }
+                }
+            }
+            // Handle accounting dependencies (NEW)
+            elseif (isset($dependency['type']) && $dependency['type'] === 'accounting') {
+                $accountingRecords = $this->getAccountingRecordsForReferences(
+                    $primaryModels,
+                    $dependency['reference_column'],
+                    $dependency['transaction_type']
+                );
+
+                if (!empty($accountingRecords)) {
+                    $dependentModels = array_merge($dependentModels, $accountingRecords);
                 }
             }
         }
 
         return $dependentModels;
     }
+
+    protected function getAccountingRecordsForReferences(array $primaryModels, string $referenceColumn, string $transactionType): array
+    {
+        $accountingRecords = [];
+
+        // Extract reference IDs from primary models
+        $referenceIds = array_values(array_filter(array_map(function ($model) use ($referenceColumn) {
+            return $model->$referenceColumn ?? null;
+        }, $primaryModels)));
+
+        if (empty($referenceIds)) {
+            return [];
+        }
+
+        try {
+            // 1. Get Transactions
+            $transactions = DB::table('transactions')
+                ->whereIn('reference_id', $referenceIds)
+                ->where('transaction_type', $transactionType)
+                ->get();
+
+            if ($transactions->isEmpty()) {
+                return [];
+            }
+
+            $transactionIds = $transactions->pluck('transaction_id')->toArray();
+
+            // Convert transactions to pseudo-models for syncing
+            foreach ($transactions as $transaction) {
+                $accountingRecords[] = $this->createAccountingPseudoModel('Transaction', $transaction);
+            }
+
+            // 2. Get Journal Entries
+            $journalEntries = DB::table('journal_entry')
+                ->whereIn('transaction_id', $transactionIds)
+                ->get();
+
+            if (!$journalEntries->isEmpty()) {
+                $journalIds = $journalEntries->pluck('journal_id')->toArray();
+
+                foreach ($journalEntries as $journalEntry) {
+                    $accountingRecords[] = $this->createAccountingPseudoModel('JournalEntry', $journalEntry);
+                }
+
+                // 3. Get Journal Lines
+                $journalLines = DB::table('journal_lines')
+                    ->whereIn('journal_id', $journalIds)
+                    ->get();
+
+                if (!$journalLines->isEmpty()) {
+                    $lineIds = $journalLines->pluck('line_id')->toArray();
+
+                    foreach ($journalLines as $line) {
+                        $accountingRecords[] = $this->createAccountingPseudoModel('JournalLine', $line);
+                    }
+
+                    // 4. Get Ledger Postings
+                    $ledgerPostings = DB::table('ledger_postings')
+                        ->whereIn('line_id', $lineIds)
+                        ->get();
+
+                    foreach ($ledgerPostings as $posting) {
+                        $accountingRecords[] = $this->createAccountingPseudoModel('LedgerPosting', $posting);
+                    }
+                }
+            }
+
+            Log::info('Retrieved accounting records for sync', [
+                'reference_ids' => $referenceIds,
+                'transaction_type' => $transactionType,
+                'transactions_count' => $transactions->count(),
+                'journal_entries_count' => $journalEntries->count(),
+                'total_records' => count($accountingRecords)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Failed to retrieve accounting records', [
+                'reference_ids' => $referenceIds,
+                'transaction_type' => $transactionType,
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return $accountingRecords;
+    }
+
+    protected function createAccountingPseudoModel(string $type, $data): object
+    {
+        $model = new \stdClass();
+
+        // Convert stdClass or array to array
+        $dataArray = is_array($data) ? $data : (array) $data;
+
+        // Set all properties from data
+        foreach ($dataArray as $key => $value) {
+            $model->$key = $value;
+        }
+
+        // Add sync metadata
+        $model->_accounting_type = $type; // Mark as accounting record
+        $model->_table_name = $this->getAccountingTableName($type);
+
+        // Generate sync_id if not present
+        if (!isset($model->sync_id)) {
+            $model->sync_id = (string) Str::uuid();
+        }
+
+        // Set sync status
+        $model->sync_status = 'pending';
+        $model->location_id = $this->locationId;
+
+        return $model;
+    }
+
+    protected function getAccountingTableName(string $type): string
+    {
+        return match ($type) {
+            'Transaction' => 'transactions',
+            'JournalEntry' => 'journal_entry',
+            'JournalLine' => 'journal_lines',
+            'LedgerPosting' => 'ledger_postings',
+            default => throw new \Exception("Unknown accounting type: {$type}")
+        };
+    }
+
 
     /**
      * Push model to central hub
@@ -1179,35 +1532,35 @@ class SyncService
      */
     protected function prepareModelForHub($model): array
     {
-        // Get all fillable attributes from the model
+        // Check if this is an accounting pseudo-model
+        if (is_object($model) && isset($model->_accounting_type)) {
+            return $this->prepareAccountingRecordForHub($model);
+        }
+
+        // Regular Eloquent model handling (existing code)
         $syncData = $model->toArray();
 
-        // Ensure model has a sync_id; generate and persist if missing so children can reference it
+        // Ensure model has a sync_id
         if (empty($model->sync_id)) {
             try {
                 $model->sync_id = Str::uuid();
-                // Avoid triggering events that might alter business state
                 $model->save();
             } catch (\Throwable $e) {
-                // If saving fails, we still include a generated sync_id in payload for linkage
                 $model->sync_id = $model->sync_id ?? (string) Str::uuid();
             }
         }
 
-        // Handle primary key: remove for incrementing models, ensure it exists for non-incrementing (UUID) models
+        // Handle primary key
         try {
             $primaryKey = method_exists($model, 'getKeyName') ? $model->getKeyName() : 'id';
             $usesIncrementing = method_exists($model, 'getIncrementing') ? $model->getIncrementing() : false;
 
             if ($primaryKey) {
                 if ($usesIncrementing) {
-                    // For auto-incrementing models, remove the primary key to let the hub generate it
                     unset($syncData[$primaryKey]);
                 } else {
-                    // For UUID/non-incrementing models, ensure we have a valid primary key
                     $primaryValue = $model->getKey();
                     if (empty($primaryValue)) {
-                        // Generate UUID if missing
                         $primaryValue = (string) Str::uuid();
                         $model->setAttribute($primaryKey, $primaryValue);
                         try {
@@ -1215,22 +1568,20 @@ class SyncService
                                 $model->save();
                             });
                         } catch (\Throwable $e) {
-                            // ignore inability to persist primary key; still send generated value
+                            // ignore
                         }
                     }
-                    // Always set the primary key in syncData for non-incrementing models
                     $syncData[$primaryKey] = $primaryValue;
                 }
             }
         } catch (\Throwable $e) {
-            // ignore key handling issues
             Log::warning('Error handling primary key in sync preparation', [
                 'model' => get_class($model),
                 'error' => $e->getMessage()
             ]);
         }
 
-        // Remove sync-related fields that will be handled separately
+        // Remove sync-related fields
         unset($syncData['sync_id']);
         unset($syncData['location_id']);
         unset($syncData['sync_status']);
@@ -1239,16 +1590,15 @@ class SyncService
         unset($syncData['last_sync_attempt_at']);
         unset($syncData['sync_error']);
 
-        // Remove user foreign keys from payload to avoid FK issues on hub; hub may not have same users
+        // Remove user foreign keys
         unset($syncData['created_by']);
         unset($syncData['modified_by']);
         unset($syncData['deleted_by']);
         unset($syncData['approved_by']);
 
-        // Ensure location_id is always set to a valid value
         $locationId = $model->location_id ?? config('app.location_id', 'unknown');
 
-        // Add sync metadata in the structure the central hub expects
+        // Add sync metadata
         $syncData['sync_metadata'] = [
             'sync_id' => $model->sync_id,
             'location_id' => $locationId,
@@ -1261,13 +1611,13 @@ class SyncService
             'last_sync_attempt_at' => $this->formatIso($model->last_sync_attempt_at ?? null),
         ];
 
-        // Include relation sync mapping for known child models so the hub can remap FKs by sync_id
+        // Include relation sync mapping
         $relationSync = $this->buildRelationSyncMapping($model);
         if (!empty($relationSync)) {
             $syncData['relation_sync'] = $relationSync;
         }
 
-        // Add soft delete information if applicable
+        // Add soft delete information
         if (method_exists($model, 'trashed') && $model->trashed()) {
             $syncData['sync_metadata']['action'] = 'delete';
             $syncData['sync_metadata']['deleted_at'] = $this->formatIso($model->deleted_at ?? null);
@@ -1275,6 +1625,105 @@ class SyncService
 
         return $syncData;
     }
+    protected function prepareAccountingRecordForHub($record): array
+    {
+        $syncData = [];
+        $tableName = $record->_table_name;
+
+        // Convert record to array, excluding internal properties
+        foreach (get_object_vars($record) as $key => $value) {
+            if (!str_starts_with($key, '_')) {
+                $syncData[$key] = $value;
+            }
+        }
+
+        // Add sync metadata
+        $syncData['sync_metadata'] = [
+            'sync_id' => $record->sync_id,
+            'location_id' => $record->location_id ?? $this->locationId,
+            'sync_version' => 1,
+            'sync_status' => 'pending',
+            'action' => 'create',
+            'accounting_type' => $record->_accounting_type,
+            'table_name' => $tableName,
+            'created_at' => $this->formatIso($record->created_at ?? now()),
+            'updated_at' => $this->formatIso($record->updated_at ?? now()),
+        ];
+
+        // Build relation sync for accounting records
+        $relationSync = $this->buildAccountingRelationSync($record);
+        if (!empty($relationSync)) {
+            $syncData['relation_sync'] = $relationSync;
+        }
+
+        return $syncData;
+    }
+
+
+    protected function buildAccountingRelationSync($record): array
+    {
+        $mapping = [];
+
+        try {
+            switch ($record->_accounting_type) {
+                case 'JournalEntry':
+                    // Link to Transaction
+                    if (!empty($record->transaction_id)) {
+                        $transaction = DB::table('transactions')
+                            ->where('transaction_id', $record->transaction_id)
+                            ->first();
+                        if ($transaction && !empty($transaction->sync_id)) {
+                            $mapping['transaction_id'] = [
+                                'model_type' => 'Accounting\\Transaction',
+                                'sync_id' => $transaction->sync_id,
+                                'table_name' => 'transactions',
+                            ];
+                        }
+                    }
+                    break;
+
+                case 'JournalLine':
+                    // Link to JournalEntry
+                    if (!empty($record->journal_id)) {
+                        $journalEntry = DB::table('journal_entry')
+                            ->where('journal_id', $record->journal_id)
+                            ->first();
+                        if ($journalEntry && !empty($journalEntry->sync_id)) {
+                            $mapping['journal_id'] = [
+                                'model_type' => 'Accounting\\JournalEntry',
+                                'sync_id' => $journalEntry->sync_id,
+                                'table_name' => 'journal_entry',
+                            ];
+                        }
+                    }
+                    break;
+
+                case 'LedgerPosting':
+                    // Link to JournalLine
+                    if (!empty($record->line_id)) {
+                        $journalLine = DB::table('journal_lines')
+                            ->where('line_id', $record->line_id)
+                            ->first();
+                        if ($journalLine && !empty($journalLine->sync_id)) {
+                            $mapping['line_id'] = [
+                                'model_type' => 'Accounting\\JournalLine',
+                                'sync_id' => $journalLine->sync_id,
+                                'table_name' => 'journal_lines',
+                            ];
+                        }
+                    }
+                    break;
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Error building accounting relation sync', [
+                'type' => $record->_accounting_type ?? 'unknown',
+                'error' => $e->getMessage()
+            ]);
+        }
+
+        return $mapping;
+    }
+
 
     /**
      * Determine the action for a model based on its sync status

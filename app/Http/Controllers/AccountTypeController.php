@@ -2,45 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccountType;
 use App\Http\Requests\AccountTypeStoreRequest;
 use App\Http\Requests\AccountTypeUpdateRequest;
-use App\Http\Resources\AccountTypeCollection;
 use App\Http\Resources\AccountTypeResource;
-use App\Models\AccountType;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 
 class AccountTypeController extends Controller
 {
-    public function index(Request $request)
+    // List all account types
+    public function index()
     {
-        $accountTypes = AccountType::all();
-        return new AccountTypeCollection($accountTypes);
+        $types = AccountType::all();
+        return AccountTypeResource::collection($types);
     }
 
+    // Store new account type
     public function store(AccountTypeStoreRequest $request)
     {
-        $accountType = AccountType::create($request->validated());
+        $type = AccountType::create([
+            'account_type_id' => Str::uuid(),
+            'account_type' => $request->account_type,
+        ]);
 
-        return new AccountTypeResource($accountType);
+        return new AccountTypeResource($type);
     }
 
-    public function show(Request $request, AccountType $accountType)
+    // Show a single account type
+    public function show(AccountType $accountType)
     {
         return new AccountTypeResource($accountType);
     }
 
+    // Update an account type
     public function update(AccountTypeUpdateRequest $request, AccountType $accountType)
     {
-        $accountType->update($request->validated());
+        $accountType->update([
+            'account_type' => $request->account_type,
+        ]);
 
         return new AccountTypeResource($accountType);
     }
 
-    public function destroy(Request $request, AccountType $accountType)
+    // Delete an account type
+    public function destroy(AccountType $accountType)
     {
         $accountType->delete();
-
-        return response()->noContent();
+        return response()->json(['message' => 'Account type deleted successfully']);
     }
 }

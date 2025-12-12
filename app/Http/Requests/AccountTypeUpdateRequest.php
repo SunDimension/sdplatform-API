@@ -6,26 +6,16 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class AccountTypeUpdateRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
         return true;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     */
     public function rules(): array
     {
         return [
-            'account_group_id' => ['required'],
-            'name' => ['required', 'string'],
-            'code' => ['required', 'string'],
-            'created_by' => ['nullable'],
-            'modified_by' => ['nullable'],
-            'deleted_by' => ['nullable'],
+            'account_type' => ['required', 'string', 'max:255'],
         ];
     }
+    
 }
