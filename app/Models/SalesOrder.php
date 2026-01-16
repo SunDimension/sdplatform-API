@@ -132,4 +132,11 @@ class SalesOrder extends Model
         return $this->hasMany(ProductAudit::class, 'reference_id')
             ->where('reference_type', 'SalesOrder');
     }
+
+    // protected static function booted()
+    // {
+    //     static::created(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::updated(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::deleted(fn ($model) => dispatch(new SyncModelJob($model, 'delete')));
+    // }
 }

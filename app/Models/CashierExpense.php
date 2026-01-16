@@ -96,4 +96,6 @@ class CashierExpense extends Model
     {
         return $this->belongsTo(ExpenseLine::class, 'expense_line_id');
     }
+
+   
 }

@@ -145,4 +145,11 @@ class SalesReceipt extends Model
     {
         return $this->hasMany(Release::class, 'sales_receipt_id');
     }
+
+    // protected static function booted()
+    // {
+    //     static::created(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::updated(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::deleted(fn ($model) => dispatch(new SyncModelJob($model, 'delete')));
+    // }
 }

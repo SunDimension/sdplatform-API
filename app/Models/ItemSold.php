@@ -189,4 +189,11 @@ class ItemSold extends Model
             ->orderBy('create_items.name')
             ->get();
     }
+    
+    // protected static function booted()
+    // {
+    //     static::created(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::updated(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::deleted(fn ($model) => dispatch(new SyncModelJob($model, 'delete')));
+    // }
 }

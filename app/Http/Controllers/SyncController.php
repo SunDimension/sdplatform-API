@@ -252,16 +252,17 @@ class SyncController extends Controller
     /**
      * Check online status
      */
-    protected function checkOnlineStatus(): bool
-    {
-        try {
-            $response = \Illuminate\Support\Facades\Http::timeout(5)
-                ->get(config('sync.central_hub_url') . '/health');
-            return $response->successful();
-        } catch (\Exception $e) {
-            return false;
-        }
+ protected function checkOnlineStatus(): bool
+{
+    try {
+        $response = Http::timeout(5)
+            ->get(config('sync.central_hub_url') . '/status'); // use /status instead of /health
+        return $response->successful();
+    } catch (\Exception $e) {
+        return false;
     }
+}
+
 
     /**
      * Get count of models pending sync

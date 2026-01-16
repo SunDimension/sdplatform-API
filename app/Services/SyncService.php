@@ -698,84 +698,6 @@ class SyncService
     /**
      * Resolve and collect dependent models that should be synced with the provided primary models.
      */
-    // protected function getDependentModelsFor(string $primaryClass, array $primaryModels): array
-    // {
-    //     if (empty($primaryModels)) {
-    //         return [];
-    //     }
-
-    //     $dependencies = [
-    //         // When pushing SalesOrder, also push its ItemSold rows
-    //         'App\\Models\\SalesOrder' => [
-    //             [
-    //                 'class' => 'App\\Models\\ItemSold',
-    //                 'foreign_key' => 'sales_order_id',
-    //             ],
-    //         ],
-    //         // When pushing Release, also push its ReleaseDetails rows
-    //         'App\\Models\\Release' => [
-    //             [
-    //                 'class' => 'App\\Models\\ReleaseDetails',
-    //                 'foreign_key' => 'release_id',
-    //             ],
-    //         ],
-    //         // When pushing ReturnItem (return header), also push its ReturnDetails rows
-    //         'App\\Models\\ReturnItem' => [
-    //             [
-    //                 'class' => 'App\\Models\\ReturnDetails',
-    //                 'foreign_key' => 'return_id',
-    //             ],
-    //         ],
-    //         // When pushing StoreTransferOrder (transfer header), also push its StoreTransferItem rows
-    //         'App\\Models\\StoreTransferOrder' => [
-    //             [
-    //                 'class' => 'App\\Models\\StoreTransferItem',
-    //                 'foreign_key' => 'transfer_order_id',
-    //             ],
-    //         ],
-    //         // When pushing ReceiveOrder (receive header), also push its ReceiveItem rows
-    //         'App\\Models\\ReceiveOrder' => [
-    //             [
-    //                 'class' => 'App\\Models\\ReceiveItem',
-    //                 'foreign_key' => 'receive_order_id',
-    //             ],
-    //         ],
-    //     ];
-
-    //     if (!isset($dependencies[$primaryClass])) {
-    //         return [];
-    //     }
-
-    //     $dependentModels = [];
-
-    //     // Collect primary IDs once
-    //     $primaryIds = array_values(array_filter(array_map(function ($model) {
-    //         return $model->id ?? null;
-    //     }, $primaryModels)));
-
-    //     if (empty($primaryIds)) {
-    //         return [];
-    //     }
-
-    //     foreach ($dependencies[$primaryClass] as $dependency) {
-    //         $dependentClass = $dependency['class'];
-    //         $fk = $dependency['foreign_key'];
-
-    //         if (class_exists($dependentClass)) {
-    //             // Only include child rows that need syncing
-    //             $rows = $dependentClass::whereIn($fk, $primaryIds)
-    //                 ->whereIn('sync_status', ['pending', 'deleted_pending'])
-    //                 ->get()
-    //                 ->all();
-    //             if (!empty($rows)) {
-    //                 $dependentModels = array_merge($dependentModels, $rows);
-    //             }
-    //         }
-    //     }
-
-    //     return $dependentModels;
-    // }
-
     protected function getDependentModelsFor(string $primaryClass, array $primaryModels): array
     {
         if (empty($primaryModels)) {
@@ -793,7 +715,7 @@ class SyncService
                 [
                     'type' => 'accounting',
                     'reference_column' => 'id', // The column in SalesOrder that maps to transactions.reference_id
-                    'transaction_type' => 'SALES', // The transaction_type value to filter by
+                    'transaction_type' => 'SALE', // The transaction_type value to filter by
                 ],
             ],
             // When pushing CashierExpense, also push its accounting records
@@ -833,6 +755,44 @@ class SyncService
                     'foreign_key' => 'receive_order_id',
                 ],
             ],
+            // NEW: When pushing PurchaseOrder, also push its PurchaseOrderItem rows
+            'App\\Models\\PurchaseOrder' => [
+                [
+                    'class' => 'App\\Models\\PurchaseOrderItem',
+                    'foreign_key' => 'po_id', // FK in purchase_order_items referencing po_id in purchase_order
+                ],
+            ],
+            // NEW: When pushing GoodsRecieved, also push its GoodsRecievedItem rows
+            // Note: StockMovement removed as it's independent (no FK reference)
+            'App\\Models\\GoodsRecieved' => [
+                [
+                    'class' => 'App\\Models\\GoodsRecievedItem',
+                    'foreign_key' => 'gr_id', // FK in goods_received_items referencing gr_id in goods_recieved
+                ],
+            ],
+
+            'App\\Models\\GoodsRecievedItem' => [
+    [
+        'class' => 'App\\Models\\StockDisbursementItem',
+        'foreign_key' => 'gr_item_id',
+    ],
+],
+
+            // NEW: When pushing StockDisbursement, also push its StockDisbursementItem rows
+            // Note: StockMovement removed as it's independent (no FK reference)
+            'App\\Models\\StockDisbursement' => [
+                [
+                    'class' => 'App\\Models\\StockDisbursementItem',
+                    'foreign_key' => 'disbursement_id', // FK in stock_disbursement_items referencing disbursement_id in stock_disbursement
+                ],
+            ],
+            // NEW: When pushing SupplierInvoice, also push its SupplierInvoiceItem rows
+            'App\\Models\\SupplierInvoice' => [
+                [
+                    'class' => 'App\\Models\\SupplierInvoiceItem',
+                    'foreign_key' => 'invoice_id', // FK in supplier_invoice_items referencing invoice_id in supplier_invoice
+                ],
+            ],
         ];
 
         if (!isset($dependencies[$primaryClass])) {
@@ -842,9 +802,13 @@ class SyncService
         $dependentModels = [];
 
         // Collect primary IDs once
+        // $primaryIds = array_values(array_filter(array_map(function ($model) {
+        //     return $model->id ?? null;
+        // }, $primaryModels)));
         $primaryIds = array_values(array_filter(array_map(function ($model) {
-            return $model->id ?? null;
-        }, $primaryModels)));
+    return $model->getKey();
+}, $primaryModels)));
+
 
         if (empty($primaryIds)) {
             return [];
@@ -884,89 +848,75 @@ class SyncService
         return $dependentModels;
     }
 
-    protected function getAccountingRecordsForReferences(array $primaryModels, string $referenceColumn, string $transactionType): array
-    {
-        $accountingRecords = [];
+  
 
-        // Extract reference IDs from primary models
-        $referenceIds = array_values(array_filter(array_map(function ($model) use ($referenceColumn) {
-            return $model->$referenceColumn ?? null;
-        }, $primaryModels)));
+    protected function getAccountingRecordsForReferences(
+    array $primaryModels,
+    string $referenceColumn,
+    string $transactionType
+): array {
+    $referenceIds = array_values(array_filter(array_map(
+        fn ($model) => $model->{$referenceColumn} ?? null,
+        $primaryModels
+    )));
 
-        if (empty($referenceIds)) {
-            return [];
-        }
-
-        try {
-            // 1. Get Transactions
-            $transactions = DB::table('transactions')
-                ->whereIn('reference_id', $referenceIds)
-                ->where('transaction_type', $transactionType)
-                ->get();
-
-            if ($transactions->isEmpty()) {
-                return [];
-            }
-
-            $transactionIds = $transactions->pluck('transaction_id')->toArray();
-
-            // Convert transactions to pseudo-models for syncing
-            foreach ($transactions as $transaction) {
-                $accountingRecords[] = $this->createAccountingPseudoModel('Transaction', $transaction);
-            }
-
-            // 2. Get Journal Entries
-            $journalEntries = DB::table('journal_entry')
-                ->whereIn('transaction_id', $transactionIds)
-                ->get();
-
-            if (!$journalEntries->isEmpty()) {
-                $journalIds = $journalEntries->pluck('journal_id')->toArray();
-
-                foreach ($journalEntries as $journalEntry) {
-                    $accountingRecords[] = $this->createAccountingPseudoModel('JournalEntry', $journalEntry);
-                }
-
-                // 3. Get Journal Lines
-                $journalLines = DB::table('journal_lines')
-                    ->whereIn('journal_id', $journalIds)
-                    ->get();
-
-                if (!$journalLines->isEmpty()) {
-                    $lineIds = $journalLines->pluck('line_id')->toArray();
-
-                    foreach ($journalLines as $line) {
-                        $accountingRecords[] = $this->createAccountingPseudoModel('JournalLine', $line);
-                    }
-
-                    // 4. Get Ledger Postings
-                    $ledgerPostings = DB::table('ledger_postings')
-                        ->whereIn('line_id', $lineIds)
-                        ->get();
-
-                    foreach ($ledgerPostings as $posting) {
-                        $accountingRecords[] = $this->createAccountingPseudoModel('LedgerPosting', $posting);
-                    }
-                }
-            }
-
-            Log::info('Retrieved accounting records for sync', [
-                'reference_ids' => $referenceIds,
-                'transaction_type' => $transactionType,
-                'transactions_count' => $transactions->count(),
-                'journal_entries_count' => $journalEntries->count(),
-                'total_records' => count($accountingRecords)
-            ]);
-        } catch (\Exception $e) {
-            Log::error('Failed to retrieve accounting records', [
-                'reference_ids' => $referenceIds,
-                'transaction_type' => $transactionType,
-                'error' => $e->getMessage()
-            ]);
-        }
-
-        return $accountingRecords;
+    if (empty($referenceIds)) {
+        return [];
     }
+
+    $accountingModels = [];
+
+    // 1. Transactions
+    $transactions = \App\Models\Transaction::whereIn('reference_id', $referenceIds)
+        ->where('transaction_type', $transactionType)
+        ->whereIn('sync_status', ['pending', 'deleted_pending'])
+        ->get();
+
+    if ($transactions->isEmpty()) {
+        return [];
+    }
+
+    $accountingModels = array_merge($accountingModels, $transactions->all());
+
+    // 2. Journal Entries
+    $journalEntries = \App\Models\JournalEntry::whereIn(
+        'transaction_id',
+        $transactions->pluck('transaction_id')
+    )
+    ->whereIn('sync_status', ['pending', 'deleted_pending'])
+    ->get();
+
+    if ($journalEntries->isNotEmpty()) {
+        $accountingModels = array_merge($accountingModels, $journalEntries->all());
+    }
+
+    // 3. Journal Lines
+    $journalLines = \App\Models\JournalLine::whereIn(
+        'journal_id',
+        $journalEntries->pluck('journal_id')
+    )
+    ->whereIn('sync_status', ['pending', 'deleted_pending'])
+    ->get();
+
+    if ($journalLines->isNotEmpty()) {
+        $accountingModels = array_merge($accountingModels, $journalLines->all());
+    }
+
+    // 4. Ledger Postings
+    $ledgerPostings = \App\Models\LedgerPosting::whereIn(
+        'line_id',
+        $journalLines->pluck('line_id')
+    )
+    ->whereIn('sync_status', ['pending', 'deleted_pending'])
+    ->get();
+
+    if ($ledgerPostings->isNotEmpty()) {
+        $accountingModels = array_merge($accountingModels, $ledgerPostings->all());
+    }
+
+    return $accountingModels;
+}
+
 
     protected function createAccountingPseudoModel(string $type, $data): object
     {
@@ -1308,7 +1258,7 @@ class SyncService
         return [
             'App\Models\JournalEntry',
             'App\Models\Transaction',
-            'App\Models\PaymentVoucher',
+            // 'App\Models\PaymentVoucher',
             'App\Models\Branch',
             'App\Models\Customer',
             'App\Models\Vendor',
@@ -1333,12 +1283,24 @@ class SyncService
             'App\Models\StoreTransferOrder',
             'App\Models\User',
             'App\Models\CreateItem',
-            'App\Models\TransactionJournalEntry',
-            'App\Models\TransactionJournalEntryDetail',
+            // 'App\Models\TransactionJournalEntry',
+            // 'App\Models\TransactionJournalEntryDetail',
             'App\Models\BankRemittance',
             'App\Models\CashierExpense',
-            'App\Models\JournalEntryDetail',
+            // 'App\Models\JournalEntryDetail',
             'App\Models\ProductAudit',
+            'App\Models\PurchaseItemCost',
+            'App\Models\PurchaseOrder',
+            'App\Models\PurchaseOrderItem',
+            'App\Models\GoodsRecieved',
+            'App\Models\GoodsRecievedItem',
+            'App\Models\StockDisbursement',
+            'App\Models\StockDisbursementItem',
+            'App\Models\Supplier',
+            'App\Models\SupplierInvoice',
+            'App\Models\SupplierPayment',
+            'App\Models\StockMovement',
+            'App\Models\SupplierInvoiceItem'
             // Add more models as needed
         ];
     }

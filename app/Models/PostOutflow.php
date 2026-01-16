@@ -57,4 +57,5 @@ class PostOutflow extends Model
     {
         return $this->attributes['message'] ?? null;
     }
+      
 }

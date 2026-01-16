@@ -13,6 +13,9 @@ class ReturnDetails extends Model
 {
     use HasFactory, SoftDeletes, HasUuid, Syncable;
 
+        protected $keyType = 'string';
+    public $incrementing = false;
+
     protected $fillable = [
         'return_id',
         'product_id',
@@ -61,4 +64,11 @@ class ReturnDetails extends Model
     {
         return $this->belongsTo(Measurement::class, 'unit_measurement', 'id'); // Fixed typo here
     }
+
+    // protected static function booted()
+    // {
+    //     static::created(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::updated(fn ($model) => dispatch(new SyncModelJob($model)));
+    //     static::deleted(fn ($model) => dispatch(new SyncModelJob($model, 'delete')));
+    // }
 }

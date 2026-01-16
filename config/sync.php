@@ -38,77 +38,69 @@ return [
     */
     'models' => [
         'App\Models\JournalEntry' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
-        'App\Models\JournalEntryDetail' => [
-            'batch_size' => 50,
-            'sync_fields' => ['*'],
-            'exclude_fields' => [],
-        ],
+      
         'App\Models\Transaction' => [
             'batch_size' => 100,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
-        'App\Models\PaymentVoucher' => [
+   
+        'App\Models\CreateItem' => [
             'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
-        'App\Models\CreateItem' => [
-            'batch_size' => 50,
-            'sync_fields' => ['*'],
-            'exclude_fields' => [],
-        ],
         'App\Models\Store' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\StoreItem' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\Customer' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\Vendor' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\SalesOrder' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\SalesReceipt' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\ItemSold' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\ReceiveOrder' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\ReceiveItem' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\StoreTransferOrder' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
@@ -118,80 +110,166 @@ return [
             'exclude_fields' => [],
         ],
         'App\Models\BankRemittance' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\PostOutflow' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\PostInflow' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\Release' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\ReleaseDetail' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\ReturnItem' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\ReturnDetail' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\PriceChange' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\CashierRemittance' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\CashierExpense' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\User' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\CreditTransaction' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
         'App\Models\Branch' => [
-            'batch_size' => 50,
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
-        'App\Models\TransactionJournalEntry' => [
-            'batch_size' => 50,
+         'App\Models\PurchaseItemCost' => [
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
-        'App\Models\TransactionJournalEntryDetail' => [
-            'batch_size' => 50,
+        'App\Models\PurchaseOrder' => [
+            'batch_size' => 10,
             'sync_fields' => ['*'],
             'exclude_fields' => [],
         ],
+         'App\Models\PurchaseOrderItem' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+            'App\Models\GoodsRecieved' => [
+                'batch_size' => 10,
+                'sync_fields' => ['*'],
+                'exclude_fields' => [],
+            ],
+            'App\Models\GoodsRecievedItem' => [
+                'batch_size' => 10,
+                'sync_fields' => ['*'],
+                'exclude_fields' => [],
+            ],
+              'App\Models\Supplier' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+          'App\Models\SupplierPayment' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+
+          'App\Models\SupplierInvoice' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        
+          'App\Models\SupplierInvoiceItem' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+          'App\Models\StockDisbursement' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        
+          'App\Models\StockDisbursementItem' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+          'App\Models\StockMovement' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+          'App\Models\Transaction' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+         'App\Models\TransactionType' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+         'App\Models\JournalLine' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+            'App\Models\LedgerAccount' => [
+                'batch_size' => 10,
+                'sync_fields' => ['*'],
+                'exclude_fields' => [],
+            ],
+
+
+
+        'App\Models\ProductAudit' => [
+            'batch_size' => 10,
+            'sync_fields' => ['*'],
+            'exclude_fields' => [],
+        ],
+        // 'App\Models\TransactionJournalEntryDetail' => [
+        //     'batch_size' => 50,
+        //     'sync_fields' => ['*'],
+        //     'exclude_fields' => [],
+        // ],
 
     ],
 
@@ -381,6 +459,8 @@ return [
 
 
     // ... existing sync configuration ...
+
+	//'verify_ssl' => env('SYNC_VERIFY_SSL', true),
 
     /*
     |--------------------------------------------------------------------------

@@ -62,9 +62,14 @@ return [
             //     PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             // ]) : [],
             // the below works online
-            'options'   => [
-                \PDO::ATTR_EMULATE_PREPARES => true
-            ]
+            // 'options'   => [
+            //     \PDO::ATTR_EMULATE_PREPARES => true
+            // ]
+
+            'options' => extension_loaded('pdo_mysql') ? [
+    PDO::ATTR_EMULATE_PREPARES => false,
+] : [],
+
         ],
 
         'pgsql' => [

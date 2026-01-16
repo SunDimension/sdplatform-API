@@ -31,4 +31,11 @@ class ExpenseLine extends Model
     protected $casts = [
         'id' => 'string',
     ];
+
+            protected static function booted()
+    {
+        static::created(fn ($model) => dispatch(new SyncModelJob($model)));
+        static::updated(fn ($model) => dispatch(new SyncModelJob($model)));
+        static::deleted(fn ($model) => dispatch(new SyncModelJob($model, 'delete')));
+    }
 }

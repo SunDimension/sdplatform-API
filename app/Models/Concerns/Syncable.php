@@ -162,4 +162,19 @@ trait Syncable
     {
         return $query->where('sync_status', $status);
     }
+
+    // In your Syncable trait
+public function getSyncableAttributes()
+{
+    $attributes = $this->getAttributes();
+    
+    // Clean up empty strings
+    foreach ($attributes as $key => $value) {
+        if ($value === '') {
+            $attributes[$key] = null;
+        }
+    }
+    
+    return $attributes;
+}
 } 

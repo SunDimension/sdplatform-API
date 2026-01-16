@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 
 class ProductAudit extends Model
 {
-    use HasFactory, SoftDeletes, Syncable, HasUuid;
+    use HasFactory,  Syncable, HasUuid, SoftDeletes;
 
 
     protected $table = 'product_audits';
@@ -169,4 +169,11 @@ class ProductAudit extends Model
     {
         return $this->morphTo(__FUNCTION__, 'reference_type', 'reference_id');
     }
+
+    //   protected static function booted()
+    //     {
+    //         static::created(fn ($model) => dispatch(new SyncModelJob($model)));
+    //         static::updated(fn ($model) => dispatch(new SyncModelJob($model)));
+    //         static::deleted(fn ($model) => dispatch(new SyncModelJob($model, 'delete')));
+    //     }
 }

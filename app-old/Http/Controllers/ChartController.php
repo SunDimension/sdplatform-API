@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Http\Requests\ChartStoreRequest;
+use App\Http\Requests\ChartUpdateRequest;
+use App\Http\Resources\ChartCollection;
+use App\Http\Resources\ChartResource;
+use App\Models\Chart;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+
+class ChartController extends Controller
+{
+    public function index(Request $request): ChartCollection
+    {
+        $charts = Chart::all();
+
+        return new ChartCollection($charts);
+    }
+
+    public function store(ChartStoreRequest $request): ChartResource
+    {
+        $chart = Chart::create($request->validated());
+
+        return new ChartResource($chart);
+    }
+
+    public function show(Request $request, Chart $chart)
+    {
+        return new ChartResource($chart);
+    }
+
+    public function update(ChartUpdateRequest $request, Chart $chart)
+    {
+        $chart->update($request->validated());
+
+        return new ChartResource($chart);
+    }
+
+    public function destroy(Request $request, Chart $chart)
+    {
+        $chart->delete();
+
+        return response()->noContent();
+    }
+}

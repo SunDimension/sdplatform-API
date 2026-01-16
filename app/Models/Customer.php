@@ -83,4 +83,6 @@ class Customer extends Model
     {
         return $this->hasMany(CreditTransaction::class, "customer_id");
     }
+
+   
 }

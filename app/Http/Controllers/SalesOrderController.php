@@ -20,11 +20,18 @@ use App\Models\SalesInvoice;
 use App\Models\SalesReceipt;
 use App\Models\StoreItem;
 use App\Models\Store;
+use App\Models\Transaction;
+use App\Models\TransactionType;
+use App\Models\LedgerAccount;
+use App\Models\JournalEntry;
+use App\Models\JournalLine;
+use App\Models\LedgerPosting;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Log as FacadesLog;
 use Carbon\Carbon;
 
+use App\Traits\AccountingSyncHelper; 
 use GuzzleHttp\Psr7\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Response as HttpResponse;
@@ -40,7 +47,7 @@ use Illuminate\Support\Str;
 class SalesOrderController extends Controller
 {
 
-
+// use AccountingSyncHelper;
 
 
 
@@ -118,6 +125,41 @@ class SalesOrderController extends Controller
         return response()->json($stores);
     }
 
+
+    // Add this method to your SalesOrderController
+    // This should handle the /sales-order-info/{no} endpoint
+
+    public function getSalesOrderInfo($orderno)
+    {
+        $salesOrder = SalesOrder::with(['itemSold.product', 'itemSold.store', 'itemSold.measurement', 'customer', 'creditTransaction', 'branch', 'store', 'user'])
+            ->where('sales_order_number', $orderno)
+            ->withSum('salesReceipts as total_paid', 'amount_paid')
+            ->firstOrFail();
+
+        // CRITICAL FIX: Calculate deposit for THIS SPECIFIC customer only
+        $customerId = $salesOrder->customer_id;
+
+        // Get the total inflows for this customer (with status 3 - approved/posted)
+        $inflows = PostInflow::where('customer_id', $customerId)
+            ->where('inflow_status', 3)
+            ->sum('amount');
+
+        // Get the total outflows for this customer
+        $outflows = PostOutflow::where('customer_id', $customerId)
+            ->sum('amount');
+
+        // Calculate the available balance (deposit) for this customer
+        $customerDeposit = $inflows - $outflows;
+
+        // Ensure deposit is never negative
+        $customerDeposit = max(0, $customerDeposit);
+
+        return response()->json([
+            'data' => new SalesOrderResource($salesOrder, $customerDeposit)
+        ]);
+    }
+
+   
     public function pendingReceipts(Request $request)
     {
         // Optionally, you can add filtering and sorting capabilities here
@@ -327,7 +369,7 @@ class SalesOrderController extends Controller
     /**
      * Post accounting entries for sales order
      */
-    private function postAccountingEntries(
+    private function postAccountingEntries2(
         string $saleId,
         string $customerId,
         float $totalAmount,
@@ -442,6 +484,77 @@ class SalesOrderController extends Controller
         }
     }
 
+    
+private function postAccountingEntries(
+    string $saleId,
+    string $customerId,
+    float $totalAmount,
+    string $paymentType,
+    $saleDate
+) {
+    // Resolve chart of account IDs
+    $cashAccount = LedgerAccount::where('account_code', '1000')->value('account_id');
+    $receivableAccount = LedgerAccount::where('account_code', '1020')->value('account_id');
+    $salesAccount = LedgerAccount::where('account_code', '4000')->value('account_id');
+
+    if (!$cashAccount || !$receivableAccount || !$salesAccount) {
+        throw new \RuntimeException('Required ledger accounts not found');
+    }
+
+    $description = $paymentType === 'Credit'
+        ? "Credit Sale #{$saleId}"
+        : "{$paymentType} Sale #{$saleId}";
+
+    $transactionDate = date('Y-m-d', strtotime($saleDate));
+
+    // Create TRANSACTION (UUID auto-generated)
+    $transaction = Transaction::create([
+        'transaction_type' => 'SALE',
+        'reference_id'     => $saleId,
+        'transaction_date' => $transactionDate,
+        'total_amount'     => $totalAmount,
+        'description'      => $description,
+        'sync_status'      => 'pending',
+    ]);
+
+    // Create JOURNAL ENTRY (UUID auto-generated)
+    $journalEntry = JournalEntry::create([
+        'transaction_id' => $transaction->transaction_id,
+        'entry_date'     => $transactionDate,
+        'description'    => $description,
+        'sync_status'    => 'pending',
+    ]);
+
+    // Create JOURNAL LINES
+    $debitLine = JournalLine::create([
+        'journal_id'    => $journalEntry->journal_id,
+        'account_id'    => $paymentType === 'Credit' ? $receivableAccount : $cashAccount,
+        'debit_amount'  => $totalAmount,
+        'credit_amount' => 0,
+        'sync_status'   => 'pending',
+    ]);
+
+    $creditLine = JournalLine::create([
+        'journal_id'    => $journalEntry->journal_id,
+        'account_id'    => $salesAccount,
+        'debit_amount'  => 0,
+        'credit_amount' => $totalAmount,
+        'sync_status'   => 'pending',
+    ]);
+
+    // Post to GENERAL LEDGER
+    foreach ([$debitLine, $creditLine] as $line) {
+        LedgerPosting::create([
+            'line_id'        => $line->line_id,
+            'account_id'     => $line->account_id,
+            'posting_date'   => $transactionDate,
+            'debit_amount'   => $line->debit_amount,
+            'credit_amount'  => $line->credit_amount,
+            'sync_status'    => 'pending',
+        ]);
+    }
+}
+
 
 
     public function edit($id)
@@ -501,25 +614,15 @@ class SalesOrderController extends Controller
         DB::beginTransaction();
 
         try {
-            // Find the sales order
             $salesOrder = SalesOrder::findOrFail($id);
 
-            $hasRelease = SalesReceipt::where('sales_order_id', $salesOrder->id)
-                ->whereExists(function ($query) {
-                    $query->select(DB::raw(1))
-                        ->from('releases')
-                        ->whereColumn('releases.sales_receipt_id', 'sales_receipts.id');
-                })
-                ->exists();
+            // 1. Reverse old accounting
+            $this->reverseAccountingEntries(
+                $salesOrder->id,
+                $salesOrder->created_at
+            );
 
-            if ($hasRelease) {
-                DB::rollBack();
-                return response()->json([
-                    'message' => 'Cannot update sales order that has been released'
-                ], 403);
-            }
-
-            // Update sales order details
+            // 2. Update sales order
             $salesOrder->update([
                 'customer_id' => $validated['customer_id'],
                 'branch_id' => $validated['branch_id'],
@@ -528,126 +631,29 @@ class SalesOrderController extends Controller
                 'payment_type' => $validated['payment_type'],
             ]);
 
-            // Process items
-            $currentItemIds = [];
+            // 3. Update items (your existing logic)
 
-            foreach ($validated['items'] as $itemData) {
-                $itemData['amount'] = ($itemData['unit_price'] - ($itemData['discount'] ?? 0)) * $itemData['quantity'];
-
-                if (isset($itemData['id'])) {
-                    // Update existing item
-                    $item = ItemSold::find($itemData['id']);
-                    $item->update($itemData);
-                    $currentItemIds[] = $item->id;
-                } else {
-                    // Add new item
-                    $newItem = ItemSold::create(array_merge($itemData, [
-                        'sales_order_id' => $salesOrder->id,
-                        'sales_date' => now(),
-                    ]));
-                    $currentItemIds[] = $newItem->id;
-                }
-            }
-
-            // Delete items not in the current request
-            ItemSold::where('sales_order_id', $salesOrder->id)
-                ->whereNotIn('id', $currentItemIds)
-                ->delete();
-
-            // Find related sales receipts
-            $salesReceipts = SalesReceipt::where('sales_order_id', $salesOrder->id)->get();
-
-            foreach ($salesReceipts as $receipt) {
-                $receipt->amount_paid = $salesOrder->total_amount;
-                $receipt->total_amount = $salesOrder->total_amount;
-
-                // If payment_detail is a JSON column, update it here.
-                // Example: set all to new total_amount as cash (adjust as needed for your logic)
-                $receipt->payment_detail = json_encode([
-                    [
-                        'payment_type' => $salesOrder->payment_type,
-                        'amount' => $salesOrder->total_amount
-                    ]
-                ]);
-                $receipt->save();
-            }
+            // 4. Post new accounting
+            $this->postAccountingEntries(
+                $salesOrder->id,
+                $validated['customer_id'],
+                $validated['total_amount'],
+                $validated['payment_type'],
+                now()
+            );
 
             DB::commit();
 
             return response()->json([
                 'message' => 'Sales Order Updated Successfully',
                 'data' => new SalesOrderResource($salesOrder)
-            ], 200);
+            ]);
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json([
-                'message' => 'Error updating sales order',
-                'error' => $e->getMessage()
-            ], 500);
+            throw $e;
         }
     }
-    // public function cancel($id)
-    // {
-    //     // Start a database transaction
-    //     DB::beginTransaction();
-
-    //     try {
-    //         // Find the sales order
-    //         $salesOrder = SalesOrder::with('itemSold')->findOrFail($id);
-
-    //         // Check if the sales order is already canceled
-    //         if ($salesOrder->status === 'Canceled') {
-    //             return response()->json(['message' => 'Sales Order is already canceled.'], 400);
-    //         }
-
-    //         // Loop through items in the sales order and restore stock
-    //         foreach ($salesOrder->itemSold as $itemSold) {
-    //             $storeItem = StoreItem::where('create_item_id', $itemSold->product_id)
-    //                 ->where('store_id', $salesOrder->store_id)
-    //                 ->first();
-
-    //             if ($storeItem) {
-    //                 // Calculate previous quantity using StockUtil
-    //                 $previousQuantity = StockUtil::getQuantityForRequest($itemSold->product_id, $itemSold->store_id);
-    //                 $quantityChange = $itemSold->quantity_pieces;
-    //                 $newQuantity = $previousQuantity + $quantityChange;
-
-    //                 // Optionally update the storeItem's available quantity here if needed
-    //                 // $storeItem->quantity_available = $newQuantity;
-    //                 // $storeItem->save();
-
-    //                 // Log the restoration in ProductAudit
-    //                 ProductAudit::create([
-    //                     'action_type' => 'restored',
-    //                     'product_id' => $itemSold->product_id,
-    //                     'user_id' => auth()->id(),
-    //                     'quantity_change' => $quantityChange,
-    //                     'previous_quantity' => $previousQuantity,
-    //                     'new_quantity' => $newQuantity,
-    //                     'reference_type' => 'SalesOrder',
-    //                     'reference_id' => $salesOrder->id,
-    //                     'store_id' => $salesOrder->store_id,
-    //                     'notes' => 'Stock restored due to order cancellation'
-    //                 ]);
-    //             } else {
-    //                 Log::warning("StoreItem for product {$itemSold->product_id} not found in store {$salesOrder->store_id}");
-    //             }
-    //         }
-
-    //         // Update the order status to 'Canceled' instead of deleting it
-    //         $salesOrder->update(['status' => 'Canceled']);
-
-    //         // Commit the transaction
-    //         DB::commit();
-
-    //         return response()->json(['message' => 'Sales Order Canceled Successfully.'], 200);
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         Log::error('Error canceling sales order: ' . $e->getMessage());
-    //         return response()->json(['message' => 'An error occurred while canceling the order.'], 500);
-    //     }
-    // }
-
+    
     public function cancel($id)
     {
         // Start a database transaction
@@ -864,6 +870,101 @@ class SalesOrderController extends Controller
         }
     }
 
+    private function postReturnAccountingEntries(
+        string $returnId,
+        string $saleId,
+        float $returnAmount,
+        string $paymentType,
+        $returnDate
+    ) {
+        // Accounts
+        $cashAccount = DB::table('ledger_accounts')
+            ->where('account_code', '1000')
+            ->value('account_id');
+
+        $receivableAccount = DB::table('ledger_accounts')
+            ->where('account_code', '1020')
+            ->value('account_id');
+
+        $salesReturnAccount = DB::table('ledger_accounts')
+            ->where('account_code', '4010')
+            ->value('account_id');
+
+        if (!$salesReturnAccount || (!$cashAccount && !$receivableAccount)) {
+            throw new \Exception('Required return accounting accounts not found');
+        }
+
+        $transactionId = Str::uuid()->toString();
+        $journalId = Str::uuid()->toString();
+
+        $description = "Sales Return #{$returnId} (Sale #{$saleId})";
+
+        // 1. Transaction
+        DB::table('transactions')->insert([
+            'transaction_id' => $transactionId,
+            'transaction_type' => 'SALE_RETURN',
+            'reference_id' => $returnId,
+            'transaction_date' => date('Y-m-d', strtotime($returnDate)),
+            'total_amount' => $returnAmount,
+            'description' => $description,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 2. Journal Entry
+        DB::table('journal_entry')->insert([
+            'journal_id' => $journalId,
+            'transaction_id' => $transactionId,
+            'entry_date' => date('Y-m-d', strtotime($returnDate)),
+            'description' => $description,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 3. Debit Sales Returns
+        DB::table('journal_lines')->insert([
+            'line_id' => Str::uuid()->toString(),
+            'journal_id' => $journalId,
+            'account_id' => $salesReturnAccount,
+            'debit_amount' => $returnAmount,
+            'credit_amount' => 0,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 4. Credit Cash or A/R
+        DB::table('journal_lines')->insert([
+            'line_id' => Str::uuid()->toString(),
+            'journal_id' => $journalId,
+            'account_id' => $paymentType === 'Credit'
+                ? $receivableAccount
+                : $cashAccount,
+            'debit_amount' => 0,
+            'credit_amount' => $returnAmount,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        // 5. Post to Ledger
+        $lines = DB::table('journal_lines')
+            ->where('journal_id', $journalId)
+            ->get();
+
+        foreach ($lines as $line) {
+            DB::table('ledger_postings')->insert([
+                'posting_id' => Str::uuid()->toString(),
+                'line_id' => $line->line_id,
+                'account_id' => $line->account_id,
+                'posting_date' => date('Y-m-d', strtotime($returnDate)),
+                'debit_amount' => $line->debit_amount,
+                'credit_amount' => $line->credit_amount,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+    }
+
+
     /**
      * Process a return request
      */
@@ -960,6 +1061,14 @@ class SalesOrderController extends Controller
                 $returnDetails->unit_measurement = $itemData['unit_measurement'];
                 $returnDetails->save();
             }
+
+            $this->postReturnAccountingEntries(
+                $return->id,
+                $salesOrder->id,
+                $totalReturnAmount,
+                $salesOrder->payment_type,
+                $return->return_date
+            );
 
             DB::commit();
 

@@ -217,7 +217,14 @@ public function tax(): BelongsTo
         return $this->hasMany(Release::class); // A CreateItem can have many releases
     }
 
+
+public function purchaseItemCosts(): HasMany
+    {
+        return $this->hasMany(PurchaseItemCost::class, 'product_id', 'id');
+    }
     
+
+        
     // public function item($id)
 // {
 //     // Find the item by ID

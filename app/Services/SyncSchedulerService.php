@@ -63,26 +63,42 @@ class SyncSchedulerService
     /**
      * Get optimal sync mode based on current conditions
      */
+    // public function getOptimalSyncMode(): string
+    // {
+    //     // If offline, only process queue
+    //     if (!$this->syncService->isOnline()) {
+    //         return 'queue-only';
+    //     }
+
+    //     // If many pending items, do full sync
+    //     if ($this->getPendingItemsCount() > 50) {
+    //         return 'full';
+    //     }
+
+    //     // If few pending items, do push-only
+    //     if ($this->getPendingItemsCount() > 0) {
+    //         return 'push-only';
+    //     }
+
+    //     // Default to pull-only for regular updates
+    //     return 'pull-only';
+    // }
+
     public function getOptimalSyncMode(): string
-    {
-        // If offline, only process queue
-        if (!$this->syncService->isOnline()) {
-            return 'queue-only';
-        }
+{
+    $pending = $this->getPendingItemsCount();
 
-        // If many pending items, do full sync
-        if ($this->getPendingItemsCount() > 50) {
-            return 'full';
-        }
-
-        // If few pending items, do push-only
-        if ($this->getPendingItemsCount() > 0) {
-            return 'push-only';
-        }
-
-        // Default to pull-only for regular updates
-        return 'pull-only';
+    if ($pending > 0) {
+        return 'push-only';
     }
+
+    if (!$this->syncService->isOnline()) {
+        return 'queue-only';
+    }
+
+    return 'pull-only';
+}
+
 
     /**
      * Get sync interval based on activity level

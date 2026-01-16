@@ -61,4 +61,6 @@ class PriceChange extends Model
     {
         return $this->belongsTo(ChangeReason::class);
     }
+
+     
 }

@@ -22,4 +22,7 @@ class AccountType extends Model
     {
         return $this->hasMany(ChartOfAccount::class, 'account_type_id', 'account_type_id');
     }
+    
+   
+
 }

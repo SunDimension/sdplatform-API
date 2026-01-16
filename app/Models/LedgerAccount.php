@@ -6,11 +6,14 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\Concerns\Syncable;
+
+
 
 
 class LedgerAccount extends Model
 {
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, Syncable;
 
     /**
      * The attributes that are mass assignable.
@@ -30,6 +33,13 @@ class LedgerAccount extends Model
         'created_at',
         'updated_at',
         'account_id',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
 
 
@@ -46,8 +56,10 @@ class LedgerAccount extends Model
     ];
 
 
-    public function accountType(): BelongsTo
-    {
-        return $this->belongsTo(AccountType::class, 'account_type_id');
-    }
+    // public function accountType(): BelongsTo
+    // {
+    //     return $this->belongsTo(AccountType::class, 'account_type_id');
+    // }
+
+ 
 }

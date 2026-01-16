@@ -2,26 +2,39 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Concerns\Syncable;
 
 class JournalEntry extends Model
 {
-    protected $table = 'journal_entry'; // ✅ Make sure this is set
+    use Syncable, HasUuids;
     
-    protected $primaryKey = 'journal_id'; // ✅ Since you're using journal_id, not id
-    
-    public $incrementing = false; // ✅ Since journal_id is UUID
-    
-    protected $keyType = 'string'; // ✅ UUID is string
+    protected $table = 'journal_entry';
+    protected $primaryKey = 'journal_id';
+    public $incrementing = false;
+    protected $keyType = 'string';
     
     protected $fillable = [
         'journal_id',
         'transaction_id',
         'entry_date',
         'description',
+        'sync_id',
+        'location_id',
+        'sync_status',
+        'sync_version',
+        'last_synced_at',
+        'last_sync_attempt_at',
+        'sync_error',
     ];
     
     protected $casts = [
         'entry_date' => 'date',
     ];
+
+    public function uniqueIds()
+    {
+        return ['journal_id'];
+    }
 }

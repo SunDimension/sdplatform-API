@@ -41,7 +41,7 @@ class BankRemittance extends Model
         'last_sync_attempt_at',
         'sync_error',
         'id'
-        
+         
         
 
     ];
@@ -89,6 +89,8 @@ class BankRemittance extends Model
     {
         return $this->belongsTo(Bank::class,);
     }
+
+  
 
    
 }

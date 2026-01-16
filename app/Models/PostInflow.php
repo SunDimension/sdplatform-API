@@ -49,4 +49,6 @@ class PostInflow extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+   
 }
