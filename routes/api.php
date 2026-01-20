@@ -14,6 +14,7 @@ use App\Http\Controllers\LedgerAccountController;
 use App\Http\Controllers\TrialBalanceController;
 use App\Http\Controllers\CreditTransactionController;
 use App\Http\Controllers\PurchaseItemCostController;
+use App\Http\Controllers\DeployController;
 use App\Http\Controllers\SyncController;
 use App\Models\CreditTransaction;
 use Illuminate\Support\Facades\Route;
@@ -145,6 +146,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
     Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
 
+
+
+    Route::post('/deploy', [DeployController::class, 'deploy']);
+    Route::post('/deploy/rollback', [DeployController::class, 'rollback']);
 
     Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
     Route::get('get-cashier-remittance/{id}', [App\Http\Controllers\CashierRemittanceController::class, 'get']);
