@@ -87,11 +87,17 @@ class RunDeployment extends Command
                     'cwd' => $releasePath,
                     'description' => 'Running migrations'
                 ],
+                // [
+                //     'command' => 'php artisan optimize',
+                //     'cwd' => $releasePath,
+                //     'description' => 'Optimizing application'
+                // ],
                 [
-                    'command' => 'php artisan optimize',
+                    'command' => 'php artisan optimize:clear && php artisan optimize',
                     'cwd' => $releasePath,
-                    'description' => 'Optimizing application'
+                    'description' => 'Clearing and optimizing application'
                 ],
+
             ];
 
             foreach ($commands as $item) {
