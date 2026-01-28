@@ -2,6 +2,8 @@
 
 use Illuminate\Support\Facades\Route;
 
+use App\Http\Controllers\DeploymentHubController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -16,3 +18,8 @@ use Illuminate\Support\Facades\Route;
 // Route::get('/', function () {
 //     return view('welcome');
 // });
+
+// use App\Http\Controllers\DeploymentHubController;
+
+Route::get('/deploy', [DeploymentHubController::class, 'showForm'])->name('hub.deploy.form');
+Route::post('/deploy', [DeploymentHubController::class, 'deployToField'])->name('hub.deploy');

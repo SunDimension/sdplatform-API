@@ -63,22 +63,11 @@ Route::middleware('auth:sanctum')->group(function () {
         // Get a specific user
         Route::get('/{user}', [UsersController::class, 'show'])->name('users.show');
 
-        // Update a specific user
-        Route::put('/{user}', [UsersController::class, 'update'])->name('users.update');
+
 
         // Delete a specific user
         Route::delete('/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
-
-        // Assign roles to a user
-        Route::post('/{user}/roles/assign', [UsersController::class, 'assignRole'])->name('users.assignRole');
-
-        // Remove roles from a user
-        Route::post('/{user}/roles/remove', [UsersController::class, 'removeRole'])->name('users.removeRole');
-
-        // Sync roles for a user (replace existing roles with new ones)
-        Route::post('/{user}/roles/sync', [UsersController::class, 'syncRoles'])->name('users.syncRoles');
     });
-
 
     Route::prefix('roles')->group(function () {
         // Get all roles
@@ -90,8 +79,7 @@ Route::middleware('auth:sanctum')->group(function () {
         // Get a specific role
         Route::get('/{role}', [RolesController::class, 'show'])->name('roles.show');
 
-        // Update a specific role
-        Route::put('/{role}', [RolesController::class, 'update'])->name('roles.update');
+
 
         // Delete a specific role
         Route::delete('/{role}', [RolesController::class, 'destroy'])->name('roles.destroy');
@@ -148,8 +136,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 
 
-    Route::post('/deploy', [DeployController::class, 'deploy']);
-    Route::post('/deploy/rollback', [DeployController::class, 'rollback']);
 
     Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
     Route::get('get-cashier-remittance/{id}', [App\Http\Controllers\CashierRemittanceController::class, 'get']);
@@ -671,3 +657,7 @@ Route::prefix('sync')->group(function () {
     Route::get('/status', [SyncController::class, 'status']);
     Route::post('/force', [SyncController::class, 'forceSync']);
 });
+
+
+Route::post('/deploy', [DeployController::class, 'deploy']);
+Route::post('/deploy/rollback', [DeployController::class, 'rollback']);

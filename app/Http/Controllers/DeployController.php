@@ -30,7 +30,7 @@ class DeployController extends Controller
             "mkdir {$releasePath}",
 
             // Clone repository
-            "git clone -b {$this->branch} . {$releasePath}",
+            "git clone -b {$this->branch} https://github.com/SunDimension/sales-and-inventory-software.git {$releasePath}",
 
             // Link .env
             "cmd /c mklink {$releasePath}\\.env {$sharedPath}\\.env",
@@ -39,11 +39,14 @@ class DeployController extends Controller
             "cmd /c mklink /J {$releasePath}\\storage {$sharedPath}\\storage",
 
             // Laravel optimizations
+            // "cd {$releasePath} && php artisan migrate --force",
+            "cd {$releasePath} && composer install --no-dev --optimize-autoloader",
+            "cd {$releasePath} && php artisan key:generate",
             "cd {$releasePath} && php artisan migrate --force",
             "cd {$releasePath} && php artisan optimize",
 
             // Switch live version (atomic)
-            "if exist {$currentPath} rmdir {$currentPath}",
+            "if exist {$currentPath} ren {$currentPath} current_old",
             "cmd /c mklink /J {$currentPath} {$releasePath}",
         ];
 
