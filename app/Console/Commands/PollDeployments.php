@@ -16,16 +16,28 @@ class PollDeployments extends Command
     protected string $branch   = 'db-sync-v2';
     protected string $hubUrl = 'https://sync.hamirglobal.com/api/deploy/pending';
 
-    protected string $deployToken;
+    protected ?string $deployToken = null;
 
     public function __construct()
     {
         parent::__construct();
         $this->deployToken = env('DEPLOY_TOKEN');
+        
+        if (empty($this->deployToken)) {
+            // Don't fail in constructor, but we'll check in handle()
+            Log::warning('DEPLOY_TOKEN not configured in .env file');
+        }
     }
 
     public function handle()
     {
+        // Check if token is configured
+        if (empty($this->deployToken)) {
+            $this->error('DEPLOY_TOKEN is not set in your .env file.');
+            $this->error('Please add: DEPLOY_TOKEN=your_token_here');
+            return 1;
+        }
+
         $this->info('Polling hub for pending deployments...');
 
         try {
@@ -139,11 +151,11 @@ class PollDeployments extends Command
                 'cwd' => $releasePath,
                 'description' => 'Running migrations'
             ],
-            // Optimize application
+            // Clear and optimize application
             [
-                'command' => 'php artisan optimize',
+                'command' => 'php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan optimize',
                 'cwd' => $releasePath,
-                'description' => 'Optimizing application'
+                'description' => 'Clearing cache and optimizing application'
             ],
         ];
 
@@ -279,6 +291,11 @@ class PollDeployments extends Command
 
     protected function notifyHubCompleted(int $deploymentId, string $status, string $message)
     {
+        if (empty($this->deployToken)) {
+            Log::warning('Cannot notify hub: DEPLOY_TOKEN not configured');
+            return;
+        }
+
         try {
             Http::withHeaders([
                 'X-DEPLOY-TOKEN' => $this->deployToken,

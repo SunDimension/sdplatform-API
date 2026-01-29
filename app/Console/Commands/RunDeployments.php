@@ -88,9 +88,9 @@ class RunDeployment extends Command
                     'description' => 'Running migrations'
                 ],
                 [
-                    'command' => 'php artisan optimize:clear && php artisan optimize',
+                    'command' => 'php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan optimize',
                     'cwd' => $releasePath,
-                    'description' => 'Clearing and optimizing application'
+                    'description' => 'Clearing cache and optimizing application'
                 ],
             ];
 
