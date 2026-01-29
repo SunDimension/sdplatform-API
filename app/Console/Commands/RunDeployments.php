@@ -87,17 +87,11 @@ class RunDeployment extends Command
                     'cwd' => $releasePath,
                     'description' => 'Running migrations'
                 ],
-                // [
-                //     'command' => 'php artisan optimize',
-                //     'cwd' => $releasePath,
-                //     'description' => 'Optimizing application'
-                // ],
                 [
                     'command' => 'php artisan optimize:clear && php artisan optimize',
                     'cwd' => $releasePath,
                     'description' => 'Clearing and optimizing application'
                 ],
-
             ];
 
             foreach ($commands as $item) {
@@ -180,28 +174,54 @@ class RunDeployment extends Command
     {
         $this->info("→ Switching to new release...");
 
-        // Remove old symlink/directory
-        if (is_link($this->currentPath)) {
-            rmdir($this->currentPath);
-        } elseif (is_dir($this->currentPath)) {
-            $backup = $this->currentPath . '_backup_' . now()->format('Ymd_His');
-            rename($this->currentPath, $backup);
-            $this->warn("Backed up old current directory to: {$backup}");
+        // Remove old symlink/junction using PowerShell (more reliable on Windows)
+        if (file_exists($this->currentPath)) {
+            $this->info("Removing existing 'current' link...");
+            
+            $removeProcess = Process::fromShellCommandline(
+                "powershell -Command \"if (Test-Path '{$this->currentPath}') { " .
+                "(Get-Item '{$this->currentPath}').Delete() }\"",
+                dirname($this->currentPath)
+            );
+
+            $removeProcess->run();
+
+            if (!$removeProcess->isSuccessful()) {
+                $this->warn("Warning: Could not remove existing 'current' link. Trying alternative method...");
+                
+                // Alternative: use rmdir /S /Q for junctions
+                $altRemove = Process::fromShellCommandline(
+                    "cmd /c rmdir \"{$this->currentPath}\"",
+                    dirname($this->currentPath)
+                );
+                
+                $altRemove->run();
+                
+                if (!$altRemove->isSuccessful()) {
+                    throw new \RuntimeException(
+                        "Failed to remove existing 'current' link.\n" .
+                        "Error: " . $removeProcess->getErrorOutput() . "\n" .
+                        "Alt Error: " . $altRemove->getErrorOutput()
+                    );
+                }
+            }
+            
+            $this->info("✓ Removed existing 'current' link");
         }
 
-        // Create new symlink
-        $process = Process::fromShellCommandline(
-            "mklink /J {$this->currentPath} {$releasePath}",
+        // Create new junction
+        $createProcess = Process::fromShellCommandline(
+            "mklink /J \"{$this->currentPath}\" \"{$releasePath}\"",
             dirname($this->currentPath)
         );
 
-        $process->run();
+        $createProcess->run();
 
-        if (!$process->isSuccessful()) {
+        if (!$createProcess->isSuccessful()) {
             throw new \RuntimeException(
                 "Failed to create symlink.\n" .
-                    "Command: mklink /J {$this->currentPath} {$releasePath}\n" .
-                    "Error: " . $process->getErrorOutput()
+                "Command: mklink /J {$this->currentPath} {$releasePath}\n" .
+                "Error: " . $createProcess->getErrorOutput()
             );
         }
 
@@ -226,7 +246,7 @@ class RunDeployment extends Command
 
         throw new \RuntimeException(
             'Could not determine git repository URL. ' .
-                'Make sure the current directory has a .git folder or specify the repo URL manually.'
+            'Make sure the current directory has a .git folder or specify the repo URL manually.'
         );
     }
 

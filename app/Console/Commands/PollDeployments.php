@@ -176,9 +176,9 @@ class PollDeployments extends Command
 
                 throw new \RuntimeException(
                     "Command failed: {$item['command']}\n" .
-                        "Working directory: {$item['cwd']}\n" .
-                        "Exit code: {$process->getExitCode()}\n" .
-                        "Output: {$fullOutput}"
+                    "Working directory: {$item['cwd']}\n" .
+                    "Exit code: {$process->getExitCode()}\n" .
+                    "Output: {$fullOutput}"
                 );
             }
 
@@ -198,29 +198,54 @@ class PollDeployments extends Command
 
     protected function switchRelease(string $currentPath, string $releasePath)
     {
-        // Remove old symlink if exists
-        if (is_link($currentPath)) {
-            rmdir($currentPath);
-        } elseif (is_dir($currentPath)) {
-            // If it's a real directory (shouldn't be), back it up
-            $backup = $currentPath . '_backup_' . now()->format('Ymd_His');
-            rename($currentPath, $backup);
-            $this->warn("Backed up old current directory to: {$backup}");
+        // Remove old symlink/junction using PowerShell (more reliable on Windows)
+        if (file_exists($currentPath)) {
+            $this->info("Removing existing 'current' link...");
+            
+            $removeProcess = Process::fromShellCommandline(
+                "powershell -Command \"if (Test-Path '{$currentPath}') { " .
+                "(Get-Item '{$currentPath}').Delete() }\"",
+                dirname($currentPath)
+            );
+
+            $removeProcess->run();
+
+            if (!$removeProcess->isSuccessful()) {
+                $this->warn("Warning: Could not remove existing 'current' link. Trying alternative method...");
+                
+                // Alternative: use rmdir for junctions (no /S flag for junctions!)
+                $altRemove = Process::fromShellCommandline(
+                    "cmd /c rmdir \"{$currentPath}\"",
+                    dirname($currentPath)
+                );
+                
+                $altRemove->run();
+                
+                if (!$altRemove->isSuccessful()) {
+                    throw new \RuntimeException(
+                        "Failed to remove existing 'current' link.\n" .
+                        "Error: " . $removeProcess->getErrorOutput() . "\n" .
+                        "Alt Error: " . $altRemove->getErrorOutput()
+                    );
+                }
+            }
+            
+            $this->info("✓ Removed existing 'current' link");
         }
 
-        // Create new symlink
-        $process = Process::fromShellCommandline(
-            "mklink /J {$currentPath} {$releasePath}",
+        // Create new junction
+        $createProcess = Process::fromShellCommandline(
+            "mklink /J \"{$currentPath}\" \"{$releasePath}\"",
             dirname($currentPath)
         );
 
-        $process->run();
+        $createProcess->run();
 
-        if (!$process->isSuccessful()) {
+        if (!$createProcess->isSuccessful()) {
             throw new \RuntimeException(
                 "Failed to create symlink to new release.\n" .
-                    "Command: mklink /J {$currentPath} {$releasePath}\n" .
-                    "Output: " . $process->getErrorOutput()
+                "Command: mklink /J {$currentPath} {$releasePath}\n" .
+                "Output: " . $createProcess->getErrorOutput()
             );
         }
 
@@ -248,7 +273,7 @@ class PollDeployments extends Command
         // Fallback - you should set this to your actual repo URL
         throw new \RuntimeException(
             'Could not determine git repository URL. ' .
-                'Please set it manually in the command or ensure current directory has a .git folder.'
+            'Please set it manually in the command or ensure current directory has a .git folder.'
         );
     }
 
