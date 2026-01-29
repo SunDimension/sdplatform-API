@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\Process\Process;
 
-class PollDeployments extends Command
+class PollDeployment extends Command
 {
     protected $signature = 'deploy:poll';
     protected $description = 'Poll the hub for pending deployment requests and execute them';
@@ -21,20 +21,58 @@ class PollDeployments extends Command
     public function __construct()
     {
         parent::__construct();
-        $this->deployToken = env('DEPLOY_TOKEN');
+        $this->deployToken = $this->getDeployToken();
+    }
+
+    protected function getDeployToken(): ?string
+    {
+        $token = env('DEPLOY_TOKEN');
         
-        if (empty($this->deployToken)) {
-            // Don't fail in constructor, but we'll check in handle()
-            Log::warning('DEPLOY_TOKEN not configured in .env file');
+        if (!empty($token)) {
+            return $token;
         }
+
+        $envPath = base_path('.env');
+        
+        if (file_exists($envPath) && is_readable($envPath)) {
+            try {
+                $envContent = file_get_contents($envPath);
+                $lines = explode("\n", $envContent);
+                
+                foreach ($lines as $line) {
+                    $line = trim($line);
+                    
+                    if (empty($line) || strpos($line, '#') === 0) {
+                        continue;
+                    }
+                    
+                    if (strpos($line, 'DEPLOY_TOKEN=') === 0) {
+                        $parts = explode('=', $line, 2);
+                        if (count($parts) === 2) {
+                            $value = trim($parts[1]);
+                            $value = trim($value, '"\'');
+                            
+                            if (!empty($value)) {
+                                Log::info('DEPLOY_TOKEN loaded directly from .env file');
+                                return $value;
+                            }
+                        }
+                    }
+                }
+            } catch (\Throwable $e) {
+                Log::error('Failed to read .env file directly', ['error' => $e->getMessage()]);
+            }
+        }
+
+        return null;
     }
 
     public function handle()
     {
-        // Check if token is configured
         if (empty($this->deployToken)) {
             $this->error('DEPLOY_TOKEN is not set in your .env file.');
             $this->error('Please add: DEPLOY_TOKEN=your_token_here');
+            $this->info('Try running: php artisan config:clear');
             return 1;
         }
 
@@ -84,7 +122,7 @@ class PollDeployments extends Command
             }
         } catch (\Throwable $e) {
             $this->error('Polling error: ' . $e->getMessage());
-            Log::error('PollDeployments error', ['error' => $e->getMessage()]);
+            Log::error('PollDeployment error', ['error' => $e->getMessage()]);
         }
 
         return 0;
@@ -97,61 +135,51 @@ class PollDeployments extends Command
         $sharedPath  = "{$this->basePath}\\shared";
         $currentPath = "{$this->basePath}\\current";
 
-        // Ensure releases directory exists
         if (!is_dir("{$this->basePath}\\releases")) {
             mkdir("{$this->basePath}\\releases", 0755, true);
         }
 
-        // Create release directory
         if (!is_dir($releasePath)) {
             mkdir($releasePath, 0755, true);
         }
 
-        // Get the repository URL from current directory
         $repoUrl = $this->getGitRepoUrl();
 
         $this->info("Cloning from: {$repoUrl}");
         $this->info("Branch: {$this->branch}");
 
-        // Commands with proper Windows handling
         $commands = [
-            // Clone repository
             [
                 'command' => "git clone -b {$this->branch} {$repoUrl} {$releasePath}",
                 'cwd' => $this->basePath,
                 'description' => 'Cloning repository'
             ],
-            // Remove storage directory created by git (so we can create symlink)
             [
                 'command' => "powershell -Command \"if (Test-Path '{$releasePath}\\storage') { Remove-Item -Path '{$releasePath}\\storage' -Recurse -Force }\"",
                 'cwd' => $releasePath,
                 'description' => 'Removing cloned storage directory'
             ],
-            // Create .env symlink
             [
                 'command' => "mklink {$releasePath}\\.env {$sharedPath}\\.env",
                 'cwd' => $releasePath,
                 'description' => 'Creating .env symlink'
             ],
-            // Create storage symlink
             [
                 'command' => "mklink /J {$releasePath}\\storage {$sharedPath}\\storage",
                 'cwd' => $releasePath,
                 'description' => 'Creating storage symlink'
             ],
-            // Composer install
             [
-                'command' => 'composer install --no-dev --optimize-autoloader --no-interaction',
+                // Add --working-dir to ensure composer only scans this release
+                'command' => "composer install --no-dev --optimize-autoloader --no-interaction --working-dir=\"{$releasePath}\"",
                 'cwd' => $releasePath,
                 'description' => 'Installing composer dependencies'
             ],
-            // Run migrations
             [
                 'command' => 'php artisan migrate --force',
                 'cwd' => $releasePath,
                 'description' => 'Running migrations'
             ],
-            // Clear and optimize application
             [
                 'command' => 'php artisan config:clear && php artisan route:clear && php artisan view:clear && php artisan optimize',
                 'cwd' => $releasePath,
@@ -186,6 +214,9 @@ class PollDeployments extends Command
                     'output' => $fullOutput,
                 ]);
 
+                // Clean up failed release
+                $this->cleanupFailedRelease($releasePath);
+
                 throw new \RuntimeException(
                     "Command failed: {$item['command']}\n" .
                     "Working directory: {$item['cwd']}\n" .
@@ -202,7 +233,6 @@ class PollDeployments extends Command
             }
         }
 
-        // Switch to new release (atomic operation)
         $this->switchRelease($currentPath, $releasePath);
 
         $this->info("✓ Deployment completed successfully: {$version}");
@@ -210,7 +240,6 @@ class PollDeployments extends Command
 
     protected function switchRelease(string $currentPath, string $releasePath)
     {
-        // Remove old symlink/junction using PowerShell (more reliable on Windows)
         if (file_exists($currentPath)) {
             $this->info("Removing existing 'current' link...");
             
@@ -223,9 +252,6 @@ class PollDeployments extends Command
             $removeProcess->run();
 
             if (!$removeProcess->isSuccessful()) {
-                $this->warn("Warning: Could not remove existing 'current' link. Trying alternative method...");
-                
-                // Alternative: use rmdir for junctions (no /S flag for junctions!)
                 $altRemove = Process::fromShellCommandline(
                     "cmd /c rmdir \"{$currentPath}\"",
                     dirname($currentPath)
@@ -245,7 +271,6 @@ class PollDeployments extends Command
             $this->info("✓ Removed existing 'current' link");
         }
 
-        // Create new junction
         $createProcess = Process::fromShellCommandline(
             "mklink /J \"{$currentPath}\" \"{$releasePath}\"",
             dirname($currentPath)
@@ -264,9 +289,29 @@ class PollDeployments extends Command
         $this->info("✓ Switched to new release");
     }
 
+    protected function cleanupFailedRelease(string $releasePath)
+    {
+        $this->warn("Cleaning up failed release: {$releasePath}");
+        
+        try {
+            $process = Process::fromShellCommandline(
+                "powershell -Command \"Remove-Item -Path '{$releasePath}' -Recurse -Force\"",
+                dirname($releasePath)
+            );
+
+            $process->setTimeout(120);
+            $process->run();
+
+            if ($process->isSuccessful()) {
+                $this->info("✓ Cleaned up failed release");
+            }
+        } catch (\Throwable $e) {
+            $this->warn("Could not cleanup failed release: " . $e->getMessage());
+        }
+    }
+
     protected function getGitRepoUrl(): string
     {
-        // Try to get from current directory
         $currentGitDir = "{$this->basePath}\\current\\.git";
 
         if (is_dir($currentGitDir)) {
@@ -282,7 +327,6 @@ class PollDeployments extends Command
             }
         }
 
-        // Fallback - you should set this to your actual repo URL
         throw new \RuntimeException(
             'Could not determine git repository URL. ' .
             'Please set it manually in the command or ensure current directory has a .git folder.'
