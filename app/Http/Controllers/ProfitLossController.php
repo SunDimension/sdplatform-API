@@ -12,7 +12,7 @@ class ProfitLossController extends Controller
     /**
      * Get Profit & Loss Statement
      */
-    public function index(Request $request): JsonResponse
+    public function searchProfitLoss(Request $request): JsonResponse
     {
         // Validate request parameters
         $validated = $request->validate([

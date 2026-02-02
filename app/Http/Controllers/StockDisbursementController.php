@@ -56,8 +56,8 @@ class StockDisbursementController extends Controller
     }
 
     public function searchDisbursements(Request $request)
-    
-      {
+
+    {
         $validated = $request->validate([
             'branch_id' => 'nullable|exists:branches,id',
             'from_date' => 'nullable|date',
@@ -194,16 +194,22 @@ class StockDisbursementController extends Controller
 
                 // Create stock movement only for usable quantity
                 if ($usableQuantity > 0) {
+                    // Replace this section in your code:
+
+                    // Create stock movement for the full quantity issued
                     StockMovement::create([
                         'product_id'      => $itemData['product_id'],
                         'reference_type'  => 'stock_disbursement',
                         'reference_id'    => $disbursementItem->disbursement_item_id,
                         'quantity_in'     => 0,
-                        'quantity_out'    => $usableQuantity,
+                        'quantity_out'    => $quantityIssued, // Use full quantity issued, not usable
                         'movement_date'   => $disbursement->disbursement_date,
                         'unit_cost'       => $itemData['unit_cost'] ?? 0,
                         'status'          => 'completed',
                         'created_by'      => $issuedBy,
+                        'remarks'         => $quantityDamaged > 0
+                            ? "Issued: {$quantityIssued}, Damaged: {$quantityDamaged}, Usable: {$usableQuantity}"
+                            : null,
                     ]);
                 }
             }

@@ -40,9 +40,18 @@ class PurchaseItemCostController extends Controller
 
     public function destroy($id)
     {
-        // $branch->delete();
-        PurchaseItemCost::destroy($id);
+        try {
+            $purchaseItemCost = PurchaseItemCost::findOrFail($id);
+            $purchaseItemCost->delete();
 
-        return response(null, Response::HTTP_NO_CONTENT);
+            return response()->json([
+                'message' => 'Purchase Item Cost deleted successfully'
+            ], Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to delete Purchase Item Cost',
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 }

@@ -11,6 +11,7 @@ use App\Models\JournalEntryDetail;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class JournalEntryController extends Controller
 {
@@ -77,4 +78,26 @@ class JournalEntryController extends Controller
 
         return response()->noContent();
     }
-}
+
+    public function searchJournalEntries(Request $request)
+    {
+      $validated = $request->validate([
+        'from_date' => 'required|date',
+        'to_date' => 'required|date|after_or_equal:from_date',
+    ]);
+
+        $query = JournalEntry::query();
+
+   
+
+        if (!empty($validated['from_date']) && !empty($validated['to_date'])) {
+            $query->whereBetween('entry_date', [
+                Carbon::parse($validated['from_date'])->startOfDay(),
+                Carbon::parse($validated['to_date'])->endOfDay(),
+            ]);
+        }
+
+        return new JournalEntryCollection($query->orderBy('entry_date', 'desc')->get());
+    }
+    }
+

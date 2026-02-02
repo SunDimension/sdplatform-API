@@ -93,6 +93,11 @@ Route::middleware('auth:sanctum')->group(function () {
             ->name('roles.detachPermission');
     });
 
+    Route::post('search-ledger-postings',[LedgerPostingController::class,'searchLedgerPosting']);
+    Route::post('search-journal-lines',[JournalLineController::class, 'searchJournalLines']);
+    Route::post('search-transactions', [TransactionController::class, 'searchTransaction']);
+    Route::post('search-profit-loss',[ProfitLossController::class, 'searchProfitLoss']);
+    Route::post('search-journal-entries',[JournalEntryController::class,'searchJournalEntries']);
     Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryController::class);
 
     Route::apiResource('purchase-item-costs', App\Http\Controllers\PurchaseItemCostController::class);
