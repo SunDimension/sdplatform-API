@@ -17,14 +17,25 @@ class UserUpdateRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      */
-  public function rules(): array
+    public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'string', 'min:8'],
-            'branch_id' => ['required', 'string', 'exists:branches,id'],
-            'store_id' => ['required', 'string', 'exists:stores,id'],
+            'role_id' => ['required'],
+            'agency_id' => ['nullable'],
+            'firstname' => ['required', 'string'],
+            'lastname' => ['required', 'string'],
+            'password' => ['required', 'password'],
+            'profile_picture' => ['nullable', 'string'],
+            'date_of_birth' => ['nullable', 'date'],
+            'gender' => ['nullable', 'string'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'phone' => ['nullable', 'string'],
+            'status' => ['required', 'string'],
+            'email_verified' => ['required'],
+            'phone_verified' => ['required'],
+            'kyc_verified' => ['required'],
+            'last_login' => ['nullable'],
+            'remember_token' => ['nullable', 'string'],
         ];
     }
 }

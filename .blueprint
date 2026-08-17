@@ -1,130 +1,409 @@
 created:
-    - app/Http/Controllers/PriceChangeController.php
-    - app/Http/Controllers/ChangeReasonController.php
-    - database/factories/PriceChangeFactory.php
-    - database/factories/ChangeReasonFactory.php
-    - database/migrations/2024_12_27_102811_create_price_changes_table.php
-    - database/migrations/2024_12_27_102812_create_change_reasons_table.php
-    - app/Models/PriceChange.php
-    - app/Models/ChangeReason.php
-    - tests/Feature/Http/Controllers/PriceChangeControllerTest.php
-    - tests/Feature/Http/Controllers/ChangeReasonControllerTest.php
-    - app/Http/Requests/PriceChangeStoreRequest.php
-    - app/Http/Requests/PriceChangeUpdateRequest.php
-    - app/Http/Requests/ChangeReasonStoreRequest.php
-    - app/Http/Requests/ChangeReasonUpdateRequest.php
-    - app/Http/Resources/PriceChangeCollection.php
-    - app/Http/Resources/PriceChangeResource.php
-    - app/Http/Resources/ChangeReasonCollection.php
-    - app/Http/Resources/ChangeReasonResource.php
+    - app/Http/Controllers/UsersController.php
+    - app/Http/Controllers/AgenciesController.php
+    - app/Http/Controllers/RolesController.php
+    - app/Http/Controllers/PermissionsController.php
+    - app/Http/Controllers/PropertyTypesController.php
+    - app/Http/Controllers/PropertyCategoriesController.php
+    - app/Http/Controllers/PropertyStatusesController.php
+    - app/Http/Controllers/PropertiesController.php
+    - app/Http/Controllers/PropertyImagesController.php
+    - app/Http/Controllers/PropertyVideosController.php
+    - app/Http/Controllers/PropertyDocumentsController.php
+    - app/Http/Controllers/FeaturesController.php
+    - app/Http/Controllers/PropertyFeaturesController.php
+    - app/Http/Controllers/AmenitiesController.php
+    - app/Http/Controllers/PropertyAmenitiesController.php
+    - app/Http/Controllers/CountriesController.php
+    - app/Http/Controllers/StatesController.php
+    - app/Http/Controllers/CitiesController.php
+    - app/Http/Controllers/AreasController.php
+    - app/Http/Controllers/PropertyEnquiriesController.php
+    - app/Http/Controllers/PropertyViewsController.php
+    - app/Http/Controllers/SavedPropertiesController.php
+    - app/Http/Controllers/PropertyOffersController.php
+    - app/Http/Controllers/InspectionBookingsController.php
+    - app/Http/Controllers/ConversationsController.php
+    - app/Http/Controllers/MessagesController.php
+    - app/Http/Controllers/SubscriptionPlansController.php
+    - app/Http/Controllers/SubscriptionsController.php
+    - app/Http/Controllers/PaymentsController.php
+    - app/Http/Controllers/ReviewsController.php
+    - app/Http/Controllers/NotificationsController.php
+    - app/Http/Controllers/AdPackagesController.php
+    - app/Http/Controllers/AdvertisementsController.php
+    - app/Http/Controllers/BlogPostsController.php
+    - app/Http/Controllers/PagesController.php
+    - app/Http/Controllers/FAQsController.php
+    - app/Http/Controllers/SettingsController.php
+    - app/Http/Controllers/AuditLogsController.php
+    - app/Http/Controllers/ReportedListingsController.php
+    - app/Http/Controllers/MortgageCalculationsController.php
+    - database/factories/UserFactory.php
+    - database/factories/AgencyFactory.php
+    - database/factories/PropertyFactory.php
+    - database/factories/RoleFactory.php
+    - database/factories/PermissionFactory.php
+    - database/factories/PermissionRoleFactory.php
+    - database/factories/PropertyTypeFactory.php
+    - database/factories/PropertyCategoryFactory.php
+    - database/factories/PropertyStatusFactory.php
+    - database/factories/PropertyImageFactory.php
+    - database/factories/PropertyVideoFactory.php
+    - database/factories/PropertyDocumentFactory.php
+    - database/factories/FeatureFactory.php
+    - database/factories/PropertyFeatureFactory.php
+    - database/factories/AmenityFactory.php
+    - database/factories/PropertyAmenityFactory.php
+    - database/factories/CountryFactory.php
+    - database/factories/StateFactory.php
+    - database/factories/CityFactory.php
+    - database/factories/AreaFactory.php
+    - database/factories/PropertyEnquiryFactory.php
+    - database/factories/PropertyViewFactory.php
+    - database/factories/SavedPropertyFactory.php
+    - database/factories/PropertyOfferFactory.php
+    - database/factories/InspectionBookingFactory.php
+    - database/factories/ConversationFactory.php
+    - database/factories/MessageFactory.php
+    - database/factories/SubscriptionPlanFactory.php
+    - database/factories/SubscriptionFactory.php
+    - database/factories/PaymentFactory.php
+    - database/factories/ReviewFactory.php
+    - database/factories/NotificationFactory.php
+    - database/factories/AdPackageFactory.php
+    - database/factories/AdvertisementFactory.php
+    - database/factories/BlogPostFactory.php
+    - database/factories/PageFactory.php
+    - database/factories/FAQFactory.php
+    - database/factories/SettingFactory.php
+    - database/factories/AuditLogFactory.php
+    - database/factories/ReportedListingFactory.php
+    - database/factories/MortgageCalculationFactory.php
+    - database/migrations/2026_08_17_111126_create_users_table.php
+    - database/migrations/2026_08_17_111127_create_agencies_table.php
+    - database/migrations/2026_08_17_111128_create_properties_table.php
+    - database/migrations/2026_08_17_111129_create_roles_table.php
+    - database/migrations/2026_08_17_111130_create_permissions_table.php
+    - database/migrations/2026_08_17_111131_create_permission_roles_table.php
+    - database/migrations/2026_08_17_111132_create_property_types_table.php
+    - database/migrations/2026_08_17_111133_create_property_categories_table.php
+    - database/migrations/2026_08_17_111134_create_property_statuses_table.php
+    - database/migrations/2026_08_17_111135_create_property_images_table.php
+    - database/migrations/2026_08_17_111136_create_property_videos_table.php
+    - database/migrations/2026_08_17_111137_create_property_documents_table.php
+    - database/migrations/2026_08_17_111138_create_features_table.php
+    - database/migrations/2026_08_17_111139_create_property_features_table.php
+    - database/migrations/2026_08_17_111140_create_amenities_table.php
+    - database/migrations/2026_08_17_111141_create_property_amenities_table.php
+    - database/migrations/2026_08_17_111142_create_countries_table.php
+    - database/migrations/2026_08_17_111143_create_states_table.php
+    - database/migrations/2026_08_17_111144_create_cities_table.php
+    - database/migrations/2026_08_17_111145_create_areas_table.php
+    - database/migrations/2026_08_17_111146_create_property_enquiries_table.php
+    - database/migrations/2026_08_17_111147_create_property_views_table.php
+    - database/migrations/2026_08_17_111148_create_saved_properties_table.php
+    - database/migrations/2026_08_17_111149_create_property_offers_table.php
+    - database/migrations/2026_08_17_111150_create_inspection_bookings_table.php
+    - database/migrations/2026_08_17_111151_create_conversations_table.php
+    - database/migrations/2026_08_17_111152_create_messages_table.php
+    - database/migrations/2026_08_17_111153_create_subscription_plans_table.php
+    - database/migrations/2026_08_17_111154_create_subscriptions_table.php
+    - database/migrations/2026_08_17_111155_create_payments_table.php
+    - database/migrations/2026_08_17_111156_create_reviews_table.php
+    - database/migrations/2026_08_17_111157_create_notifications_table.php
+    - database/migrations/2026_08_17_111158_create_ad_packages_table.php
+    - database/migrations/2026_08_17_111159_create_advertisements_table.php
+    - database/migrations/2026_08_17_111200_create_blog_posts_table.php
+    - database/migrations/2026_08_17_111201_create_pages_table.php
+    - database/migrations/2026_08_17_111202_create_f_a_q_s_table.php
+    - database/migrations/2026_08_17_111203_create_settings_table.php
+    - database/migrations/2026_08_17_111204_create_audit_logs_table.php
+    - database/migrations/2026_08_17_111205_create_reported_listings_table.php
+    - database/migrations/2026_08_17_111206_create_mortgage_calculations_table.php
+    - app/Models/User.php
+    - app/Models/Agency.php
+    - app/Models/Property.php
+    - app/Models/Role.php
+    - app/Models/Permission.php
+    - app/Models/PermissionRole.php
+    - app/Models/PropertyType.php
+    - app/Models/PropertyCategory.php
+    - app/Models/PropertyStatus.php
+    - app/Models/PropertyImage.php
+    - app/Models/PropertyVideo.php
+    - app/Models/PropertyDocument.php
+    - app/Models/Feature.php
+    - app/Models/PropertyFeature.php
+    - app/Models/Amenity.php
+    - app/Models/PropertyAmenity.php
+    - app/Models/Country.php
+    - app/Models/State.php
+    - app/Models/City.php
+    - app/Models/Area.php
+    - app/Models/PropertyEnquiry.php
+    - app/Models/PropertyView.php
+    - app/Models/SavedProperty.php
+    - app/Models/PropertyOffer.php
+    - app/Models/InspectionBooking.php
+    - app/Models/Conversation.php
+    - app/Models/Message.php
+    - app/Models/SubscriptionPlan.php
+    - app/Models/Subscription.php
+    - app/Models/Payment.php
+    - app/Models/Review.php
+    - app/Models/Notification.php
+    - app/Models/AdPackage.php
+    - app/Models/Advertisement.php
+    - app/Models/BlogPost.php
+    - app/Models/Page.php
+    - app/Models/FAQ.php
+    - app/Models/Setting.php
+    - app/Models/AuditLog.php
+    - app/Models/ReportedListing.php
+    - app/Models/MortgageCalculation.php
+    - database/seeders/1Seeder.php
+    - tests/Feature/Http/Controllers/UsersControllerTest.php
+    - tests/Feature/Http/Controllers/AgenciesControllerTest.php
+    - tests/Feature/Http/Controllers/RolesControllerTest.php
+    - tests/Feature/Http/Controllers/PermissionsControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyTypesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyCategoriesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyStatusesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertiesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyImagesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyVideosControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyDocumentsControllerTest.php
+    - tests/Feature/Http/Controllers/FeaturesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyFeaturesControllerTest.php
+    - tests/Feature/Http/Controllers/AmenitiesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyAmenitiesControllerTest.php
+    - tests/Feature/Http/Controllers/CountriesControllerTest.php
+    - tests/Feature/Http/Controllers/StatesControllerTest.php
+    - tests/Feature/Http/Controllers/CitiesControllerTest.php
+    - tests/Feature/Http/Controllers/AreasControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyEnquiriesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyViewsControllerTest.php
+    - tests/Feature/Http/Controllers/SavedPropertiesControllerTest.php
+    - tests/Feature/Http/Controllers/PropertyOffersControllerTest.php
+    - tests/Feature/Http/Controllers/InspectionBookingsControllerTest.php
+    - tests/Feature/Http/Controllers/ConversationsControllerTest.php
+    - tests/Feature/Http/Controllers/MessagesControllerTest.php
+    - tests/Feature/Http/Controllers/SubscriptionPlansControllerTest.php
+    - tests/Feature/Http/Controllers/SubscriptionsControllerTest.php
+    - tests/Feature/Http/Controllers/PaymentsControllerTest.php
+    - tests/Feature/Http/Controllers/ReviewsControllerTest.php
+    - tests/Feature/Http/Controllers/NotificationsControllerTest.php
+    - tests/Feature/Http/Controllers/AdPackagesControllerTest.php
+    - tests/Feature/Http/Controllers/AdvertisementsControllerTest.php
+    - tests/Feature/Http/Controllers/BlogPostsControllerTest.php
+    - tests/Feature/Http/Controllers/PagesControllerTest.php
+    - tests/Feature/Http/Controllers/FAQsControllerTest.php
+    - tests/Feature/Http/Controllers/SettingsControllerTest.php
+    - tests/Feature/Http/Controllers/AuditLogsControllerTest.php
+    - tests/Feature/Http/Controllers/ReportedListingsControllerTest.php
+    - tests/Feature/Http/Controllers/MortgageCalculationsControllerTest.php
+    - app/Http/Requests/UserStoreRequest.php
+    - app/Http/Requests/UserUpdateRequest.php
+    - app/Http/Requests/AgencyStoreRequest.php
+    - app/Http/Requests/AgencyUpdateRequest.php
+    - app/Http/Requests/RoleStoreRequest.php
+    - app/Http/Requests/RoleUpdateRequest.php
+    - app/Http/Requests/PermissionStoreRequest.php
+    - app/Http/Requests/PermissionUpdateRequest.php
+    - app/Http/Requests/PropertyTypeStoreRequest.php
+    - app/Http/Requests/PropertyTypeUpdateRequest.php
+    - app/Http/Requests/PropertyCategoryStoreRequest.php
+    - app/Http/Requests/PropertyCategoryUpdateRequest.php
+    - app/Http/Requests/PropertyStatusStoreRequest.php
+    - app/Http/Requests/PropertyStatusUpdateRequest.php
+    - app/Http/Requests/PropertyStoreRequest.php
+    - app/Http/Requests/PropertyUpdateRequest.php
+    - app/Http/Requests/PropertyImageStoreRequest.php
+    - app/Http/Requests/PropertyImageUpdateRequest.php
+    - app/Http/Requests/PropertyVideoStoreRequest.php
+    - app/Http/Requests/PropertyVideoUpdateRequest.php
+    - app/Http/Requests/PropertyDocumentStoreRequest.php
+    - app/Http/Requests/PropertyDocumentUpdateRequest.php
+    - app/Http/Requests/FeatureStoreRequest.php
+    - app/Http/Requests/FeatureUpdateRequest.php
+    - app/Http/Requests/PropertyFeatureStoreRequest.php
+    - app/Http/Requests/PropertyFeatureUpdateRequest.php
+    - app/Http/Requests/AmenityStoreRequest.php
+    - app/Http/Requests/AmenityUpdateRequest.php
+    - app/Http/Requests/PropertyAmenityStoreRequest.php
+    - app/Http/Requests/PropertyAmenityUpdateRequest.php
+    - app/Http/Requests/CountryStoreRequest.php
+    - app/Http/Requests/CountryUpdateRequest.php
+    - app/Http/Requests/StateStoreRequest.php
+    - app/Http/Requests/StateUpdateRequest.php
+    - app/Http/Requests/CityStoreRequest.php
+    - app/Http/Requests/CityUpdateRequest.php
+    - app/Http/Requests/AreaStoreRequest.php
+    - app/Http/Requests/AreaUpdateRequest.php
+    - app/Http/Requests/PropertyEnquiryStoreRequest.php
+    - app/Http/Requests/PropertyEnquiryUpdateRequest.php
+    - app/Http/Requests/PropertyViewStoreRequest.php
+    - app/Http/Requests/PropertyViewUpdateRequest.php
+    - app/Http/Requests/SavedPropertyStoreRequest.php
+    - app/Http/Requests/SavedPropertyUpdateRequest.php
+    - app/Http/Requests/PropertyOfferStoreRequest.php
+    - app/Http/Requests/PropertyOfferUpdateRequest.php
+    - app/Http/Requests/InspectionBookingStoreRequest.php
+    - app/Http/Requests/InspectionBookingUpdateRequest.php
+    - app/Http/Requests/ConversationStoreRequest.php
+    - app/Http/Requests/ConversationUpdateRequest.php
+    - app/Http/Requests/MessageStoreRequest.php
+    - app/Http/Requests/MessageUpdateRequest.php
+    - app/Http/Requests/SubscriptionPlanStoreRequest.php
+    - app/Http/Requests/SubscriptionPlanUpdateRequest.php
+    - app/Http/Requests/SubscriptionStoreRequest.php
+    - app/Http/Requests/SubscriptionUpdateRequest.php
+    - app/Http/Requests/PaymentStoreRequest.php
+    - app/Http/Requests/PaymentUpdateRequest.php
+    - app/Http/Requests/ReviewStoreRequest.php
+    - app/Http/Requests/ReviewUpdateRequest.php
+    - app/Http/Requests/NotificationStoreRequest.php
+    - app/Http/Requests/NotificationUpdateRequest.php
+    - app/Http/Requests/AdPackageStoreRequest.php
+    - app/Http/Requests/AdPackageUpdateRequest.php
+    - app/Http/Requests/AdvertisementStoreRequest.php
+    - app/Http/Requests/AdvertisementUpdateRequest.php
+    - app/Http/Requests/BlogPostStoreRequest.php
+    - app/Http/Requests/BlogPostUpdateRequest.php
+    - app/Http/Requests/PageStoreRequest.php
+    - app/Http/Requests/PageUpdateRequest.php
+    - app/Http/Requests/FAQStoreRequest.php
+    - app/Http/Requests/FAQUpdateRequest.php
+    - app/Http/Requests/SettingStoreRequest.php
+    - app/Http/Requests/SettingUpdateRequest.php
+    - app/Http/Requests/AuditLogStoreRequest.php
+    - app/Http/Requests/AuditLogUpdateRequest.php
+    - app/Http/Requests/ReportedListingStoreRequest.php
+    - app/Http/Requests/ReportedListingUpdateRequest.php
+    - app/Http/Requests/MortgageCalculationStoreRequest.php
+    - app/Http/Requests/MortgageCalculationUpdateRequest.php
+    - app/Http/Resources/UserCollection.php
+    - app/Http/Resources/UserResource.php
+    - app/Http/Resources/AgencyCollection.php
+    - app/Http/Resources/AgencyResource.php
+    - app/Http/Resources/RoleCollection.php
+    - app/Http/Resources/RoleResource.php
+    - app/Http/Resources/PermissionCollection.php
+    - app/Http/Resources/PermissionResource.php
+    - app/Http/Resources/PropertyTypeCollection.php
+    - app/Http/Resources/PropertyTypeResource.php
+    - app/Http/Resources/PropertyCategoryCollection.php
+    - app/Http/Resources/PropertyCategoryResource.php
+    - app/Http/Resources/PropertyStatusCollection.php
+    - app/Http/Resources/PropertyStatusResource.php
+    - app/Http/Resources/PropertyCollection.php
+    - app/Http/Resources/PropertyResource.php
+    - app/Http/Resources/PropertyImageCollection.php
+    - app/Http/Resources/PropertyImageResource.php
+    - app/Http/Resources/PropertyVideoCollection.php
+    - app/Http/Resources/PropertyVideoResource.php
+    - app/Http/Resources/PropertyDocumentCollection.php
+    - app/Http/Resources/PropertyDocumentResource.php
+    - app/Http/Resources/FeatureCollection.php
+    - app/Http/Resources/FeatureResource.php
+    - app/Http/Resources/PropertyFeatureCollection.php
+    - app/Http/Resources/PropertyFeatureResource.php
+    - app/Http/Resources/AmenityCollection.php
+    - app/Http/Resources/AmenityResource.php
+    - app/Http/Resources/PropertyAmenityCollection.php
+    - app/Http/Resources/PropertyAmenityResource.php
+    - app/Http/Resources/CountryCollection.php
+    - app/Http/Resources/CountryResource.php
+    - app/Http/Resources/StateCollection.php
+    - app/Http/Resources/StateResource.php
+    - app/Http/Resources/CityCollection.php
+    - app/Http/Resources/CityResource.php
+    - app/Http/Resources/AreaCollection.php
+    - app/Http/Resources/AreaResource.php
+    - app/Http/Resources/PropertyEnquiryCollection.php
+    - app/Http/Resources/PropertyEnquiryResource.php
+    - app/Http/Resources/PropertyViewCollection.php
+    - app/Http/Resources/PropertyViewResource.php
+    - app/Http/Resources/SavedPropertyCollection.php
+    - app/Http/Resources/SavedPropertyResource.php
+    - app/Http/Resources/PropertyOfferCollection.php
+    - app/Http/Resources/PropertyOfferResource.php
+    - app/Http/Resources/InspectionBookingCollection.php
+    - app/Http/Resources/InspectionBookingResource.php
+    - app/Http/Resources/ConversationCollection.php
+    - app/Http/Resources/ConversationResource.php
+    - app/Http/Resources/MessageCollection.php
+    - app/Http/Resources/MessageResource.php
+    - app/Http/Resources/SubscriptionPlanCollection.php
+    - app/Http/Resources/SubscriptionPlanResource.php
+    - app/Http/Resources/SubscriptionCollection.php
+    - app/Http/Resources/SubscriptionResource.php
+    - app/Http/Resources/PaymentCollection.php
+    - app/Http/Resources/PaymentResource.php
+    - app/Http/Resources/ReviewCollection.php
+    - app/Http/Resources/ReviewResource.php
+    - app/Http/Resources/NotificationCollection.php
+    - app/Http/Resources/NotificationResource.php
+    - app/Http/Resources/AdPackageCollection.php
+    - app/Http/Resources/AdPackageResource.php
+    - app/Http/Resources/AdvertisementCollection.php
+    - app/Http/Resources/AdvertisementResource.php
+    - app/Http/Resources/BlogPostCollection.php
+    - app/Http/Resources/BlogPostResource.php
+    - app/Http/Resources/PageCollection.php
+    - app/Http/Resources/PageResource.php
+    - app/Http/Resources/FAQCollection.php
+    - app/Http/Resources/FAQResource.php
+    - app/Http/Resources/SettingCollection.php
+    - app/Http/Resources/SettingResource.php
+    - app/Http/Resources/AuditLogCollection.php
+    - app/Http/Resources/AuditLogResource.php
+    - app/Http/Resources/ReportedListingCollection.php
+    - app/Http/Resources/ReportedListingResource.php
+    - app/Http/Resources/MortgageCalculationCollection.php
+    - app/Http/Resources/MortgageCalculationResource.php
 updated:
     - routes/api.php
 models:
-    Account: { id: 'char:36', name: string, code: string, account_group_id: 'char:36', account_type_id: 'char:36', account_subtype_id: 'char:36', account_owner_id: 'string nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    AccountGroup: { id: 'char:36', name: string, created_by: 'integer nullable default:NULL', modified_by: 'integer nullable default:NULL', deleted_by: 'integer nullable default:NULL' }
-    AccountOpeningBalance: { id: 'char:36', financial_year_id: 'char:36', financial_period_id: 'char:36', debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: string, account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    AccountSubtype: { id: 'char:36', name: string, account_type_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    AccountType: { id: 'char:36', account_group_id: 'char:36', name: string, code: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    AdjustmentType: { name: string }
-    ApprovalInstance: {  }
-    ApprovalLimit: {  }
-    ApprovalProcessFlow: {  }
-    ApprovalProcessModule: {  }
-    ApprovalProcessType: {  }
-    ApprovalStage: {  }
-    ApprovalType: {  }
-    Attribute: { name: string }
-    Bank: { name: string }
-    Branch: { name: string, address: string, contact_person: string, email: string, phone: string, state_id: 'biginteger unsigned', country_id: 'biginteger unsigned' }
-    Brand: { name: string }
-    Carrier: { name: string }
-    Chart: { id: 'char:36', chart_title: string, chart_type_id: 'char:36', chart_category_id: 'char:36', sql_query: text, is_active: string, module_id: string, filterColumn: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    ChartCard: { id: 'char:36', card_title: string, card_size: string, is_active: string, sql_query: text, module_id: string, submodule_id: string, sequence: string, color: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    ChartCategory: { id: 'char:36', chart_provider_id: 'char:36', chart_category: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    ChartProvider: { id: 'char:36', chart_provider: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    ChartType: { id: 'char:36', chart_category_id: 'char:36', chart_type: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    Country: { name: string }
-    CreateItem: { name: string, item_category_id: 'biginteger unsigned', batch_number: 'string nullable default:NULL', brand_id: 'biginteger unsigned', vendor_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', user_id: 'biginteger unsigned' }
-    CreditLimit: { name: string }
-    CreditSale: { customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', product_id: 'biginteger unsigned', credit_limit: 'biginteger unsigned', credit_amount: string, credit_balance: string }
-    CreditTransaction: { branch_id: 'biginteger unsigned', customer_id: 'biginteger unsigned', sales_order_id: 'biginteger unsigned nullable default:NULL', sales_receipt_id: 'biginteger unsigned nullable default:NULL', amount: string, credit_limit: 'string nullable default:NULL', credit_balance_before: 'string nullable default:NULL', type: "enum:'credit','payment'", created_by: 'biginteger unsigned', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    Customer: { name: string, customer_type_id: 'biginteger unsigned', title_id: 'biginteger unsigned', surname: string, firstname: string, middlename: string, address: 'string nullable default:NULL', phone_number: string, credit_limit: 'decimal:12,0 nullable default:NULL', credit_balance: 'decimal:12,0 nullable default:NULL', branch_id: 'integer nullable default:NULL' }
-    CustomerType: { name: string }
-    DashboardSetting: { id: 'char:36', chart_id: 'char:36', module_id: 'char:36', chart_type_id: 'char:36', chart_category_id: 'char:36', chart_title: string, is_active: string, order_by: string, is_group: string, submodule_Id: string, add_condition: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    Delivery: { customer_id: 'biginteger unsigned', sales_order_number: string, delivery_order_number: string, delivery_date: timestamp, carrier_id: 'biginteger unsigned', notes: string }
-    Designation: { name: string }
-    Dimension: { name: string }
-    Discount: { name: string }
-    ExpenseAccount: { name: string }
-    FinancialPeriod: { id: 'char:36', name: string, date_from: date, date_to: date, is_active: boolean, financial_year_id: 'char:36', financial_quarter_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    FinancialQuarter: { id: 'char:36', name: string, date_from: date, date_to: date, is_active: boolean, financial_year_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    FinancialYear: { id: 'char:36', name: string, date_from: date, date_to: date, is_active: boolean, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    InflowStatus: { name: 'string:150 nullable default:NULL' }
-    InventoryAdjustment: { item_id: 'biginteger unsigned nullable default:NULL', adjustment_type_id: 'biginteger unsigned nullable default:NULL', date: 'date nullable default:NULL', reason_id: 'biginteger unsigned nullable default:NULL', branch_id: 'biginteger unsigned nullable default:NULL', warehouse_id: 'biginteger unsigned nullable default:NULL', description: 'string nullable default:NULL', item_category_id: 'biginteger unsigned nullable default:NULL', cost_price: 'double nullable default:NULL', selling_price: 'double nullable default:NULL', quantity: 'string nullable default:NULL', store_id: 'biginteger unsigned nullable default:NULL' }
-    Invoice: { branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', customer_id: 'biginteger unsigned', invoice_number: string, order_number: string, invoice_date: timestamp, item_id: 'biginteger unsigned', rate: string, quantity: string, discount_id: 'biginteger unsigned', tax_id: 'biginteger unsigned', amount: string }
-    ItemCategory: { name: string }
-    ItemPrice: {  }
-    ItemSold: { sales_order_id: 'biginteger unsigned', product_id: 'biginteger unsigned', quantity: 'integer nullable default:NULL', unit_price: 'decimal:10,2 nullable default:NULL', amount: 'decimal:10,2 nullable default:NULL', sales_date: 'date nullable default:NULL', store_id: 'biginteger unsigned', discount: 'double default:0.00', status: "string:50 nullable default:'pending'" }
-    ItemType: { name: string }
-    JournalEntry: { id: 'char:36', description: string, payment_date: timestamp, warehouse_id: 'biginteger unsigned', vendor_id: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    JournalEntryDetail: { id: 'char:36', journal_entry_id: 'char:36', journal_type_id: 'char:36', amount: double, description: text, account_id: 'char:36', account_no: string, created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    JournalType: { id: 'char:36', name: string, sign: string }
-    Manufacturer: { name: string }
-    NewPayment: { branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', payment_amount: string, vendor_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', description: string }
-    NewPurchaseOrder: { item_category_id: 'biginteger unsigned', item_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', purchase_order_number: string, vendor_id: 'biginteger unsigned', purchase_amount: string, purchase_date: timestamp, expected_delivery_date: date, payment_type_id: 'biginteger unsigned' }
-    NewPurchaseReceived: { purchase_order_number: string, purchase_received_number: string, vendor_id: 'biginteger unsigned', received_date: date }
-    OutflowMode: { name: 'string:150 nullable default:NULL' }
-    PaymentMode: { name: string }
-    PaymentReceived: { customer_id: 'biginteger unsigned', amount_received: string, bank_charges: double, payment_number: string, deposit_bank_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', invoice_number: string }
-    PaymentTerm: { name: string }
-    PaymentType: { name: string }
-    PaymentVoucher: { product_id: 'biginteger unsigned', expense_date: timestamp, amount: string, description: string, vendor_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned', tax_id: 'biginteger unsigned', payment_mode_id: 'biginteger unsigned', expense_account_id: 'biginteger unsigned' }
-    PaymentVoucherDetail: { Expense_account_id: string, amount: string, quantity: string, item_id: 'biginteger unsigned' }
-    PeriodAccount: { id: 'char:36', financial_period_id: 'char:36', debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: 'string nullable default:NULL', account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    PeriodAccountDaily: { id: 'char:36', period_date: date, debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: string, account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    PeriodAccountYear: { id: 'char:36', financial_year_id: 'char:36', debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: 'string nullable default:NULL', account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    Permission: { name: string }
-    PostInflow: { amount: double, inflow_date: date, narration: string, bank_id: 'biginteger unsigned', inflow_status: 'biginteger unsigned', customer_id: 'integer nullable default:NULL' }
-    PostOutflow: { org_bank: 'biginteger unsigned nullable default:NULL', beneficiary: 'string:150 nullable default:NULL', amount: 'decimal:10,0 nullable default:NULL', account_name: 'string:150 nullable default:NULL', account_number: 'decimal:10,0 nullable default:NULL', bene_bank: 'biginteger unsigned nullable default:NULL', narration: 'string:150 nullable default:NULL', outflow_date: 'date nullable default:NULL', outflow_mode: 'biginteger unsigned', customer_id: 'integer nullable default:NULL', sales_receipt_id: 'biginteger nullable default:NULL' }
-    PurchaseOrderDetail: { item_category_id: 'biginteger unsigned', purchase_order_id: string, item_id: 'biginteger unsigned', unit_price: string, quantity: string, unit_id: 'biginteger unsigned' }
-    PurchaseReceivedDetail: { new_purchased_received_id: 'biginteger unsigned', item_category_id: 'biginteger unsigned', item_id: 'biginteger unsigned', unit_price: string, quantity: string, unit_id: 'biginteger unsigned' }
-    Reason: { name: string }
-    ReceiveItem: { id: 'char:36', receive_order_id: 'char:36', quantity: integer, unit_price: double, product_id: 'biginteger unsigned', description: 'text nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    ReceiveOrder: { id: 'char:36', purchase_order_number: 'string nullable default:NULL', receive_date: date, branch_id: 'biginteger unsigned', store_id: 'biginteger unsigned', vendor_id: 'biginteger unsigned nullable default:NULL', status: "enum:'pending','approved','cancelled' default:'pending'", approval_date: 'timestamp nullable default:NULL', approved_by: 'biginteger unsigned nullable default:NULL', approval_comment: 'string nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    RefundType: { name: string }
-    Release: { branch_id: 'biginteger unsigned', store_id: 'biginteger unsigned', customer_id: 'biginteger unsigned', sales_receipt_id: 'biginteger unsigned', user_id: 'biginteger unsigned', release_date: date, sales_order_id: 'biginteger nullable default:NULL' }
-    ReleaseDetails: { release_id: 'biginteger unsigned', product_id: 'biginteger unsigned', release_quantity: string, amount: string }
-    ReturnDetails: {  }
-    ReturnItem: {  }
-    Role: { name: 'string nullable default:NULL', guard_name: 'string nullable default:NULL' }
-    Sale: {  }
-    Sales: {  }
-    SalesInvoice: {  }
-    SalesOrder: { customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', store_id: 'biginteger unsigned', sales_order_number: string, total_amount: 'decimal:10,2 default:0.00', credit_limit: 'decimal:10,2 nullable default:NULL', credit_balance: 'decimal:10,2 default:0.00', payment_type: "enum:'Cash','Bank','Paylater','Credit' default:'Cash'", status: "enum:'Pending','Approved','Paid','Cancelled','Credit Pending' default:'Pending'", user_id: 'biginteger nullable default:NULL' }
-    SalesReceipt: { sales_receipt_number: 'string:150 nullable default:NULL', customer_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', payment_type: "enum:'Cash','Bank','Deposit','POS','Multi-Payment'", store_id: 'biginteger unsigned', total_amount: 'decimal:10,2 nullable default:NULL', amount_paid: 'decimal:10,2 nullable default:NULL', receipt_date: 'date nullable default:NULL', sales_order_id: 'biginteger unsigned nullable default:NULL', payment_detail: longtext, user_id: 'biginteger nullable default:NULL', cashier_id: 'biginteger nullable default:NULL' }
-    SalesType: {  }
-    ServiceType: { name: 'string nullable default:NULL' }
-    SettleCredit: {  }
-    State: { name: string }
-    Status: { name: string }
-    Store: { name: string, branch_id: 'biginteger unsigned', store_type_id: 'biginteger unsigned' }
-    StoreItem: { item_category_id: 'biginteger unsigned', create_item_id: 'biginteger unsigned', unit_id: 'biginteger unsigned', quantity: double, quantity_holding: 'double default:0.00', cost_price: double, selling_price: double, reorder_level: string, discount: 'biginteger unsigned nullable default:NULL', user_id: 'biginteger unsigned', store_id: 'biginteger unsigned', branch_id: 'biginteger nullable default:NULL' }
-    StoreTransferItem: { id: 'char:36', transfer_order_id: 'char:36', quantity: integer, unit_price: double, product_id: 'biginteger unsigned', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    StoreTransferOrder: { id: 'char:36', order_number: string, transfer_date: timestamp, source_branch_id: 'biginteger unsigned', source_store_id: 'biginteger unsigned', destination_branch_id: 'biginteger unsigned', destination_store_id: 'biginteger unsigned', approval_stage_id: 'biginteger unsigned nullable default:NULL', source_status: "enum:'pending','approved','cancelled' default:'pending'", source_date_approved: 'timestamp nullable default:NULL', destination_status: "enum:'pending','approved','cancelled' default:'pending'", destination_date_approved: 'timestamp nullable default:NULL', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    StoreType: { name: string }
-    Tax: { name: string }
-    Title: { name: string }
-    Transaction: { id: 'char:36', financial_period_id: 'char:36', transaction_date: date, transcode: string, transtype: string, naration: string, debit: double, credit: double, amount: double, warehouse_id: 'biginteger unsigned', account_no: string, account_id: 'char:36', created_by: 'biginteger unsigned nullable default:NULL', modified_by: 'biginteger unsigned nullable default:NULL', deleted_by: 'biginteger unsigned nullable default:NULL' }
-    TransactionType: {  }
-    TransferOrder: { transfer_order_number: string, transfer_date: date, transfer_reason: string, source_id: 'biginteger unsigned', destination_id: 'biginteger unsigned', image_url: string, transfer_quantity: string, item_id: 'biginteger unsigned', created_by: 'biginteger unsigned nullable default:NULL', updated_by: 'biginteger unsigned nullable default:NULL' }
-    Unit: { name: string }
-    User: { name: string, email: string, password: string, store_id: 'biginteger unsigned', status_id: 'biginteger unsigned', branch_id: 'biginteger unsigned', warehouse_id: 'biginteger unsigned' }
-    Vendor: { vendor_type: 'biginteger unsigned', name: 'string nullable default:NULL', service_type: 'biginteger unsigned', title: 'biginteger unsigned', designation: 'biginteger unsigned', contact_surname: 'string nullable default:NULL', contact_firstname: 'string nullable default:NULL', contact_middlename: 'string nullable default:NULL', contact_email: 'string nullable default:NULL', contact_phone_number: 'string nullable default:NULL', bank: 'biginteger unsigned', account_number: 'string nullable default:NULL', account_name: 'string nullable default:NULL', tin: 'string:150 nullable default:NULL', image_url: 'string nullable default:NULL' }
-    VendorCredit: { warehouse_id: 'biginteger unsigned', credit_number: string, purchase_order_number: string, vendor_id: 'biginteger unsigned', vendor_credit_date: date }
-    VendorTarget: {  }
-    VendorType: { name: string }
-    Warehouse: { name: string, branch_id: 'biginteger unsigned', warehouse_address: string, zipcode: string, contact_person: string, email: string, phone: string }
-    Weight: { name: string }
-    Year: { name: 'string:150 nullable default:NULL' }
-    PriceChange: { details: json, store_id: 'foreignId:constrained:stores', branch_id: 'foreignId:constrained:branches', change_reason_id: 'foreignId:constrained:change_reasons', status: 'enum:pending,approved,declined default:pending', approved_by: 'foreignId:constrained:users nullable', approval_date: 'timestamp nullable', comment: 'string:1000', created_by: 'foreignId:constrained:users', created_at: timestamp, updated_at: timestamp }
-    ChangeReason: { name: 'string:255', created_at: timestamp, updated_at: timestamp }
+    User: { id: 'uuid primary', role_id: 'uuid foreign:roles', agency_id: 'uuid foreign:agencies nullable', firstname: string, lastname: string, password: string, profile_picture: 'string nullable', date_of_birth: 'date nullable', gender: 'string nullable', email: 'string unique', phone: 'string nullable', status: string, email_verified: 'boolean default:false', phone_verified: 'boolean default:false', kyc_verified: 'boolean default:false', last_login: 'timestamp nullable', remember_token: 'string nullable', timestamps: {  } }
+    Agency: { id: 'uuid primary', company_name: string, registeration_number: string, address: string, phone: string, email: string, status: string, website: 'string nullable', license_number: 'string nullable', logo: 'string nullable', description: 'text nullable', subscription_id: 'uuid foreign:subscriptions nullable', timestamps: {  } }
+    Property: { id: 'uuid primary', agency_id: 'uuid foreign:agencies nullable', owner_id: 'uuid foreign:users', agent_id: 'uuid foreign:users nullable', property_type_id: 'uuid foreign:property_types', category_id: 'uuid foreign:property_categories', status_id: 'uuid foreign:property_statuses', purpose: string, description: text, price: float, title: string, currency: string, negotiable: 'boolean default:false', bedrooms: 'integer nullable', bathrooms: 'integer nullable', toilets: 'integer nullable', parking_spaces: 'integer nullable', kitchen: 'integer nullable', living_rooms: 'integer nullable', land_size: 'float nullable', building_size: 'float nullable', year_built: 'integer nullable', floors: 'integer nullable', furnished: 'boolean default:false', serviced: 'boolean default:false', pet_friendly: 'boolean default:false', minimum_rent_period: 'string nullable', available_from: 'date nullable', longitude: 'float nullable', latitude: 'float nullable', country_id: 'uuid foreign:countries', state_id: 'uuid foreign:states', city_id: 'uuid foreign:cities', area_id: 'uuid foreign:areas nullable', street_address: 'string nullable', postal_code: 'string nullable', featured: 'boolean default:false', premium: 'boolean default:false', verified: 'boolean default:false', views: 'integer default:0', likes: 'integer default:0', published_at: 'timestamp nullable', expiry_date: 'timestamp nullable', timestamps: {  } }
+    Role: { id: 'uuid primary', name: string, timestamps: {  } }
+    Permission: { id: 'uuid primary', name: string, timestamps: {  } }
+    PermissionRole: { id: 'uuid primary', permission_id: 'uuid foreign:permissions', role_id: 'uuid foreign:roles', timestamps: {  } }
+    PropertyType: { id: 'uuid primary', name: string, timestamps: {  } }
+    PropertyCategory: { id: 'uuid primary', name: string, timestamps: {  } }
+    PropertyStatus: { id: 'uuid primary', name: string, timestamps: {  } }
+    PropertyImage: { id: 'uuid primary', property_id: 'uuid foreign:properties', image_url: string, is_cover: 'boolean default:false', timestamps: {  } }
+    PropertyVideo: { id: 'uuid primary', property_id: 'uuid foreign:properties', video_url: string, thumbnail: 'string nullable', timestamps: {  } }
+    PropertyDocument: { id: 'uuid primary', property_id: 'uuid foreign:properties', survey_plan_url: 'string nullable', title: string, CofO: 'string nullable', floor_plan: 'string nullable', approval_letter: 'string nullable', document_type: string, verified: 'boolean default:false', document_url: string, timestamps: {  } }
+    Feature: { id: 'uuid primary', name: string, timestamps: {  } }
+    PropertyFeature: { id: 'uuid primary', property_id: 'uuid foreign:properties', feature_id: 'uuid foreign:features', timestamps: {  } }
+    Amenity: { id: 'uuid primary', name: string, timestamps: {  } }
+    PropertyAmenity: { id: 'uuid primary', property_id: 'uuid foreign:properties', amenity_id: 'uuid foreign:amenities', timestamps: {  } }
+    Country: { id: 'uuid primary', name: string, code: string, timestamps: {  } }
+    State: { id: 'uuid primary', country_id: 'uuid foreign:countries', name: string, timestamps: {  } }
+    City: { id: 'uuid primary', state_id: 'uuid foreign:states', name: string, timestamps: {  } }
+    Area: { id: 'uuid primary', city_id: 'uuid foreign:cities', name: string, timestamps: {  } }
+    PropertyEnquiry: { id: 'uuid primary', property_id: 'uuid foreign:properties', sender_id: 'uuid foreign:users', receiver_id: 'uuid foreign:users', message: text, status: string, email: 'string nullable', phone: 'string nullable', timestamps: {  } }
+    PropertyView: { id: 'uuid primary', property_id: 'uuid foreign:properties', user_id: 'uuid foreign:users nullable', ip_address: 'string nullable', device: 'string nullable', browser: 'string nullable', country: 'string nullable', viewed_at: timestamp, timestamps: {  } }
+    SavedProperty: { id: 'uuid primary', property_id: 'uuid foreign:properties', user_id: 'uuid foreign:users', timestamps: {  } }
+    PropertyOffer: { id: 'uuid primary', property_id: 'uuid foreign:properties', buyer_id: 'uuid foreign:users', offer_amount: float, status: string, message: 'text nullable', accepted_at: 'timestamp nullable', rejected_at: 'timestamp nullable', timestamps: {  } }
+    InspectionBooking: { id: 'uuid primary', property_id: 'uuid foreign:properties', user_id: 'uuid foreign:users', scheduled_at: timestamp, schedule_time: string, remarks: 'text nullable', status: string, timestamps: {  } }
+    Conversation: { id: 'uuid primary', property_id: 'uuid foreign:properties nullable', buyer_id: 'uuid foreign:users', seller_id: 'uuid foreign:users', timestamps: {  } }
+    Message: { id: 'uuid primary', conversation_id: 'uuid foreign:conversations', sender_id: 'uuid foreign:users', message: text, attachments: 'string nullable', read_at: 'timestamp nullable', timestamps: {  } }
+    SubscriptionPlan: { id: 'uuid primary', name: string, price: float, duration: integer, listing_limit: integer, featured_limit: integer, priority_support: 'boolean default:false', timestamps: {  } }
+    Subscription: { id: 'uuid primary', user_id: 'uuid foreign:users', subscription_plan_id: 'uuid foreign:subscription_plans', start_date: date, end_date: date, payment_id: 'uuid foreign:payments nullable', timestamps: {  } }
+    Payment: { id: 'uuid primary', user_id: 'uuid foreign:users', subscription_id: 'uuid foreign:subscriptions nullable', property_id: 'uuid foreign:properties nullable', currency: string, gateway: string, transaction_reference: string, paid_at: 'timestamp nullable', amount: float, payment_status: string, timestamps: {  } }
+    Review: { id: 'uuid primary', property_id: 'uuid foreign:properties', reviewer_id: 'uuid foreign:users', rating: integer, comment: 'text nullable', timestamps: {  } }
+    Notification: { id: 'uuid primary', user_id: 'uuid foreign:users', title: string, message: text, notification_type: string, read_at: 'timestamp nullable', timestamps: {  } }
+    AdPackage: { id: 'uuid primary', name: string, price: float, duration: integer, homepage: 'boolean default:false', category_page: 'boolean default:false', search_page: 'boolean default:false', timestamps: {  } }
+    Advertisement: { id: 'uuid primary', user_id: 'uuid foreign:users', ad_package_id: 'uuid foreign:ad_packages', property_id: 'uuid foreign:properties', start_date: date, end_date: date, status: string, timestamps: {  } }
+    BlogPost: { id: 'uuid primary', title: string, slug: 'string unique', content: text, status: string, featured_image: 'string nullable', author_id: 'uuid foreign:users', published_at: 'timestamp nullable', timestamps: {  } }
+    Page: { id: 'uuid primary', title: string, slug: 'string unique', content: text, status: string, timestamps: {  } }
+    FAQ: { id: 'uuid primary', question: string, answer: text, status: string, timestamps: {  } }
+    Setting: { id: 'uuid primary', key: 'string unique', value: 'text nullable', timestamps: {  } }
+    AuditLog: { id: 'uuid primary', user_id: 'uuid foreign:users nullable', action: string, model: string, model_id: 'uuid nullable', changes: 'text nullable', old_values: 'text nullable', new_values: 'text nullable', ip_address: 'string nullable', user_agent: 'string nullable', timestamps: {  } }
+    ReportedListing: { id: 'uuid primary', property_id: 'uuid foreign:properties', reporter_id: 'uuid foreign:users', reason: text, description: 'text nullable', resolved_by: 'uuid foreign:users nullable', resolved_at: 'timestamp nullable', status: string, timestamps: {  } }
+    MortgageCalculation: { id: 'uuid primary', user_id: 'uuid foreign:users nullable', property_id: 'uuid foreign:properties nullable', loan_amount: float, interest_rate: float, loan_term: integer, monthly_payment: float, total_payment: float, timestamps: {  } }

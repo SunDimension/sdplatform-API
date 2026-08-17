@@ -2,12 +2,9 @@
 
 namespace Tests\Feature\Http\Controllers;
 
-use App\Models\Branch;
 use App\Models\Role;
-use App\Models\Status;
 use App\Models\User;
 use App\Models\Users;
-
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use JMac\Testing\Traits\AdditionalAssertions;
@@ -47,31 +44,37 @@ final class UsersControllerTest extends TestCase
     public function store_saves(): void
     {
         $role = Role::factory()->create();
-        $user_name = $this->faker->userName();
-        $user_email = $this->faker->word();
+        $firstname = $this->faker->firstName();
+        $lastname = $this->faker->lastName();
         $password = $this->faker->password();
-        $status = Status::factory()->create();
-        $branch = Branch::factory()->create();
-
+        $email = $this->faker->safeEmail();
+        $status = $this->faker->word();
+        $email_verified = $this->faker->boolean();
+        $phone_verified = $this->faker->boolean();
+        $kyc_verified = $this->faker->boolean();
 
         $response = $this->post(route('users.store'), [
             'role_id' => $role->id,
-            'user_name' => $user_name,
-            'user_email' => $user_email,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
             'password' => $password,
-            'status_id' => $status->id,
-            'branch_id' => $branch->id,
-
+            'email' => $email,
+            'status' => $status,
+            'email_verified' => $email_verified,
+            'phone_verified' => $phone_verified,
+            'kyc_verified' => $kyc_verified,
         ]);
 
         $users = User::query()
             ->where('role_id', $role->id)
-            ->where('user_name', $user_name)
-            ->where('user_email', $user_email)
+            ->where('firstname', $firstname)
+            ->where('lastname', $lastname)
             ->where('password', $password)
-            ->where('status_id', $status->id)
-            ->where('branch_id', $branch->id)
-
+            ->where('email', $email)
+            ->where('status', $status)
+            ->where('email_verified', $email_verified)
+            ->where('phone_verified', $phone_verified)
+            ->where('kyc_verified', $kyc_verified)
             ->get();
         $this->assertCount(1, $users);
         $user = $users->first();
@@ -108,21 +111,25 @@ final class UsersControllerTest extends TestCase
     {
         $user = Users::factory()->create();
         $role = Role::factory()->create();
-        $user_name = $this->faker->userName();
-        $user_email = $this->faker->word();
+        $firstname = $this->faker->firstName();
+        $lastname = $this->faker->lastName();
         $password = $this->faker->password();
-        $status = Status::factory()->create();
-        $branch = Branch::factory()->create();
-
+        $email = $this->faker->safeEmail();
+        $status = $this->faker->word();
+        $email_verified = $this->faker->boolean();
+        $phone_verified = $this->faker->boolean();
+        $kyc_verified = $this->faker->boolean();
 
         $response = $this->put(route('users.update', $user), [
             'role_id' => $role->id,
-            'user_name' => $user_name,
-            'user_email' => $user_email,
+            'firstname' => $firstname,
+            'lastname' => $lastname,
             'password' => $password,
-            'status_id' => $status->id,
-            'branch_id' => $branch->id,
-
+            'email' => $email,
+            'status' => $status,
+            'email_verified' => $email_verified,
+            'phone_verified' => $phone_verified,
+            'kyc_verified' => $kyc_verified,
         ]);
 
         $user->refresh();
@@ -131,12 +138,14 @@ final class UsersControllerTest extends TestCase
         $response->assertJsonStructure([]);
 
         $this->assertEquals($role->id, $user->role_id);
-        $this->assertEquals($user_name, $user->user_name);
-        $this->assertEquals($user_email, $user->user_email);
+        $this->assertEquals($firstname, $user->firstname);
+        $this->assertEquals($lastname, $user->lastname);
         $this->assertEquals($password, $user->password);
-        $this->assertEquals($status->id, $user->status_id);
-        $this->assertEquals($branch->id, $user->branch_id);
-
+        $this->assertEquals($email, $user->email);
+        $this->assertEquals($status, $user->status);
+        $this->assertEquals($email_verified, $user->email_verified);
+        $this->assertEquals($phone_verified, $user->phone_verified);
+        $this->assertEquals($kyc_verified, $user->kyc_verified);
     }
 
 

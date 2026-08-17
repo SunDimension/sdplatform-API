@@ -21,8 +21,6 @@ class RoleUpdateRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
-            // 'guard-name' => ['required', 'string'],
-            
         ];
     }
 }

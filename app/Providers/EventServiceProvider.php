@@ -31,7 +31,6 @@ class EventServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // Register the SalesOrder observer
-        SalesOrder::observe(SalesOrderObserver::class);
 
         // You can register more observers here
         // PurchaseOrder::observe(PurchaseOrderObserver::class);

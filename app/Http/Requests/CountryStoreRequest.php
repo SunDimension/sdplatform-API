@@ -21,6 +21,7 @@ class CountryStoreRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string'],
+            'code' => ['required', 'string'],
         ];
     }
 }

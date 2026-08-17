@@ -43,16 +43,13 @@ final class RolesControllerTest extends TestCase
     public function store_saves(): void
     {
         $name = $this->faker->name();
-        $description = $this->faker->text();
 
         $response = $this->post(route('roles.store'), [
             'name' => $name,
-            'description' => $description,
         ]);
 
         $roles = Role::query()
             ->where('name', $name)
-            ->where('description', $description)
             ->get();
         $this->assertCount(1, $roles);
         $role = $roles->first();
@@ -89,11 +86,9 @@ final class RolesControllerTest extends TestCase
     {
         $role = Roles::factory()->create();
         $name = $this->faker->name();
-        $description = $this->faker->text();
 
         $response = $this->put(route('roles.update', $role), [
             'name' => $name,
-            'description' => $description,
         ]);
 
         $role->refresh();
@@ -102,7 +97,6 @@ final class RolesControllerTest extends TestCase
         $response->assertJsonStructure([]);
 
         $this->assertEquals($name, $role->name);
-        $this->assertEquals($description, $role->description);
     }
 
 

@@ -1,668 +1,81 @@
-<?php
-
-
-use App\Http\Controllers\CreateItemController;
-use App\Http\Controllers\UsersController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\RolesController;
-use App\Http\Controllers\SalesOrderController;
-use App\Http\Controllers\PostOutflowController;
-use App\Http\Controllers\ReturnItemController;
-use App\Http\Controllers\ProductAuditController;
-use App\Http\Controllers\SalesReceiptController;
-use App\Http\Controllers\LedgerAccountController;
-use App\Http\Controllers\TrialBalanceController;
-use App\Http\Controllers\CreditTransactionController;
-use App\Http\Controllers\PurchaseItemCostController;
-use App\Http\Controllers\DeployController;
-use App\Http\Controllers\SyncController;
-use App\Models\CreditTransaction;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MonthlyFinancialPositionController;
-use App\Http\Controllers\BalanceSheetController;
-use App\Http\Controllers\ProfitLossController;
-use App\Http\Controllers\GoodsRecievedController;
-use App\Http\Controllers\TransactionController;
-use App\Http\Controllers\JournalEntryController;
-use App\Http\Controllers\JournalLineController;
-use App\Http\Controllers\AccountTypeController;
-use App\Http\Controllers\ChartOfAccountController;
-use App\Http\Controllers\PurchaseOrderController;
-use App\Http\Controllers\LedgerPostingController;
-use App\Http\Controllers\SupplierController;
-use App\Http\Controllers\SupplierPaymentController;
-use App\Http\Controllers\StockDisbursementController;
-use App\Http\Controllers\StockMovementController;
-use App\Http\Controllers\SupplierInvoiceController;
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| is assigned the "api" middleware group. Enjoy building your API!
-|
-*/
 
-Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/login', [AuthController::class, 'login'])->name('login'); // Add this name
-Route::middleware('auth:sanctum')->post('/logout', [AuthController::class, 'logout']);
-// routes/api.php
-Route::middleware('auth:sanctum')->group(function () {
 
-    // Route::middleware('auth:sanctum')->get('/users', [UsersController::class, 'index']);
+Route::apiResource('users', App\Http\Controllers\UsersController::class);
 
-    Route::prefix('users')->group(function () {
-        // Get all users
-        Route::get('/', [UsersController::class, 'index'])->name('users.index');
+Route::apiResource('agencies', App\Http\Controllers\AgenciesController::class);
 
-        // Create a new user
-        Route::post('/', [UsersController::class, 'store'])->name('users.store');
+Route::apiResource('roles', App\Http\Controllers\RolesController::class);
 
-        // Get a specific user
-        Route::get('/{user}', [UsersController::class, 'show'])->name('users.show');
+Route::apiResource('permissions', App\Http\Controllers\PermissionsController::class);
 
+Route::apiResource('property-types', App\Http\Controllers\PropertyTypesController::class);
 
+Route::apiResource('property-categories', App\Http\Controllers\PropertyCategoriesController::class);
 
-        // Delete a specific user
-        Route::delete('/{user}', [UsersController::class, 'destroy'])->name('users.destroy');
-    });
+Route::apiResource('property-statuses', App\Http\Controllers\PropertyStatusesController::class);
 
-    Route::prefix('roles')->group(function () {
-        // Get all roles
-        Route::get('/', [RolesController::class, 'index'])->name('roles.index');
+Route::apiResource('properties', App\Http\Controllers\PropertiesController::class);
 
-        // Create a new role
-        Route::post('/', [RolesController::class, 'store'])->name('roles.store');
+Route::apiResource('property-images', App\Http\Controllers\PropertyImagesController::class);
 
-        // Get a specific role
-        Route::get('/{role}', [RolesController::class, 'show'])->name('roles.show');
+Route::apiResource('property-videos', App\Http\Controllers\PropertyVideosController::class);
 
+Route::apiResource('property-documents', App\Http\Controllers\PropertyDocumentsController::class);
 
+Route::apiResource('features', App\Http\Controllers\FeaturesController::class);
 
-        // Delete a specific role
-        Route::delete('/{role}', [RolesController::class, 'destroy'])->name('roles.destroy');
+Route::apiResource('property-features', App\Http\Controllers\PropertyFeaturesController::class);
 
-        // Attach a permission to a role
-        Route::post('/{role}/permissions/attach', [RolesController::class, 'attachPermission'])
-            ->name('roles.attachPermission');
+Route::apiResource('amenities', App\Http\Controllers\AmenitiesController::class);
 
-        // Detach a permission from a role
-        Route::post('/{role}/permissions/detach', [RolesController::class, 'detachPermission'])
-            ->name('roles.detachPermission');
-    });
+Route::apiResource('property-amenities', App\Http\Controllers\PropertyAmenitiesController::class);
 
-    Route::post('search-ledger-postings',[LedgerPostingController::class,'searchLedgerPosting']);
-    Route::post('search-journal-lines',[JournalLineController::class, 'searchJournalLines']);
-    Route::post('search-transactions', [TransactionController::class, 'searchTransaction']);
-    Route::post('search-profit-loss',[ProfitLossController::class, 'searchProfitLoss']);
-    Route::post('search-journal-entries',[JournalEntryController::class,'searchJournalEntries']);
-    Route::apiResource('item-categories', App\Http\Controllers\ItemCategoryController::class);
+Route::apiResource('countries', App\Http\Controllers\CountriesController::class);
 
-    Route::apiResource('purchase-item-costs', App\Http\Controllers\PurchaseItemCostController::class);
+Route::apiResource('states', App\Http\Controllers\StatesController::class);
 
-    Route::apiResource('years', App\Http\Controllers\YearController::class);
+Route::apiResource('cities', App\Http\Controllers\CitiesController::class);
 
-    Route::apiResource('service-types', App\Http\Controllers\ServiceTypeController::class);
+Route::apiResource('areas', App\Http\Controllers\AreasController::class);
 
-    Route::apiResource('vendor-targets', App\Http\Controllers\VendorTargetController::class);
+Route::apiResource('property-enquiries', App\Http\Controllers\PropertyEnquiriesController::class);
 
-    Route::patch('create-items/{id}/reduce-stock', [App\Http\Controllers\CreateItemController::class, 'reduceStock']);
+Route::apiResource('property-views', App\Http\Controllers\PropertyViewsController::class);
 
+Route::apiResource('saved-properties', App\Http\Controllers\SavedPropertiesController::class);
 
-    Route::apiResource('create-items', App\Http\Controllers\CreateItemController::class);
-    Route::apiResource('cash-discrepancies', App\Http\Controllers\CashDiscrepancyController::class);
-    Route::apiResource('expense-lines', App\Http\Controllers\ExpenseLineController::class);
+Route::apiResource('property-offers', App\Http\Controllers\PropertyOffersController::class);
 
-    Route::apiResource('regions', App\Http\Controllers\RegionController::class);
+Route::apiResource('inspection-bookings', App\Http\Controllers\InspectionBookingsController::class);
 
+Route::apiResource('conversations', App\Http\Controllers\ConversationsController::class);
 
-    Route::post('/sales-receipts/{id}/block', [\App\Http\Controllers\SalesReceiptController::class, 'blockReceipt']);
+Route::apiResource('messages', App\Http\Controllers\MessagesController::class);
 
-    // Unblock a sales receipt
-    Route::post('/sales-receipts/{id}/unblock', [\App\Http\Controllers\SalesReceiptController::class, 'unblockReceipt']);
+Route::apiResource('subscription-plans', App\Http\Controllers\SubscriptionPlansController::class);
 
+Route::apiResource('subscriptions', App\Http\Controllers\SubscriptionsController::class);
 
-    Route::post('/receipts-blocking/search', [SalesReceiptController::class, 'searchForBlocking'])
-        ->name('sales.receipts.searchForBlocking');
-    ///////////////////////////////////////////////////
+Route::apiResource('payments', App\Http\Controllers\PaymentsController::class);
 
-    // Route::get('/branches', [\App\Http\Controllers\BranchController::class, 'index']);
+Route::apiResource('reviews', App\Http\Controllers\ReviewsController::class);
 
+Route::apiResource('notifications', App\Http\Controllers\NotificationsController::class);
 
+Route::apiResource('ad-packages', App\Http\Controllers\AdPackagesController::class);
 
+Route::apiResource('advertisements', App\Http\Controllers\AdvertisementsController::class);
 
+Route::apiResource('blog-posts', App\Http\Controllers\BlogPostsController::class);
 
+Route::apiResource('pages', App\Http\Controllers\PagesController::class);
 
-    Route::apiResource('measurements', App\Http\Controllers\MeasurementController::class);
-    Route::apiResource('cashier-expenses', App\Http\Controllers\CashierExpenseController::class);
-    Route::apiResource('bank-remittances', App\Http\Controllers\BankRemittanceController::class);
+Route::apiResource('f-a-qs', App\Http\Controllers\FAQsController::class);
 
+Route::apiResource('settings', App\Http\Controllers\SettingsController::class);
 
+Route::apiResource('audit-logs', App\Http\Controllers\AuditLogsController::class);
 
+Route::apiResource('reported-listings', App\Http\Controllers\ReportedListingsController::class);
 
-    Route::apiResource('cashier-remittances', App\Http\Controllers\CashierRemittanceController::class);
-    Route::get('get-cashier-remittance/{id}', [App\Http\Controllers\CashierRemittanceController::class, 'get']);
-    Route::get('get-bank-remittance/{id}', [App\Http\Controllers\BankRemittanceController::class, 'get']);
-
-    // Route::get('cashier-remit', App\Http\Controllers\CashierRemittanceController::class,'newGet');
-
-    // Route::get('cashier-remittances-get', [App\Http\Controllers\CashierRemittanceController::class,'index']);
-    Route::get('cashier-expense-pending', [App\Http\Controllers\CashierExpenseController::class, 'pending']);
-    Route::get('bank-remittance-pending', [App\Http\Controllers\BankRemittanceController::class, 'pending']);
-    Route::get('cashier-remittance-pending', [App\Http\Controllers\CashierRemittanceController::class, 'pending']);
-    Route::get(
-        '/goods-received/available-items',
-        [App\Http\Controllers\GoodsRecievedController::class, 'getAvailableItems']
-    );
-    Route::post('cashier-expense-approve', [App\Http\Controllers\CashierExpenseController::class, 'approve']);
-    Route::post('bank-remittance-approve', [App\Http\Controllers\BankRemittanceController::class, 'approve']);
-    Route::post('cashier-remittance-approve', [App\Http\Controllers\CashierRemittanceController::class, 'approve']);
-
-    Route::apiResource('goods-received', App\Http\Controllers\GoodsRecievedController::class);
-    Route::post('search-cashier-remittance', [App\Http\Controllers\CashierRemittanceController::class, 'index']);
-    Route::post('search-bank-remittance', [App\Http\Controllers\BankRemittanceController::class, 'index']);
-    Route::post('search-cashier-expense', [App\Http\Controllers\CashierExpenseController::class, 'index']);
-
-    Route::post('search-stock-movements', [App\Http\Controllers\StockMovementController::class, 'search']);
-    ///////////// Sales Routes /////////////////
-    // Route::post('sales-orders', [SalesOrderController::class,'store']);
-    // Route::get('/sales-orders/{id}/edit', [SalesOrderController::class, 'edit']);
-    // Route::put('/sales-orders/{id}', [SalesOrderController::class, 'update']);
-    ///////////////
-
-    // <?php
-
-    Route::post('/supplier-invoices', [SupplierInvoiceController::class, 'store']);
-
-    Route::apiResource('supplier-invoices', SupplierInvoiceController::class);
-
-    // Route::prefix('reports')->group(function () {
-    Route::get('/profit-loss', [ProfitLossController::class, 'index']);
-    Route::get('/profit-loss/comparative', [ProfitLossController::class, 'comparative']);
-    Route::post('/profit-loss/export', [ProfitLossController::class, 'export']);
-    // });
-
-
-    // Add this nested route specifically for items (only need index/show)
-    Route::get('goods-received/{goodsReceived}/items', [GoodsRecievedController::class, 'items'])
-        ->name('goods-received.items');
-
-
-    // In routes/api.php
-
-    Route::get('/balance-sheet', [BalanceSheetController::class, 'index']);
-    Route::get('/balance-sheet/comparative', [BalanceSheetController::class, 'comparative']);
-    Route::get('/balance-sheet/trend', [BalanceSheetController::class, 'trend']);
-    Route::post('/balance-sheet/export', [BalanceSheetController::class, 'export']);
-
-
-    // routes/api.php
-    Route::prefix('supplier-payments')->group(function () {
-        Route::get('/', [SupplierPaymentController::class, 'index']);
-        Route::post('/', [SupplierPaymentController::class, 'store']);
-        Route::get('/summary', [SupplierPaymentController::class, 'getPaymentSummary']);
-        Route::get('/unpaid-invoices', [SupplierPaymentController::class, 'getUnpaidInvoices']);
-        Route::get('/{id}', [SupplierPaymentController::class, 'show']);
-    });
-
-
-
-    // In routes/api.php
-
-    Route::get('/monthly-financial-position', [MonthlyFinancialPositionController::class, 'index']);
-    Route::get('/{yearMonth}', [MonthlyFinancialPositionController::class, 'show'])
-        ->where('yearMonth', '\d{4}-\d{1,2}');
-    Route::get('/year-to-date', [MonthlyFinancialPositionController::class, 'yearToDate']);
-
-    Route::apiResource('sales-orders', App\Http\Controllers\SalesOrderController::class);
-
-    Route::post('search-post-outflows', [App\Http\Controllers\PostOutflowController::class, 'index']);
-
-    Route::post('search-post-inflows', [App\Http\Controllers\PostInflowController::class, 'index']);
-
-    Route::post('search-sales-orders', [App\Http\Controllers\SalesOrderController::class, 'index']);
-
-
-
-    Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
-
-
-
-    Route::post('return-transactions', [App\Http\Controllers\ReturnItemController::class, 'index']);
-
-
-    Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
-
-    Route::post('search-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'index']);
-    Route::post('my-sales-receipts', [App\Http\Controllers\SalesReceiptController::class, 'myReceipts']);
-
-
-    Route::post('search-item_sold', [App\Http\Controllers\SalesOrderController::class, 'salesSummary']);
-
-
-
-    Route::post('/credit-transactions/{id}/cancel', [CreditTransactionController::class, 'cancelCredit']);
-
-    Route::post('search-customer-record', [App\Http\Controllers\SalesReceiptController::class, 'CustomerAndDate']);
-
-    Route::get('/post-outflow/customer-inflow-details', [PostOutflowController::class, 'getCustomerInflowDetails']);
-    Route::post('search-sales-release', [App\Http\Controllers\ReleaseController::class, 'index']);
-
-    Route::get('/credit-awaiting-payment', [App\Http\Controllers\CreditTransactionController::class, 'pendingPayment']);
-    Route::get('/customer-balances', [App\Http\Controllers\CustomerController::class, 'balances']);
-    Route::get('/customer-balance-history/{id}', [App\Http\Controllers\CustomerController::class, 'customerBalanceHistory']);
-    Route::get('/sales-orders-pending-credit', [App\Http\Controllers\SalesOrderController::class, 'pendingCredit']);
-    Route::get('/sales-orders-pending-receipt', [App\Http\Controllers\SalesOrderController::class, 'pendingReceipts']);
-    Route::get('/sales-order-info/{no}', [SalesOrderController::class, 'getSalesOrderInfo']);
-    // Route::get('/sales-order-info/{orderno}', [App\Http\Controllers\SalesOrderController::class, 'getbynumber']);
-    Route::get('/sales-receipt-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class, 'getbynumber']);
-    Route::apiResource('sales-order', App\Http\Controllers\SalesOrderController::class);
-    // Route::post('sales-order', App\Http\Controllers\SalesOrderController::class);
-
-    Route::post('/sales-orders/{id}/cancel', [SalesOrderController::class, 'cancel']);
-
-    Route::get('/sales-order/{id}/edit', [SalesOrderController::class, 'edit']);
-    Route::get('credit-transactions/for-order/{salesOrderId}', [CreditTransactionController::class, 'getForOrder']);
-
-
-    Route::post('/sales-receipt/{id}/cancel', [SalesReceiptController::class, 'cancel']);
-
-    // Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
-
-    Route::post('/customers/{id}/assign-credit', [App\Http\Controllers\CustomerController::class, 'assignCredit']);
-
-    Route::post('/store-items/{id}/set-limit', [App\Http\Controllers\StoreItemController::class, 'setLimit']);
-    /////////// StoreItem////////////////////////////////////////
-
-    Route::apiResource('store-items', App\Http\Controllers\StoreItemController::class);
-
-    Route::get('my-store-items', [App\Http\Controllers\StoreItemController::class, "myStoreItems"]);
-
-    // Route::get('my-store-itemsold', [App\Http\Controllers\SalesOrderController::class, "mystoreItemSold"]);
-
-
-    Route::get('my-stores-inventory', [App\Http\Controllers\StoreItemController::class, "myStoreItemsSetLimit"]);
-
-
-
-    Route::get('/returns/{returnId}/with-receipt', [ReturnItemController::class, 'getReturnWithReceipt']);
-
-
-    Route::get('my-store-items-inventory', [App\Http\Controllers\StoreItemController::class, 'myStoreItems2']);
-
-    Route::get('get-inventory-by-store/{itemId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStore"]);
-    Route::get('get-inventory-by-branch-store/{itemId}/{branchId}', [App\Http\Controllers\StoreItemController::class, "GetInventoryByStoreBranch"]);
-    Route::get('store-items/{storeId}/products', [App\Http\Controllers\StoreItemController::class, "getStoreProducts"]);
-
-    Route::apiResource('item_price', App\Http\Controllers\ItemPriceController::class);
-    Route::apiResource('sales-receipt', App\Http\Controllers\SalesReceiptController::class);
-
-    Route::apiResource('stock-disbursements', StockDisbursementController::class);
-
-    Route::apiResource('item-sold', App\Http\Controllers\ItemSoldController::class);
-
-    Route::apiResource('release', App\Http\Controllers\ReleaseController::class);
-
-    Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::class);
-
-    // Accounting entries routes for return items
-    Route::post('return-items/{id}/generate-accounting-entries', [App\Http\Controllers\ReturnItemController::class, 'generateAccountingEntries']);
-    Route::post('return-items/generate-bulk-accounting-entries', [App\Http\Controllers\ReturnItemController::class, 'generateBulkAccountingEntries']);
-    Route::get('return-items/{id}/accounting-entries', [App\Http\Controllers\ReturnItemController::class, 'getAccountingEntries']);
-
-    Route::post('return-approve', [App\Http\Controllers\ReturnItemController::class, 'approve']);
-
-    Route::get('return-pending', [App\Http\Controllers\ReturnItemController::class, 'pending']);
-    Route::get('return-pending-credit', [App\Http\Controllers\ReturnItemController::class, 'pendingCredit']);
-
-    Route::get('get-return/{id}', [App\Http\Controllers\ReturnItemController::class, 'get']);
-
-    Route::apiResource('return-details', App\Http\Controllers\ReturnDetailsController::class);
-
-    Route::apiResource('release-details', App\Http\Controllers\ReleaseDetailsController::class);
-
-    Route::apiResource('release', App\Http\Controllers\ReleaseController::class);
-
-    Route::apiResource('return-items', App\Http\Controllers\ReturnItemController::class);
-
-    Route::apiResource('return-details', App\Http\Controllers\ReturnDetailsController::class);
-
-    Route::apiResource('release-details', App\Http\Controllers\ReleaseDetailsController::class);
-    Route::apiResource('dimensions', App\Http\Controllers\DimensionController::class);
-
-    Route::apiResource('roles', App\Http\Controllers\RolesController::class);
-
-    Route::apiResource('adjustment-types', App\Http\Controllers\AdjustmentTypeController::class);
-
-    Route::apiResource('weights', App\Http\Controllers\WeightController::class);
-
-    Route::apiResource('item-types', App\Http\Controllers\ItemTypeController::class);
-
-    Route::apiResource('statuses', App\Http\Controllers\StatusController::class);
-
-    Route::apiResource('inflow-statuses', App\Http\Controllers\InflowStatusController::class);
-
-    Route::apiResource('outflow-modes', App\Http\Controllers\OutflowModeController::class);
-
-    Route::apiResource('post-outflows', App\Http\Controllers\PostOutflowController::class);
-
-    // Accounting entries routes for post outflows
-    Route::post('post-outflows/{id}/generate-accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'generateAccountingEntries']);
-    Route::post('post-outflows/generate-bulk-accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'generateBulkAccountingEntries']);
-    Route::get('post-outflows/{id}/accounting-entries', [App\Http\Controllers\PostOutflowController::class, 'getAccountingEntries']);
-
-    Route::apiResource('settle-credits', App\Http\Controllers\SettleCreditController::class);
-
-    Route::apiResource('post-inflows', App\Http\Controllers\PostInflowController::class);
-
-    // Accounting entries routes for post inflows
-    Route::post('post-inflows/{id}/generate-accounting-entries', [App\Http\Controllers\PostInflowController::class, 'generateAccountingEntries']);
-    Route::post('post-inflows/generate-bulk-accounting-entries', [App\Http\Controllers\PostInflowController::class, 'generateBulkAccountingEntries']);
-    Route::get('post-inflows/{id}/accounting-entries', [App\Http\Controllers\PostInflowController::class, 'getAccountingEntries']);
-
-
-    /////////////////////////////////////////////////////
-    Route::apiResource('branches', App\Http\Controllers\BranchController::class);
-
-    Route::apiResource('customer-types', App\Http\Controllers\CustomerTypeController::class);
-
-    Route::apiResource('purchase-orders',  App\Http\Controllers\PurchaseOrderController::class);
-
-    Route::post('search-stock-disbursements', [App\Http\Controllers\StockDisbursementController::class, 'searchDisbursements']);
-
-
-    Route::apiResource('units', App\Http\Controllers\UnitController::class);
-
-    Route::apiResource('payment-terms', App\Http\Controllers\PaymentTermController::class);
-
-    Route::post('search-purchase-orders', [App\Http\Controllers\PurchaseOrderController::class, 'searchPurchase']);
-
-    Route::apiResource('discounts', App\Http\Controllers\DiscountController::class);
-
-    Route::post('search-goods-received', [App\Http\Controllers\GoodsRecievedController::class, 'searchGoodsReceived']);
-
-    // Route::apiResource('taxes', App\Http\Controllers\TaxController::class);
-    Route::get('/supplier-invoices/{id}', [SupplierInvoiceController::class, 'show']);
-
-
-    // In routes/api.php
-    Route::get('/disbursed-stock/available-quantities', [StockDisbursementController::class, 'getAvailableQuantities'])
-        ->name('disbursed-stock.available-quantities');
-    Route::post('search-suppliers-invoices', [App\Http\Controllers\SupplierInvoiceController::class, 'invoicesSearch']);
-
-    Route::apiResource('titles', App\Http\Controllers\TitleController::class);
-
-    Route::apiResource('carriers', App\Http\Controllers\CarrierController::class);
-
-    Route::apiResource('payment-modes', App\Http\Controllers\PaymentModeController::class);
-
-    Route::apiResource('payment-types', App\Http\Controllers\PaymentTypeController::class);
-
-    Route::apiResource('designations', App\Http\Controllers\DesignationController::class);
-
-    Route::apiResource('manufacturers', App\Http\Controllers\ManufacturerController::class);
-
-    Route::apiResource('brands', App\Http\Controllers\BrandController::class);
-
-    Route::apiResource('attributes', App\Http\Controllers\AttributeController::class);
-
-    Route::apiResource('countries', App\Http\Controllers\CountryController::class);
-
-    Route::apiResource('states', App\Http\Controllers\StateController::class);
-
-    Route::apiResource('banks', App\Http\Controllers\BankController::class);
-
-    Route::apiResource('permissions', App\Http\Controllers\PermissionController::class);
-
-    // Route::apiResource('search', App\Http\Controllers\CreateItemController::class, 'search');
-    Route::get('/create-items/search', [CreateItemController::class, 'search'])->name('createItems.search');
-
-    Route::apiResource('vendor-types', App\Http\Controllers\VendorTypeController::class);
-
-    Route::apiResource('vendors', App\Http\Controllers\VendorController::class);
-
-    Route::apiResource('reasons', App\Http\Controllers\ReasonController::class);
-
-    Route::apiResource('transfer-orders', App\Http\Controllers\TransferOrderController::class);
-
-    Route::apiResource('deliveries', App\Http\Controllers\DeliveryController::class);
-
-    // Route::apiResource('sales', App\Http\Controllers\SaleController::class);
-
-    Route::apiResource('inventory-adjustments', App\Http\Controllers\InventoryAdjustmentController::class);
-
-    // Route::apiResource('invoices', App\Http\Controllers\InvoiceController::class);
-
-    Route::apiResource('credit-sales', App\Http\Controllers\CreditSaleController::class);
-
-    Route::apiResource('customers', App\Http\Controllers\CustomerController::class);
-
-    Route::get('pending-release/{storeId}', [App\Http\Controllers\SalesReceiptController::class, 'pendingReleaseStore']);
-    Route::get('pending-release', [App\Http\Controllers\SalesReceiptController::class, 'pendingRelease']);
-    Route::get('new-release-order-info/{orderno}/{storeId}', [App\Http\Controllers\SalesReceiptController::class, 'pendingReleaseOrder2']);
-    Route::get('new-release-order-info/{orderno}', [App\Http\Controllers\SalesReceiptController::class, 'pendingReleaseOrder']);
-
-    Route::apiResource('sales-receipts', App\Http\Controllers\SalesReceiptController::class);
-
-    // Accounting entries routes for sales receipts
-    Route::post('sales-receipts/{id}/generate-accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'generateAccountingEntries']);
-    Route::post('sales-receipts/generate-bulk-accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'generateBulkAccountingEntries']);
-    Route::get('sales-receipts/{id}/accounting-entries', [App\Http\Controllers\SalesReceiptController::class, 'getAccountingEntries']);
-
-    Route::apiResource('credit-limits', App\Http\Controllers\CreditLimitController::class);
-
-    Route::apiResource('payment-receiveds', App\Http\Controllers\PaymentReceivedController::class);
-
-    Route::apiResource('payment-vouchers', App\Http\Controllers\PaymentVoucherController::class);
-
-    Route::apiResource('vendor-credits', App\Http\Controllers\VendorCreditController::class);
-
-    Route::apiResource('purchase-received-details', App\Http\Controllers\PurchaseReceivedDetailController::class);
-
-    // Route::apiResource('new-purchase-orders', App\Http\Controllers\NewPurchaseOrderController::class);
-
-    Route::apiResource('users', App\Http\Controllers\UsersController::class);
-
-    Route::apiResource('new-purchase-receiveds', App\Http\Controllers\NewPurchaseReceivedController::class);
-
-    Route::apiResource('payment-voucher-details', App\Http\Controllers\PaymentVoucherDetailController::class);
-
-    Route::apiResource('new-payments', App\Http\Controllers\NewPaymentController::class);
-
-    Route::apiResource('purchase-order-details', App\Http\Controllers\PurchaseOrderDetailController::class);
-
-
-    Route::apiResource('refund-types', App\Http\Controllers\RefundTypeController::class);
-
-    Route::apiResource('sales-type', App\Http\Controllers\SalesTypeController::class);
-    Route::apiResource('store-types', App\Http\Controllers\StoreTypeController::class);
-
-    Route::apiResource('stores', App\Http\Controllers\StoreController::class);
-    Route::get('my-stores/{branchid}', [App\Http\Controllers\StoreController::class, 'mystore2']);
-    Route::get('my-stores', [App\Http\Controllers\StoreController::class, 'mystore']);
-    Route::get('my-stores-with-items', [App\Http\Controllers\StoreController::class, 'mystorewithItems']);
-
-    Route::apiResource('accounts', App\Http\Controllers\AccountController::class);
-    Route::apiResource('account-groups', App\Http\Controllers\AccountGroupController::class);
-
-    Route::apiResource('account-subtypes', App\Http\Controllers\AccountSubtypeController::class);
-    Route::apiResource('account-types', App\Http\Controllers\AccountTypeController::class);
-    Route::apiResource('charts', App\Http\Controllers\ChartController::class);
-    Route::apiResource('chart-cards', App\Http\Controllers\ChartCardController::class);
-    Route::apiResource('chart-categories', App\Http\Controllers\ChartCategoryController::class);
-    Route::apiResource('chart-providers', App\Http\Controllers\ChartProviderController::class);
-    Route::apiResource('chart-types', App\Http\Controllers\ChartTypeController::class);
-    Route::apiResource('dashboard-settings', App\Http\Controllers\DashboardSettingController::class);
-    Route::apiResource('journal-types', App\Http\Controllers\JournalTypeController::class);
-    Route::apiResource('journal-entries', App\Http\Controllers\JournalEntryController::class);
-    Route::get('journal-entry/pending', [App\Http\Controllers\JournalEntryController::class, 'pending']);
-
-    Route::apiResource('journal-entry-details', App\Http\Controllers\JournalEntryDetailController::class);
-
-    Route::apiResource('transactions', App\Http\Controllers\TransactionController::class);
-
-    Route::apiResource('account-opening-balances', App\Http\Controllers\AccountOpeningBalanceController::class);
-
-    Route::apiResource('period-accounts', App\Http\Controllers\PeriodAccountController::class);
-
-    Route::apiResource('period-account-years', App\Http\Controllers\PeriodAccountYearController::class);
-
-    Route::apiResource('period-account-dailies', App\Http\Controllers\PeriodAccountDailyController::class);
-
-    Route::apiResource('financial-years', App\Http\Controllers\FinancialYearController::class);
-
-    Route::apiResource('financial-quarters', App\Http\Controllers\FinancialQuarterController::class);
-
-    Route::apiResource('financial-periods', App\Http\Controllers\FinancialPeriodController::class);
-
-    Route::apiResource('approval-instances', App\Http\Controllers\ApprovalInstanceController::class);
-
-    Route::apiResource('approval-limits', App\Http\Controllers\ApprovalLimitController::class);
-
-    Route::apiResource('approval-process-flows', App\Http\Controllers\ApprovalProcessFlowController::class);
-
-    Route::apiResource('approval-process-modules', App\Http\Controllers\ApprovalProcessModuleController::class);
-
-    Route::apiResource('approval-process-types', App\Http\Controllers\ApprovalProcessTypeController::class);
-
-    Route::apiResource('approval-stages', App\Http\Controllers\ApprovalStageController::class);
-
-    Route::apiResource('approval-types', App\Http\Controllers\ApprovalTypeController::class);
-
-    // Financial Reporting Routes
-    Route::prefix('financial-reporting')->group(function () {
-        Route::post('profit-and-loss', [App\Http\Controllers\FinancialReportingController::class, 'generateProfitAndLoss']);
-        Route::post('balance-sheet', [App\Http\Controllers\FinancialReportingController::class, 'generateBalanceSheet']);
-        Route::post('trial-balance', [App\Http\Controllers\FinancialReportingController::class, 'generateTrialBalance']);
-        Route::get('trial-balance-summary', [App\Http\Controllers\FinancialReportingController::class, 'getTrialBalanceSummary']);
-        Route::post('comparative-statements', [App\Http\Controllers\FinancialReportingController::class, 'generateComparativeStatements']);
-        Route::get('financial-periods', [App\Http\Controllers\FinancialReportingController::class, 'getFinancialPeriods']);
-        Route::get('account-summary', [App\Http\Controllers\FinancialReportingController::class, 'getAccountSummary']);
-        Route::get('financial-metrics', [App\Http\Controllers\FinancialReportingController::class, 'getFinancialMetrics']);
-    });
-
-    // Periodic Financial Reports Routes
-    Route::prefix('periodic-financial-reports')->group(function () {
-        Route::post('generate', [App\Http\Controllers\PeriodicFinancialReportController::class, 'generateReports']);
-        Route::get('reports', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getReports']);
-        Route::get('reports/{reportId}', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getReport']);
-        Route::put('reports/{reportId}/status', [App\Http\Controllers\PeriodicFinancialReportController::class, 'updateReportStatus']);
-        Route::delete('reports/{reportId}', [App\Http\Controllers\PeriodicFinancialReportController::class, 'deleteReport']);
-        Route::post('generate-for-branch', [App\Http\Controllers\PeriodicFinancialReportController::class, 'generateReportsForBranch']);
-        Route::post('generate-for-region', [App\Http\Controllers\PeriodicFinancialReportController::class, 'generateReportsForRegion']);
-        Route::get('summary', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getReportSummary']);
-        Route::post('archive-old', [App\Http\Controllers\PeriodicFinancialReportController::class, 'archiveOldReports']);
-        Route::get('filter-options', [App\Http\Controllers\PeriodicFinancialReportController::class, 'getFilterOptions']);
-    });
-
-    Route::post('/receipts/search', [SalesOrderController::class, 'searchReceipt'])
-        ->name('sales.receipts.search');
-    Route::post('/returns/process', [SalesOrderController::class, 'processReturn'])
-        ->name('sales.returns.process');
-
-    Route::post('/credit-returns/process', [SalesOrderController::class, 'processCreditReturn'])
-        ->name('credit.returns.process');
-
-    Route::post('/credits/search', [CreditTransactionController::class, 'searchCredit']);
-
-    // Route::get('/sales-report', [SalesOrderController::class, 'salesReport']);
-
-
-
-
-
-    Route::get('/my-store-itemsold', [SalesOrderController::class, 'myStoreItemSold'])
-        ->name('sales.stores');
-
-    // Generate sales report
-    Route::get('/sales-report', [SalesOrderController::class, 'salesReport'])
-        ->name('sales.report');
-
-    // Get products for a specific store
-    Route::get('/store/{storeId}/products', [SalesOrderController::class, 'getStoreProducts'])
-        ->name('sales.store.products');
-
-    // Get sales summary
-    Route::get('/sales-summary', [SalesOrderController::class, 'getSalesSummary'])
-        ->name('sales.summary');
-
-
-    //     Route::get('/product-audits', [ProductAuditController::class, 'index']);
-    // Route::get('/product-audits/action-types', [ProductAuditController::class, 'actionTypes']);
-
-
-    Route::prefix('product-audits')->group(function () {
-        Route::get('/', [ProductAuditController::class, 'index']);
-        Route::get('/action-types', [ProductAuditController::class, 'actionTypes']);
-        Route::get('/stores-with-products', [ProductAuditController::class, 'storesWithProducts']);
-        Route::get('/store-products/{store_id}', [ProductAuditController::class, 'getStoreProducts']);
-    });
-
-    Route::get('/reports/product-availability', [SalesOrderController::class, 'productAvailabilityReport']);
-
-    // Return Item Routes
-    Route::get('returns/{id}/with-receipt', [ReturnItemController::class, 'getReturnWithReceipt']);
-    Route::get('returns/by-receipt/{receiptNumber}', [ReturnItemController::class, 'getByReceiptNumber']);
-
-    // Sales Receipt Routes (if not already there)
-    Route::get('sales-receipts/{id}/with-returns', [SalesReceiptController::class, 'showWithReturns']);
-
-    Route::get('/trial-balance', [TrialBalanceController::class, 'index']);
-    Route::get('/transactions', [TransactionController::class, 'index']);
-    Route::get('/journal-entries', [JournalEntryController::class, 'index']);
-    Route::get('/journal-lines', [JournalLineController::class, 'index']);
-    Route::get('/ledger-posting', [LedgerPostingController::class, 'index']);
-    Route::apiResource('account-types', AccountTypeController::class);
-    Route::apiResource('chart-of-accounts', ChartOfAccountController::class);
-
-    Route::apiResource('receive-orders', App\Http\Controllers\ReceiveOrderController::class);
-    Route::get('pending-receive-orders', [App\Http\Controllers\ReceiveOrderController::class, 'pending']);
-    Route::post('approve-receive-order', [App\Http\Controllers\ReceiveOrderController::class, 'approve']);
-
-    Route::apiResource('receive-items', App\Http\Controllers\ReceiveItemController::class);
-    Route::apiResource('store-transfer-orders', App\Http\Controllers\StoreTransferOrderController::class);
-
-
-    Route::apiResource('ledger-accounts', App\Http\Controllers\LedgerAccountController::class);
-    Route::get('pending-transfer-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'pending']);
-    Route::get('pending-transfer-branch-orders', [App\Http\Controllers\StoreTransferOrderController::class, 'branch_pending']);
-    Route::post('approve-transfer-order', [App\Http\Controllers\StoreTransferOrderController::class, 'approve']);
-
-
-    Route::apiResource('store-transfer-items', App\Http\Controllers\StoreTransferItemController::class);
-    Route::apiResource('credit-transactions', App\Http\Controllers\CreditTransactionController::class);
-    Route::apiResource('price-changes', App\Http\Controllers\PriceChangeController::class);
-    Route::apiResource('change-reasons', App\Http\Controllers\ChangeReasonController::class);
-    Route::get('pending-price-change', [App\Http\Controllers\PriceChangeController::class, 'pending']);
-    Route::post('approve-price-change', [App\Http\Controllers\PriceChangeController::class, 'approve']);
-});
-
-Route::prefix('suppliers')->group(function () {
-    Route::get('/', [SupplierController::class, 'index']);
-    Route::post('/', [SupplierController::class, 'store']);
-
-    // Correct paths
-    // Route::put('/{supplier}', [SupplierController::class, 'update']);
-    Route::get('/{supplier}', [SupplierController::class, 'show']);
-    Route::delete('/{supplier}', [SupplierController::class, 'destroy']);
-
-    // Additional routes
-    Route::post('/bulk-delete', [SupplierController::class, 'bulkDelete']);
-    Route::patch('/{supplier}/status', [SupplierController::class, 'updateStatus']);
-});
-Route::put('/suppliers/{supplier}', [SupplierController::class, 'update']);
-// Synchronization Routes
-Route::prefix('sync')->group(function () {
-    Route::post('/push', [SyncController::class, 'push']);
-    Route::post('/pull', [SyncController::class, 'pull']);
-    Route::post('/pull-for-hub', [SyncController::class, 'pullForHub']); // Endpoint for central hub to pull local changes
-    Route::post('/queue/process', [SyncController::class, 'processQueue']);
-    Route::get('/status', [SyncController::class, 'status']);
-    Route::post('/force', [SyncController::class, 'forceSync']);
-});
-
-
-Route::post('/deploy', [DeployController::class, 'deploy']);
-Route::post('/deploy/rollback', [DeployController::class, 'rollback']);
+Route::apiResource('mortgage-calculations', App\Http\Controllers\MortgageCalculationsController::class);

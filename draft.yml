@@ -1,511 +1,472 @@
 models:
-  ItemCategory:
-    id: uuid primary
-    name: string
 
-  PaymentTerm:
+  User:
     id: uuid primary
-    name: string
-       
-  ItemType:
-     id: uuid primary
-     name: string
-     
-  Unit:
-    id: uuid primary
-    name: string
-    
-
-  Dimension:
-    id: uuid primary
-    name: string
-     
-
-  Weight:
-    id: uuid primary
-    name: string
-    
-
-  ExpenseAccount:
-    id: uuid primary
-    name: string
-    
- 
-  AdjustmentType:
-    id: uuid primary
-    name: string
-  
-
-  Status:
-    id: uuid primary
-    name: string
-   
-
-  CustomerType:
-    id: uuid primary
-    name: string
-   
-  
-  Branch:
-    id: uuid primary
-    name: string
-    address: string
-    contact_person: string
-    email: string
-    phone: string
-    state_id: id foreign:states
-    country_id: id foreign:countries
-   
-
-  Title:
-    id: uuid primary
-    name: string
-   
-
-  Warehouse:
-    id: uuid primary
-    name: string
-    branch_id: id foreign:branches
-    warehouse_address: string
-    zipcode: string
-    contact_person: string
-    email: string
-    phone: string
-   
-  
-  Tax:
-    id: uuid primary
-    name: string
- 
-
-  Discount:
-    id: uuid primary
-    name: string
- 
-
-  PaymentMode:
-    id: uuid primary
-    name: string
- 
-
-  Carrier:
-    id: uuid primary
-    name: string
- 
-
-  PaymentType:
-    id: uuid primary
-    name: string
- 
-
-  Designation:
-    id: uuid primary
-    name: string
- 
-
-  Bank:
-    id: uuid primary
-    name: string
- 
-
-  Manufacturer:
-    id: uuid primary
-    name: string
- 
-
-  VendorType:
-    id: uuid primary
-    name: string
- 
-
-  Reason:
-    id: uuid primary
-    name: string
- 
-
-  Brand:
-    id: uuid primary
-    name: string
- 
-
-  Attribute:
-    id: uuid primary
-    name: string
- 
-
-  Country:
-    id: uuid primary
-    name: string
- 
-
-  State:
-    id: uuid primary
-    name: string
- 
-
-  CreateItem:
-    id: uuid primary
-    name: string
-    item_category_id: id foreign:item_categories
-    item_type_id: id foriegn:item_types
-    description: string
-    batch_number: string
-    unit_id: id foreign:units
-    brand_id: id foreign:brands
-    cost_price: float
-    selling_price: float
-    reorder_level: string
-    dimension_id: id foreign:dimensions
-    weight_id: id foreign:weights
-    branch_id: id foreign:branches
-    warehouse: id foreign:warehouses
-    vendor_id: id foreign:vendors
-    image_url: string
-    barcode: string 
-    
- 
-  Vendor:
-    id: uuid primary
-    name: string
-    address: string
-    contact_title: string
-    contact_designation: string
-    contact_surname: string
-    contact_firstname: string
-    contact_middlename: string
-    contact_fullname: string
-    vendor_type_id: id foreign:vendor_types
-    phone_number: string
-    email: string 
-    image_url: string
-    tin: string 
-    bank_id: id foriegn:banks
-    account_number: string 
-    
-
-  TransferOrder:
-    id: uuid primary
-    transfer_order_number: string
-    transfer_date: timestamp
-    transfer_reason: string
-    source_warehouse_id: id foreign:warehouses
-    destination_warehouse_id: id foreign:warehouses
-    image_url: string 
-    transfer_quantity: string 
-    item_id: id foreign:create_items
-
-  Delivery:
-    id: uuid primary
-    customer_id: id foreign:customers
-    sales_order_number: string
-    delivery_order_number: string
-    delivery_date: timestamp
-    carrier_id: id foreign:carriers
-    notes: string 
-      
-
-  InventoryAdjustment:
-    id: uuid primary
-    item_id: id foreign:create_items
-    adjustment_type_id: id foreign:adjustment_types
-    date: timestamp
-    reason_id: id foreign:reasons
-    branch_id: id foreign:branchs
-    warehouse_id: id foreign:warehouses
-    description: string 
-    item_category_id: id foreign:item_categories
-    cost_price: float
-    selling_price: float
-    quantity: string 
-
-  Invoice:
-    id: uuid primary
-    branch_id: id foriegn:branches
-    warehouse_id: id foreign:warehouses
-    customer_id: id foreign:customerss
-    invoice_number: string
-    order_number: string 
-    invoice_date: timestamp
-    item_id: id foreign:create_items
-    rate: string
-    quantity: string 
-    discount_id: id foreign:discounts
-    tax_id: id foreign:taxes
-    amount: string 
-
-  Sale:
-    id: uuid primary
-    customer_id: id foreign:customerss
-    product_id: id foreign:create_items
-    branch_id: id foreign:branches
-    warehouse_id: id foreign:warehouses
-    quantity: float 
-    price: float 
-    discount_id: id foreign:discounts
-    discount: float
-    sales_order_number: string 
-    total_amount: flaot 
-    amount_paid: float
-    balance_amount: float
-    payment_mode: id foreign:payment_modes
-
-  CreditLimit:
-    id: uuid primary
-    name: string
-      
-
-  CreditSale:
-    id: uuid primary
-    customer_id: id foreign:customerss
-    branch_id: id foreign:branches
-    warehouse_id: id foreign:warehouses
-    product_id: id foreign:create_items
-    credit_limit: id foreign:credit_limits
-    credit_amount: string
-    credit_balance: string
-
-  Customer:
-    id: uuid primary
-    customer_type_id: id foreign:customer_types
-    title_id: id foreign:titles
-    surname: string
+    role_id: uuid foreign:roles
+    agency_id: uuid foreign:agencies nullable
     firstname: string
-    middlename: string
-    phone_number: string
-    fullname: string
+    lastname: string
+    password: string
+    profile_picture: string nullable
+    date_of_birth: date nullable
+    gender: string nullable
+    email: string unique
+    phone: string nullable
+    status: string
+    email_verified: boolean default:false
+    phone_verified: boolean default:false
+    kyc_verified: boolean default:false
+    last_login: timestamp nullable
+    remember_token: string nullable
+    timestamps: {}
 
-  PaymentReceived:
+  Agency:
     id: uuid primary
-    customer_id: id foreign:customers
-    amount_received: string
-    bank_charges: float
-    payment_number: string
-    deposit_bank_id: id foreign:banks
-    payment_mode_id: id foreign:payment_modes
-    invoice_number: string 
+    company_name: string
+    registeration_number: string
+    address: string
+    phone: string
+    email: string
+    status: string
+    website: string nullable
+    license_number: string nullable
+    logo: string nullable
+    description: text nullable
+    subscription_id: uuid foreign:subscriptions nullable
+    timestamps: {}
 
-
-  SalesReceipt:
+  Property:
     id: uuid primary
-    customer_id: id foreign:customers
-    branch_id: id foreign:branches
-    warehouse_id: id foreign:warehouses
-    product_id: id foreign:create_items
-    tax_id: id foreign:taxes
-    payment_mode_id: id foreign:payment_modes
-    discount_id: id foreign:discounts
-    quantity: string
-    rate: string
-    amount: string
-    receipt_date: timestamp
-    customer_note: string
-
-  PaymentVoucher:
-    id: uuid primary
-    product_id: id foreign:create_items
-    expense_date: timestamp
-    amount: string
-    description: string
-    branch_id: id foreign:branches
-    warehouse_id: id foreign:warehouses
-    tax_id: id foreign:taxes
-    vendor_id: id foreign:vendors
-    payment_mode_id: id foreign:payment_modes
-    expense_account_id: id foreign:expense_account_id
-
-  VendorCredit:
-    id: uuid primary
-    vendor_id: id foreign:vendors
-    warehouse_id: id foreign:warehouses
-    credit_number: string
-    purchase_order_number: string
-    vendor_credit_date: date
-
-  PurchaseReceivedDetail:
-    id: uuid primary
-    new_purchased_received_id: id foreign:new_purchase_receiveds
-    item_category_id: id foreign:item_categories
-    item_id: id foreign:create_items
-    unit_price: string
-    quantity: string
-    unit_id: id foreign:units
+    agency_id: uuid foreign:agencies nullable
+    owner_id: uuid foreign:users
+    agent_id: uuid foreign:users nullable
+    property_type_id: uuid foreign:property_types
+    category_id: uuid foreign:property_categories
+    status_id: uuid foreign:property_statuses
+    purpose: string
+    description: text
+    price: float
+    title: string
+    currency: string
+    negotiable: boolean default:false
+    bedrooms: integer nullable
+    bathrooms: integer nullable
+    toilets: integer nullable
+    parking_spaces: integer nullable
+    kitchen: integer nullable
+    living_rooms: integer nullable
+    land_size: float nullable
+    building_size: float nullable
+    year_built: integer nullable
+    floors: integer nullable
+    furnished: boolean default:false
+    serviced: boolean default:false
+    pet_friendly: boolean default:false
+    minimum_rent_period: string nullable
+    available_from: date nullable
+    longitude: float nullable
+    latitude: float nullable
+    country_id: uuid foreign:countries
+    state_id: uuid foreign:states
+    city_id: uuid foreign:cities
+    area_id: uuid foreign:areas nullable
+    street_address: string nullable
+    postal_code: string nullable
+    featured: boolean default:false
+    premium: boolean default:false
+    verified: boolean default:false
+    views: integer default:0
+    likes: integer default:0
+    published_at: timestamp nullable
+    expiry_date: timestamp nullable
+    timestamps: {}
 
   Role:
     id: uuid primary
     name: string
-    description: string 
+    timestamps: {}
 
-  User:
+  Permission:
     id: uuid primary
-    role_id: id foreign:role
-    user_name: string
-    user_email: string
-    password: string
-    status_id: id foreign:statuses
-    branch_id: id foreign:branches
-    warehouse_id: id foreign:warehouses
+    name: string
+    timestamps: {}
 
-  NewPurchaseOrder:
+  PermissionRole:
     id: uuid primary
-    item_category_id: id foreign:item_categories
-    item_id: id foreign:create_items
-    vendor_id: id foreign:vendors
-    branch_id: id foreign:branches
-    payment_mode_id: id foreign:payment_modes
-    purchase_order_number: string
-    purchase_amount: string
-    purchase_date: timestamp
-    expected_delivery_date: date
-    payment_type_id: id foreign:payment_types
+    permission_id: uuid foreign:permissions
+    role_id: uuid foreign:roles
+    timestamps: {}
 
-  NewPurchaseReceived:
+  PropertyType:
     id: uuid primary
-    vendor_id: id foreign:vendors
-    purchase_order_number: string
-    purchase_received_number: string
-    received_date: date
+    name: string
+    timestamps: {}
 
-  NewPayment:
+  PropertyCategory:
     id: uuid primary
-    vendor_id: id foreign:vendors
-    branch_id: id foreign:branches
-    warehouse_id: id foreign:warehouses
-    payment_amount: string
-    payment_mode_id: id foreign:payment_modes
-    description: string 
+    name: string
+    timestamps: {}
 
-  PaymentVoucherDetail:
+  PropertyStatus:
     id: uuid primary
-    Expense_account_id: int
-    amount: string
-    quantity: string
-    item_id: id foreign:create_items
+    name: string
+    timestamps: {}
 
-  PurchaseOrderDetail:
-    item_category_id: id foreign:item_categories
-    purchase_order_id: int
-    item_id: id foreign:create_items
-    unit_price: string
-    quantity: string
-    unit_id: id foreign:units
+  PropertyImage:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    image_url: string
+    is_cover: boolean default:false
+    timestamps: {}
 
+  PropertyVideo:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    video_url: string
+    thumbnail: string nullable
+    timestamps: {}
+
+  PropertyDocument:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    survey_plan_url: string nullable
+    title: string
+    CofO: string nullable
+    floor_plan: string nullable
+    approval_letter: string nullable
+    document_type: string
+    verified: boolean default:false
+    document_url: string
+    timestamps: {}
+
+  Feature:
+    id: uuid primary
+    name: string
+    timestamps: {}
+
+  PropertyFeature:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    feature_id: uuid foreign:features
+    timestamps: {}
+
+  Amenity:
+    id: uuid primary
+    name: string
+    timestamps: {}
+
+  PropertyAmenity:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    amenity_id: uuid foreign:amenities
+    timestamps: {}
+
+  Country:
+    id: uuid primary
+    name: string
+    code: string
+    timestamps: {}
+
+  State:
+    id: uuid primary
+    country_id: uuid foreign:countries
+    name: string
+    timestamps: {}
+
+  City:
+    id: uuid primary
+    state_id: uuid foreign:states
+    name: string
+    timestamps: {}
+
+  Area:
+    id: uuid primary
+    city_id: uuid foreign:cities
+    name: string
+    timestamps: {}
+
+  PropertyEnquiry:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    sender_id: uuid foreign:users
+    receiver_id: uuid foreign:users
+    message: text
+    status: string
+    email: string nullable
+    phone: string nullable
+    timestamps: {}
+
+  PropertyView:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    user_id: uuid foreign:users nullable
+    ip_address: string nullable
+    device: string nullable
+    browser: string nullable
+    country: string nullable
+    viewed_at: timestamp
+    timestamps: {}
+
+  SavedProperty:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    user_id: uuid foreign:users
+    timestamps: {}
+
+  PropertyOffer:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    buyer_id: uuid foreign:users
+    offer_amount: float
+    status: string
+    message: text nullable
+    accepted_at: timestamp nullable
+    rejected_at: timestamp nullable
+    timestamps: {}
+
+  InspectionBooking:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    user_id: uuid foreign:users
+    scheduled_at: timestamp
+    schedule_time: string
+    remarks: text nullable
+    status: string
+    timestamps: {}
+
+  Conversation:
+    id: uuid primary
+    property_id: uuid foreign:properties nullable
+    buyer_id: uuid foreign:users
+    seller_id: uuid foreign:users
+    timestamps: {}
+
+  Message:
+    id: uuid primary
+    conversation_id: uuid foreign:conversations
+    sender_id: uuid foreign:users
+    message: text
+    attachments: string nullable
+    read_at: timestamp nullable
+    timestamps: {}
+
+  SubscriptionPlan:
+    id: uuid primary
+    name: string
+    price: float
+    duration: integer
+    listing_limit: integer
+    featured_limit: integer
+    priority_support: boolean default:false
+    timestamps: {}
+
+  Subscription:
+    id: uuid primary
+    user_id: uuid foreign:users
+    subscription_plan_id: uuid foreign:subscription_plans
+    start_date: date
+    end_date: date
+    payment_id: uuid foreign:payments nullable
+    timestamps: {}
+
+  Payment:
+    id: uuid primary
+    user_id: uuid foreign:users
+    subscription_id: uuid foreign:subscriptions nullable
+    property_id: uuid foreign:properties nullable
+    currency: string
+    gateway: string
+    transaction_reference: string
+    paid_at: timestamp nullable
+    amount: float
+    payment_status: string
+    timestamps: {}
+
+  Review:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    reviewer_id: uuid foreign:users
+    rating: integer
+    comment: text nullable
+    timestamps: {}
+
+  Notification:
+    id: uuid primary
+    user_id: uuid foreign:users
+    title: string
+    message: text
+    notification_type: string
+    read_at: timestamp nullable
+    timestamps: {}
+
+  AdPackage:
+    id: uuid primary
+    name: string
+    price: float
+    duration: integer
+    homepage: boolean default:false
+    category_page: boolean default:false
+    search_page: boolean default:false
+    timestamps: {}
+
+  Advertisement:
+    id: uuid primary
+    user_id: uuid foreign:users
+    ad_package_id: uuid foreign:ad_packages
+    property_id: uuid foreign:properties
+    start_date: date
+    end_date: date
+    status: string
+    timestamps: {}
+
+  BlogPost:
+    id: uuid primary
+    title: string
+    slug: string unique
+    content: text
+    status: string
+    featured_image: string nullable
+    author_id: uuid foreign:users
+    published_at: timestamp nullable
+    timestamps: {}
+
+  Page:
+    id: uuid primary
+    title: string
+    slug: string unique
+    content: text
+    status: string
+    timestamps: {}
+
+  FAQ:
+    id: uuid primary
+    question: string
+    answer: text
+    status: string
+    timestamps: {}
+
+  Setting:
+    id: uuid primary
+    key: string unique
+    value: text nullable
+    timestamps: {}
+
+  AuditLog:
+    id: uuid primary
+    user_id: uuid foreign:users nullable
+    action: string
+    model: string
+    model_id: uuid nullable
+    changes: text nullable
+    old_values: text nullable
+    new_values: text nullable
+    ip_address: string nullable
+    user_agent: string nullable
+    timestamps: {}
+
+  ReportedListing:
+    id: uuid primary
+    property_id: uuid foreign:properties
+    reporter_id: uuid foreign:users
+    reason: text
+    description: text nullable
+    resolved_by: uuid foreign:users nullable
+    resolved_at: timestamp nullable
+    status: string
+    timestamps: {}
+
+  MortgageCalculation:
+    id: uuid primary
+    user_id: uuid foreign:users nullable
+    property_id: uuid foreign:properties nullable
+    loan_amount: float
+    interest_rate: float
+    loan_term: integer
+    monthly_payment: float
+    total_payment: float
+    timestamps: {}
 
 controllers:
-  ItemCategory:
+
+  Users:
     resource: api
-  CreateItem:
-    resource: api
-  Dimension:
+  Agencies:
     resource: api
   Roles:
     resource: api
-  AdjustmentType:
+  Permissions:
     resource: api
-  Weight:
+  PropertyTypes:
     resource: api
-  ItemType:
+  PropertyCategories:
     resource: api
-
-  Status:
+  PropertyStatuses:
     resource: api
-
-  Branch:
+  Properties:
     resource: api
-
-  CustomerType:
+  PropertyImages:
     resource: api
-  Warehouse:
+  PropertyVideos:
     resource: api
-  Unit:
+  PropertyDocuments:
     resource: api
-  PaymentTerm:
+  Features:
     resource: api
-  Discount:
+  PropertyFeatures:
     resource: api
-  Tax:
+  Amenities:
     resource: api
-  Carrier:
+  PropertyAmenities:
     resource: api
-  PaymentMode:
+  Countries:
     resource: api
-  PaymentType:
+  States:
     resource: api
-  Designation:
+  Cities:
     resource: api
-  Manufacturer:
+  Areas:
     resource: api
-  Brand:
+  PropertyEnquiries:
     resource: api
-  Attribute:
+  PropertyViews:
     resource: api
-  Country:
+  SavedProperties:
     resource: api
-  State:
+  PropertyOffers:
     resource: api
-  Bank:
+  InspectionBookings:
     resource: api
-  VendorType:
+  Conversations:
     resource: api
-  Vendor:
+  Messages:
     resource: api
-  TransferOrder:
+  SubscriptionPlans:
     resource: api
-  Delivery:
+  Subscriptions:
     resource: api
-  Sale:
+  Payments:
     resource: api
-  InventoryAdjustment:
+  Reviews:
     resource: api
-  Invoice:
+  Notifications:
     resource: api
-  CreditSale:
+  AdPackages:
     resource: api
-  Customer:
+  Advertisements:
     resource: api
-  SalesReceipt:
+  BlogPosts:
     resource: api
-  CreditLimit:
+  Pages:
     resource: api
-  PaymentReceived:
+  FAQs:
     resource: api
-  PaymentVoucher:
+  Settings:
     resource: api
-  VendorCredit:
+  AuditLogs:
     resource: api
-  PurchaseReceivedDetail:
+  ReportedListings:
     resource: api
-  NewPurchaseOrder:
-    resource: api
-  Users:
-    resource: api
-  NewPurchaseReceived:
-    resource: api
-  PaymentVoucherDetail:
-    resource: api
-  NewPayment:
-    resource: api
-  PurchaseOrderDetail:
+  MortgageCalculations:
     resource: api
 
-seeders: ItemCategory,
-  CreateItem,
-  Dimension,
-  Role,
-  AdjustmentType,
-  Weight,
-  ItemType,
-  Status,
-  Branch,
-  CustomerType,
-  Warehouse,
-  Unit,
-  PaymentTerm,
-  Discount,
-  Tax,
-  Carrier,
-  PaymentMode,
-  PaymentType,
-  Designation,
-  Brand,
-  Attribute,
-  Country, State, Bank, VendorType, CreateItem
+seeders: true

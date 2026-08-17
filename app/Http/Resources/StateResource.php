@@ -14,6 +14,7 @@ class StateResource extends JsonResource
     {
         return [
             'id' => $this->id,
+            'country_id' => $this->country_id,
             'name' => $this->name,
         ];
     }
